@@ -1,6 +1,8 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import AvisoGate from './components/AvisoGate'
 import RotaProtegida from './components/RotaProtegida'
+import BottomNav from './components/BottomNav'
+import { useSessao } from './auth/SessionContext'
 import Boletos from './pages/Boletos'
 import Cadastro from './pages/Cadastro'
 import Consumo from './pages/Consumo'
@@ -12,7 +14,19 @@ import Login from './pages/Login'
 import Sobre from './pages/Sobre'
 import Suporte from './pages/Suporte'
 
+// Telas onde a barra de navegação não aparece: login (ainda sem sessão)
+// e o chat de um chamado (já tem sua própria barra fixa de envio no
+// rodapé, sobreporia as duas).
+function mostrarBottomNav(pathname: string): boolean {
+  if (pathname === '/login') return false
+  if (pathname.startsWith('/suporte/')) return false
+  return true
+}
+
 function App() {
+  const { logado } = useSessao()
+  const location = useLocation()
+
   return (
     <AvisoGate>
       <Routes>
@@ -91,6 +105,8 @@ function App() {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      {logado && mostrarBottomNav(location.pathname) && <BottomNav />}
     </AvisoGate>
   )
 }

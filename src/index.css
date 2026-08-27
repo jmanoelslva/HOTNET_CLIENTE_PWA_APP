@@ -12,3 +12,9 @@ body {
   background: #f5f5f5;
   color: #333333;
 }
+
+/* Reserva espaço pro conteúdo não ficar escondido atrás da barra de
+   navegação fixa no rodapé, quando ela está presente na página. */
+body:has(.bottom-nav) {
+  padding-bottom: 64px;
+}

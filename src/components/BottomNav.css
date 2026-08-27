@@ -1,0 +1,33 @@
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  height: 64px;
+  background: #ffffff;
+  border-top: 1px solid #eeeeee;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #9e9e9e;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.bottom-nav-item.ativo {
+  font-weight: 800;
+}
