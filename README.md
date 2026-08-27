@@ -55,6 +55,9 @@ Sem isso, o login funciona (primeira resposta chega normalmente) mas a
 sessão não se mantém entre requisições, porque o cookie nunca é aceito
 pelo navegador para o domínio `cliente.hotnet.net.br`.
 
+Configuração pronta (Nginx e Apache) e checklist de validação em
+[`deploy/DEPLOY.md`](deploy/DEPLOY.md).
+
 ### Quirk: 401 no próprio `/login`
 
 O endpoint `/login` responde `HTTP 401` com um corpo JSON normal

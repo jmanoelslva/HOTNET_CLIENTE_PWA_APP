@@ -1,0 +1,57 @@
+# Exemplo de vhost Nginx para cliente.hotnet.net.br
+#
+# Serve o build estático do Vite (npm run build -> dist/) e faz o reverse
+# proxy de /api/* para o backend real (hotnet.net.br), reescrevendo o
+# domínio do cookie de sessão — sem isso, o navegador nunca aceita o
+# BRBOSCookie pra um domínio diferente do que respondeu o Set-Cookie
+# (ver README.md, seção "Reverse proxy em produção").
+#
+# Ajuste os caminhos de certificado (ssl_certificate/ssl_certificate_key)
+# e o "root" pro local real onde o conteúdo de dist/ for publicado.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name cliente.hotnet.net.br;
+
+    # Redireciona tudo pra HTTPS.
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name cliente.hotnet.net.br;
+
+    ssl_certificate     /etc/letsencrypt/live/cliente.hotnet.net.br/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cliente.hotnet.net.br/privkey.pem;
+
+    root /var/www/hotnet-web/dist;
+    index index.html;
+
+    # SPA: qualquer rota que não bata em um arquivo real cai no index.html
+    # (o roteamento de fato acontece no react-router-dom, no navegador).
+    location / {
+        try_files $uri /index.html;
+    }
+
+    # Reverse proxy do backend Controllr/BRbyte — mesma lógica do proxy de
+    # desenvolvimento do Vite (vite.config.ts), só que aqui é o Nginx quem
+    # faz esse papel em produção.
+    location /api/ {
+        proxy_pass https://hotnet.net.br/;
+
+        proxy_set_header Host hotnet.net.br;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # OBRIGATÓRIO: reescreve o domínio do Set-Cookie de hotnet.net.br
+        # pra cliente.hotnet.net.br, senão o navegador descarta o cookie
+        # de sessão (BRBOSCookie) por não bater com o domínio da página.
+        proxy_cookie_domain hotnet.net.br cliente.hotnet.net.br;
+
+        # Preserva o path do lado de baixo (o "/api" some da URL real).
+        proxy_ssl_server_name on;
+    }
+}
