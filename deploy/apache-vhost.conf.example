@@ -23,6 +23,14 @@
 
     DocumentRoot /var/www/hotnet-web/dist
 
+    # OBRIGATÓRIO: o pacote apache2 do Debian já vem com um
+    # "Alias /icons/ ..." global (mods-enabled/alias.conf, usado pros
+    # ícones de listagem de diretório) que intercepta /icons/* antes de
+    # chegar na pasta do próprio app — sem isso, os ícones do manifest
+    # do PWA (public/icons/) dão 404 e o navegador nunca oferece "Instalar
+    # app". Este Alias mais específico sobrepõe o padrão do sistema.
+    Alias /icons /var/www/hotnet-web/dist/icons
+
     <Directory /var/www/hotnet-web/dist>
         Options -Indexes
         AllowOverride None

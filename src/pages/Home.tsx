@@ -5,6 +5,7 @@ import {
   MdBadge,
   MdDataUsage,
   MdDescription,
+  MdGetApp,
   MdHelp,
   MdInfoOutline,
   MdLogout,
@@ -19,6 +20,8 @@ import { buscarContratos } from '../api/contratos'
 import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, type ConsumoPorContrato } from '../api/consumo'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import { CORES, comAlpha } from '../utils/cores'
+import { usePwaInstall } from '../hooks/usePwaInstall'
+import { useToast } from '../components/Toast/ToastContext'
 import logoHotnet from '../assets/logo-hotnet.png'
 import './Home.css'
 
@@ -40,6 +43,8 @@ const ITENS_MENU = [
 export default function Home() {
   const { cpf, sair } = useSessao()
   const navigate = useNavigate()
+  const { toast } = useToast()
+  const { podeInstalarNativo, podeInstalarIos, instalar } = usePwaInstall()
   const [nomeExibido, setNomeExibido] = useState('Cliente')
   const [menuAvatarAberto, setMenuAvatarAberto] = useState(false)
 
@@ -104,6 +109,17 @@ export default function Home() {
     }
   }
 
+  async function aoClicarInstalar() {
+    setMenuAvatarAberto(false)
+    if (podeInstalarNativo) {
+      const resultado = await instalar()
+      if (resultado === 'accepted') toast('App instalado!', 'sucesso')
+      return
+    }
+    // iOS Safari não tem prompt nativo de instalação — só o passo manual.
+    toast('Toque no ícone de compartilhar do navegador e escolha "Adicionar à Tela de Início".', 'info')
+  }
+
   const corStatus = online === true ? CORES.sucessoVivo : online === false ? CORES.erro : CORES.textoFraco
 
   return (
@@ -132,6 +148,11 @@ export default function Home() {
             <>
               <div className="home-avatar-menu-fundo" onClick={() => setMenuAvatarAberto(false)} />
               <div className="home-avatar-menu">
+                {(podeInstalarNativo || podeInstalarIos) && (
+                  <button onClick={aoClicarInstalar}>
+                    <MdGetApp size={18} /> Instalar app
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setMenuAvatarAberto(false)
