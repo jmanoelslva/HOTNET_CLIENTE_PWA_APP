@@ -79,10 +79,9 @@ Todas as telas principais implementadas e validadas contra o backend real:
 - **Consumo** — uso diário por contrato/CPE, navegação de mês, sessão de
   conexão ao vivo (IP/MAC/IPv6, duração, download/upload da sessão).
 - **Suporte** — lista de chamados (abas Abertos/Resolvidos), abertura de
-  novo chamado, chat com envio de mensagens e anexos.
+  novo chamado, chat com envio de mensagens, anexos (foto/câmera,
+  galeria ou arquivo) e compartilhamento de localização.
 - **Avisos** — gate obrigatório em tela cheia quando há avisos não
   confirmados (mesmo comportamento do `AvisoActivity` do app Android).
 
-Fora do escopo desta primeira leva (recursos secundários do app Android):
-geolocalização no chat de suporte, captura direta de foto/câmera para
-anexos (o upload via seletor do sistema já funciona).
+Paridade funcional completa com as telas principais do app Android.
