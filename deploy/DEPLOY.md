@@ -82,6 +82,13 @@ caminho padrão do Certbot. Sem HTTPS, o cookie de sessão do Controllr
 - [ ] Testar "Ver boletos em PDF" e "Ver contrato completo" (abrem
       `/api/...` em nova aba) — confirma que o proxy também funciona
       fora das chamadas fetch/XHR.
+- [ ] DevTools → Network → recarregar `/` → clicar na requisição de
+      `sw.js` (ou `/`) e conferir o cabeçalho de resposta `Cache-Control:
+      no-cache` — sem isso, atualizações do app podem ficar escondidas
+      no navegador do cliente por horas/dias até ele limpar os dados
+      manualmente (ver "Aviso de nova versão" no README). Já numa
+      requisição de `/assets/*.js`, o esperado é o oposto: `Cache-
+      Control: public, max-age=31536000, immutable`.
 
 ## Teste temporário via IP puro (sem domínio, sem HTTPS)
 

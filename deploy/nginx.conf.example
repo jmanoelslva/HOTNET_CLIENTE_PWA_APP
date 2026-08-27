@@ -57,6 +57,19 @@ server {
         # de câmera do sistema sem precisar de permissão via API).
         add_header Permissions-Policy "geolocation=(self), camera=(), microphone=(), payment=(), usb=()" always;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+        # NUNCA cachear o que passa por aqui (index.html, sw.js,
+        # workbox-*.js, manifest.webmanifest) — é assim que o navegador
+        # descobre que existe uma versão nova pra instalar: ele só nota
+        # a diferença se buscar esses arquivos de novo na rede. Sem
+        # "Cache-Control" nenhum, a política padrão do navegador podia
+        # manter o sw.js "antigo" guardado por horas/dias, escondendo
+        # atualizações até o cliente limpar os dados manualmente (bug
+        # relatado e confirmado — era exatamente isso). Os arquivos
+        # dentro de /assets/ têm hash no nome (mudam de URL sempre que o
+        # conteúdo muda), então esses sim podem — e devem — cachear por
+        # muito tempo (ver location /assets/ abaixo).
+        add_header Cache-Control "no-cache" always;
     }
 
     # Reverse proxy do backend Controllr/BRbyte — mesma lógica do proxy de
@@ -111,6 +124,15 @@ server {
     # só cai pro backend (named location abaixo) quando não existir.
     location /assets/ {
         try_files $uri @assets_backend;
+
+        # Só quando o arquivo é servido DAQUI (do nosso build) — cai pro
+        # @assets_backend (proxy pro Controllr) antes de gerar resposta
+        # quando o arquivo local não existe, então esse header nunca vai
+        # junto nesse outro caso. Cache por 1 ano vale porque o nome do
+        # arquivo muda sempre que o conteúdo muda (hash no nome, ex:
+        # index-D4VyL3qq.js) — nunca serve um arquivo "errado" do cache
+        # com esse esquema, "immutable" é seguro de verdade aqui.
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
     }
 
     location @assets_backend {

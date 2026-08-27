@@ -138,6 +138,16 @@ build **precisa** fazer o mesmo reverse proxy do Vite:
   `DetalheChamado.tsx`) — o anexo de foto usa `<input type="file"
   capture>`, que abre o app de câmera do sistema sem precisar de
   permissão via API do navegador, então `camera` fica desligado.
+- **`Cache-Control` diferente pra cada tipo de arquivo** — `no-cache` no
+  HTML/`sw.js`/`manifest.webmanifest` (nunca cachear: é assim que o
+  navegador percebe uma versão nova, ver "Aviso de nova versão" acima) e
+  `public, max-age=31536000, immutable` só nos arquivos de `/assets/`
+  com hash no nome (o nome muda sempre que o conteúdo muda, então cache
+  "pra sempre" é seguro ali). Bug real já visto em produção: sem o
+  `no-cache`, o cliente só via uma atualização do app (ex: correção de
+  interface) depois de limpar os dados do navegador manualmente — o
+  próprio `sw.js` ficava preso no cache HTTP comum do navegador, então a
+  checagem de atualização nunca chegava a buscar a versão nova na rede.
 
 Sem a reescrita do cookie especificamente, o login funciona (primeira
 resposta chega normalmente) mas a sessão não se mantém entre
@@ -238,8 +248,23 @@ com um app nativo do que um site comum:
   `injectRegister: false`) em vez do script mínimo auto-injetado, só pra
   ter acesso ao callback `onNeedRefresh` — uma faixa fixa no topo
   (`StatusBanners.tsx`) avisa e só recarrega quando o cliente confirmar.
+  **Depende do servidor não cachear `sw.js`/`index.html`/
+  `manifest.webmanifest`** (`Cache-Control: no-cache`, configurado nos
+  exemplos de deploy — ver "Reverse proxy em produção" abaixo): sem
+  isso, o próprio navegador pode continuar servindo um `sw.js` antigo
+  do cache dele por horas/dias sem nunca buscar o novo na rede, e esse
+  aviso nunca aparece — o cliente só vê a versão nova limpando os dados
+  do app manualmente (bug relatado e confirmado; não é sobre o cache do
+  service worker em si, que já era gerenciado certo, e sim sobre o
+  cache HTTP comum do navegador escondendo o `sw.js` novo da própria
+  checagem de atualização).
 - **Barra de navegação inferior** (`BottomNav`) fixa nas telas
   autenticadas, com atalho colorido pras 5 telas mais usadas.
+- **Confirmação antes de sair** (`ModalConfirmarLogout.tsx`) — os dois
+  atalhos de logout (menu do avatar em Home, botão "Sair" na barra
+  inferior) abrem o mesmo modal de confirmação em vez de encerrar a
+  sessão na hora, pra um toque acidental não derrubar o cliente sem
+  querer.
 - **Toasts** (`ToastProvider`/`useToast`) no lugar de `window.alert()`.
 - **Modais em bottom-sheet** (deslizam de baixo, com alça no topo) em
   vez de aparecer centralizados.

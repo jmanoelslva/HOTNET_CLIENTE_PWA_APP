@@ -25,6 +25,7 @@ import { CORES, comAlpha } from '../utils/cores'
 import { usePwaInstall } from '../hooks/usePwaInstall'
 import { useTema } from '../hooks/useTema'
 import ModalInstalarIos from '../components/ModalInstalarIos'
+import ModalConfirmarLogout from '../components/ModalConfirmarLogout'
 import logoHotnet from '../assets/logo-hotnet.png'
 import './Home.css'
 
@@ -50,6 +51,7 @@ export default function Home() {
   const { tema, alternarTema } = useTema()
   const [nomeExibido, setNomeExibido] = useState('Cliente')
   const [menuAvatarAberto, setMenuAvatarAberto] = useState(false)
+  const [confirmarSairAberto, setConfirmarSairAberto] = useState(false)
 
   const [consumoContratos, setConsumoContratos] = useState<ConsumoPorContrato[]>([])
   const [cpePkSelecionado, setCpePkSelecionado] = useState<number | null>(null)
@@ -162,7 +164,13 @@ export default function Home() {
                 >
                   <MdInfoOutline size={18} /> Sobre
                 </button>
-                <button className="home-avatar-menu-sair" onClick={sair}>
+                <button
+                  className="home-avatar-menu-sair"
+                  onClick={() => {
+                    setMenuAvatarAberto(false)
+                    setConfirmarSairAberto(true)
+                  }}
+                >
                   <MdLogout size={18} /> Sair
                 </button>
               </div>
@@ -239,6 +247,14 @@ export default function Home() {
       </div>
 
       <ModalInstalarIos aberto={modalIosAberto} onFechar={fecharModalIos} />
+      <ModalConfirmarLogout
+        aberto={confirmarSairAberto}
+        onCancelar={() => setConfirmarSairAberto(false)}
+        onConfirmar={() => {
+          setConfirmarSairAberto(false)
+          sair()
+        }}
+      />
     </div>
   )
 }
