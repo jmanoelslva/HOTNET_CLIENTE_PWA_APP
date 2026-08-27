@@ -65,6 +65,7 @@ export default function Suporte() {
   const [aba, setAba] = useState<Aba>('abertos')
 
   const [categorias, setCategorias] = useState<CategoriaDto[]>([])
+  const [checklistAberto, setChecklistAberto] = useState(false)
   const [dialogAberto, setDialogAberto] = useState(false)
   const [categoriaPk, setCategoriaPk] = useState<number | null>(null)
   const [categoriaMenuAberto, setCategoriaMenuAberto] = useState(false)
@@ -207,9 +208,56 @@ export default function Suporte() {
         </button>
       )}
 
-      <button className="suporte-fab" onClick={abrirDialog} aria-label="Novo chamado">
+      <button className="suporte-fab" onClick={() => setChecklistAberto(true)} aria-label="Novo chamado">
         <MdAdd size={28} />
       </button>
+
+      {checklistAberto && (
+        <div className="suporte-modal-fundo" onClick={() => setChecklistAberto(false)}>
+          <div className="suporte-checklist" onClick={(evento) => evento.stopPropagation()}>
+            <MdSupportAgent size={48} color="#f28f3b" className="suporte-checklist-icone" />
+            <h2>Antes de abrir o chamado</h2>
+            <p>Esses passos resolvem boa parte dos problemas rapidinho</p>
+
+            <div className="suporte-checklist-itens">
+              <div className="suporte-checklist-item">
+                <span>🔌</span>
+                <div>
+                  <strong>Já reiniciou o roteador?</strong>
+                  <p>Desligue por 10 segundos e ligue de novo</p>
+                </div>
+              </div>
+              <div className="suporte-checklist-item">
+                <span>🔗</span>
+                <div>
+                  <strong>Os cabos estão bem conectados?</strong>
+                  <p>Confira se nenhum fio está solto</p>
+                </div>
+              </div>
+              <div className="suporte-checklist-item">
+                <span>📱</span>
+                <div>
+                  <strong>Testou em outro aparelho?</strong>
+                  <p>Ajuda a saber se é só um aparelho ou a rede toda</p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              className="suporte-btn-primario suporte-checklist-continua"
+              onClick={() => {
+                setChecklistAberto(false)
+                abrirDialog()
+              }}
+            >
+              Continua sem funcionar
+            </button>
+            <button className="suporte-checklist-resolvido" onClick={() => setChecklistAberto(false)}>
+              Resolvido, obrigado
+            </button>
+          </div>
+        </div>
+      )}
 
       {dialogAberto && (
         <div className="suporte-modal-fundo" onClick={() => setDialogAberto(false)}>

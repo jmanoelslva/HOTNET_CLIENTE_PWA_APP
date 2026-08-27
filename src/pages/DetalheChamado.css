@@ -12,21 +12,8 @@
   background: #ffffff;
 }
 
-.detalhe-voltar {
-  border: none;
-  background: transparent;
-  color: #f28f3b;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .detalhe-resumo {
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 .detalhe-resumo-topo {

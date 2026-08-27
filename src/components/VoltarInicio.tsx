@@ -2,12 +2,17 @@ import { Link } from 'react-router-dom'
 import { MdArrowBack } from 'react-icons/md'
 import './VoltarInicio.css'
 
-/** Link de volta pro painel principal — usado no topo das telas internas. */
-export default function VoltarInicio() {
+interface Props {
+  to?: string
+  label?: string
+}
+
+/** Link de volta — usado no topo das telas internas (padrão: pro painel principal). */
+export default function VoltarInicio({ to = '/', label = 'Início' }: Props) {
   return (
-    <Link to="/" className="voltar-inicio">
+    <Link to={to} className="voltar-inicio">
       <MdArrowBack size={16} />
-      Início
+      {label}
     </Link>
   )
 }

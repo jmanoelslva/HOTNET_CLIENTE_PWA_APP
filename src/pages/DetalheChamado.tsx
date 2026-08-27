@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { MdArrowBack, MdAttachFile, MdCameraAlt, MdDescription, MdImage, MdLocationOn } from 'react-icons/md'
+import { useLocation, useParams } from 'react-router-dom'
+import { MdAttachFile, MdCameraAlt, MdDescription, MdImage, MdLocationOn } from 'react-icons/md'
+import VoltarInicio from '../components/VoltarInicio'
 import {
   buscarOperacoes,
   chamadoResolvido,
@@ -30,7 +31,6 @@ function formatarDataHora(data: string | null): string {
 export default function DetalheChamado() {
   const { ticketPk } = useParams<{ ticketPk: string }>()
   const pk = Number(ticketPk)
-  const navigate = useNavigate()
   const location = useLocation()
   const { toast } = useToast()
   const chamado = (location.state as { chamado?: TicketDto } | null)?.chamado ?? null
@@ -133,9 +133,7 @@ export default function DetalheChamado() {
   return (
     <div className="detalhe-tela">
       <header className="detalhe-cabecalho">
-        <button className="detalhe-voltar" onClick={() => navigate('/suporte')}>
-          <MdArrowBack size={16} /> Voltar
-        </button>
+        <VoltarInicio to="/suporte" label="Chamados" />
         {chamado && (
           <div className="detalhe-resumo">
             <div className="detalhe-resumo-topo">
