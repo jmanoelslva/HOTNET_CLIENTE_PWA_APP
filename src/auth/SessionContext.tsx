@@ -1,12 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import { buscarCadastroInfo, login as apiLogin, logout as apiLogout } from '../api/client'
-import { useToast } from '../components/Toast/ToastContext'
-
-// O Controllr encerra o token de sessão sozinho depois de 10min sem uso
-// (documentado no backend). Deslogamos no cliente bem antes disso — 2min
-// sem interação nenhuma — pra não deixar uma sessão web aberta e "morta"
-// exposta num dispositivo compartilhado/esquecido.
-const LIMITE_INATIVIDADE_MS = 2 * 60 * 1000
 
 interface SessionState {
   logado: boolean
@@ -90,41 +83,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setCpf(null)
     }
   }, [])
-
-  const { toast } = useToast()
-
-  // Desloga sozinho depois de LIMITE_INATIVIDADE_MS sem nenhuma interação
-  // (mouse/teclado/toque/scroll) — cobre tanto ficar ocioso com a aba
-  // aberta quanto trocar de aba/app e esquecer, já que nenhum desses
-  // eventos dispara enquanto a aba está em segundo plano. Confere por
-  // timestamp (em vez de só um setTimeout) pra não errar quando o
-  // navegador suspende timers de aba em background e o aparelho volta
-  // do fundo direto pro "verificarInatividade" do visibilitychange.
-  useEffect(() => {
-    if (!logado) return
-
-    let ultimaAtividade = Date.now()
-    const registrarAtividade = () => {
-      ultimaAtividade = Date.now()
-    }
-    const verificarInatividade = () => {
-      if (Date.now() - ultimaAtividade >= LIMITE_INATIVIDADE_MS) {
-        toast('Sua sessão foi encerrada por inatividade. Faça login novamente.', 'info')
-        sair()
-      }
-    }
-
-    const eventosAtividade = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart']
-    eventosAtividade.forEach((evento) => window.addEventListener(evento, registrarAtividade))
-    document.addEventListener('visibilitychange', verificarInatividade)
-    const intervalo = setInterval(verificarInatividade, 15_000)
-
-    return () => {
-      eventosAtividade.forEach((evento) => window.removeEventListener(evento, registrarAtividade))
-      document.removeEventListener('visibilitychange', verificarInatividade)
-      clearInterval(intervalo)
-    }
-  }, [logado, sair, toast])
 
   return (
     <SessionContext.Provider value={{ logado, verificando, carregando, erro, cpf, entrar, sair }}>

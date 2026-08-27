@@ -63,11 +63,10 @@ caso. Mantém tudo na mesma origem do ponto de vista do navegador, sem CORS.
   ainda vale antes de mandar pro login, então recarregar a página não
   desloga o cliente à toa. Enquanto essa checagem roda (`verificando`),
   `RotaProtegida` mostra um spinner em vez de já redirecionar.
-- **Logout automático por inatividade** — 2 minutos sem nenhuma
-  interação (mouse/teclado/toque/scroll), bem abaixo do lease de 10min
-  que o Controllr já dá ao token — margem de segurança pra não deixar
-  sessão web aberta num aparelho esquecido/compartilhado. Ver
-  `LIMITE_INATIVIDADE_MS` em `src/auth/SessionContext.tsx`.
+- **Expiração por inatividade** — sem lógica própria no cliente; quem
+  encerra é o backend, pelo lease de 10min que o Controllr já dá ao
+  token. O front só reage ao 401 resultante (ver "Quirk: 401 no
+  próprio `/login`" abaixo).
 
 ### Reverse proxy em produção (obrigatório)
 
