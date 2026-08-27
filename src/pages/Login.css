@@ -16,14 +16,11 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-.login-card h1 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #f28f3b, #d94a38);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+.login-logo {
+  display: block;
+  height: 56px;
+  width: auto;
+  margin: 0 0 4px;
 }
 
 .login-subtitulo {

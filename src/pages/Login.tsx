@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSessao } from '../auth/SessionContext'
+import logoHotnet from '../assets/logo-hotnet.png'
 import './Login.css'
 
 export default function Login() {
@@ -18,7 +19,7 @@ export default function Login() {
   return (
     <div className="login-tela">
       <div className="login-card">
-        <h1>HOTNET</h1>
+        <img src={logoHotnet} alt="HOTNET" className="login-logo" />
         <p className="login-subtitulo">Acesse com seu CPF ou CNPJ</p>
 
         <form onSubmit={aoEnviar}>
