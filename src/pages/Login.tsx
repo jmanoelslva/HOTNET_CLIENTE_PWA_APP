@@ -9,6 +9,7 @@ import './Login.css'
 export default function Login() {
   const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
+  const [mostrarSenha, setMostrarSenha] = useState(false)
   const [ajudaAberta, setAjudaAberta] = useState(false)
   const { entrar, carregando, erro } = useSessao()
   const navigate = useNavigate()
@@ -27,7 +28,9 @@ export default function Login() {
         <img src={logoHotnet} alt="HOTNET" className="login-logo" />
 
         <form onSubmit={aoEnviar}>
-          <label htmlFor="usuario">CPF ou CNPJ</label>
+          <label htmlFor="usuario">
+            <span className="login-label-icone">👤</span> CPF ou CNPJ
+          </label>
           <input
             id="usuario"
             type="text"
@@ -38,24 +41,36 @@ export default function Login() {
             required
           />
 
-          <label htmlFor="senha">Senha</label>
-          <input
-            id="senha"
-            type="password"
-            value={senha}
-            onChange={(evento) => setSenha(evento.target.value)}
-            required
-          />
+          <label htmlFor="senha">
+            <span className="login-label-icone">🔒</span> Senha
+          </label>
+          <div className="login-campo-senha">
+            <input
+              id="senha"
+              type={mostrarSenha ? 'text' : 'password'}
+              value={senha}
+              onChange={(evento) => setSenha(evento.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="login-toggle-senha"
+              onClick={() => setMostrarSenha((v) => !v)}
+              aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+            >
+              {mostrarSenha ? '🙈' : '👁️'}
+            </button>
+          </div>
 
           {erro && <p className="login-erro">{erro}</p>}
 
-          <button type="submit" disabled={carregando}>
+          <button type="submit" className="login-btn-entrar" disabled={carregando}>
             {carregando ? 'Entrando…' : 'Entrar'}
           </button>
         </form>
 
         <button type="button" className="login-nao-consigo" onClick={() => setAjudaAberta(true)}>
-          Não consigo entrar?
+          🆘 Não consigo entrar?
         </button>
       </div>
 

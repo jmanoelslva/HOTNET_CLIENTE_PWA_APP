@@ -35,15 +35,23 @@
 }
 
 .login-card label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 13px;
   font-weight: 700;
   color: #333333;
   margin-top: 12px;
 }
 
+.login-label-icone {
+  font-size: 14px;
+}
+
 .login-card input {
   margin-top: 6px;
   height: 48px;
+  width: 100%;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 0 16px;
@@ -57,6 +65,26 @@
   border-color: #f28f3b;
 }
 
+.login-campo-senha {
+  position: relative;
+}
+
+.login-campo-senha input {
+  padding-right: 44px;
+}
+
+.login-toggle-senha {
+  position: absolute;
+  top: 6px;
+  right: 0;
+  height: 48px;
+  width: 44px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+}
+
 .login-erro {
   margin-top: 12px;
   color: #d94a38;
@@ -64,7 +92,7 @@
   font-weight: 600;
 }
 
-.login-card form button {
+.login-btn-entrar {
   margin-top: 24px;
   height: 52px;
   border: none;
@@ -76,7 +104,7 @@
   background: linear-gradient(135deg, #f28f3b, #d94a38);
 }
 
-.login-card form button:disabled {
+.login-btn-entrar:disabled {
   opacity: 0.7;
   cursor: default;
 }
