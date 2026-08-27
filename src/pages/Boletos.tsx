@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { MdCheckCircle, MdFileDownload, MdPayments, MdQrCode2, MdQrCodeScanner } from 'react-icons/md'
+import { MdCheckCircle, MdFileDownload, MdPayments, MdQrCodeScanner } from 'react-icons/md'
 import { FaBarcode } from 'react-icons/fa'
+import { SiPix } from 'react-icons/si'
 import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
 import {
@@ -284,7 +285,7 @@ export default function Boletos() {
                       style={{ background: '#00a8841a', color: '#00a884' }}
                       onClick={() => aoCopiar(`pix-${fatura.invoice_pk}`, fatura.invoice_qrcode)}
                     >
-                      <MdQrCode2 />
+                      <SiPix />
                       {copiado === `pix-${fatura.invoice_pk}` ? '✓ Código PIX Copiado!' : 'Pagar com PIX'}
                     </button>
                     {fatura.invoice_qrcode_image && (

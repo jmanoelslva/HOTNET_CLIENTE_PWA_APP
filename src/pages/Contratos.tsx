@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MdDescription } from 'react-icons/md'
+import { MdDescription, MdFileDownload, MdPayments } from 'react-icons/md'
 import { urlImpressaoContrato } from '../api/client'
 import { buscarContratos, type Contrato } from '../api/contratos'
 import VoltarInicio from '../components/VoltarInicio'
@@ -125,11 +125,17 @@ export default function Contratos() {
                 )}
 
                 <div className="contrato-acoes">
-                  <button onClick={() => navigate('/boletos', { state: { contratoPk: contrato.id } })}>
-                    Meus boletos
+                  <button
+                    style={{ background: '#d94a381a', color: '#d94a38' }}
+                    onClick={() => navigate('/boletos', { state: { contratoPk: contrato.id } })}
+                  >
+                    <MdPayments /> Meus boletos
                   </button>
-                  <button onClick={() => window.open(urlImpressaoContrato(contrato.id), '_blank')}>
-                    Ver contrato completo
+                  <button
+                    style={{ background: '#f28f3b1a', color: '#f28f3b' }}
+                    onClick={() => window.open(urlImpressaoContrato(contrato.id), '_blank')}
+                  >
+                    <MdFileDownload /> Ver contrato completo
                   </button>
                 </div>
               </li>
