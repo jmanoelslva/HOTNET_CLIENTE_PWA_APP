@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState, useSyncExternalStore } from 'react'
 import { useToast } from '../components/Toast/ToastContext'
 
 /**
@@ -30,28 +30,50 @@ function jaInstalado(): boolean {
   )
 }
 
+/**
+ * O "posso instalar via prompt nativo?" mora em módulo, não em useState
+ * de usePwaInstall — `beforeinstallprompt` só dispara UMA VEZ por
+ * carregamento de página inteiro, não a cada navegação da SPA. Preso a
+ * estado local do hook, sair e voltar pro Login (ou qualquer
+ * desmontar/remontar de quem chama o hook) criava uma instância nova
+ * com o evento zerado — e o navegador não dispara de novo só porque um
+ * listener novo apareceu, então o botão "Instalar app" sumia pra
+ * sempre até recarregar a página inteira, mesmo a instalação
+ * continuando disponível de verdade (bug confirmado na prática).
+ * useSyncExternalStore mantém todo componente que usa o hook em
+ * sincronia com esse estado compartilhado.
+ */
+let eventoCapturado: EventoInstalarPwa | null = null
+let instaladoCompartilhado = typeof window === 'undefined' ? false : jaInstalado()
+const ouvintesMudanca = new Set<() => void>()
+
+function notificarMudanca() {
+  ouvintesMudanca.forEach((ouvir) => ouvir())
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault()
+    eventoCapturado = e as EventoInstalarPwa
+    notificarMudanca()
+  })
+  window.addEventListener('appinstalled', () => {
+    instaladoCompartilhado = true
+    eventoCapturado = null
+    notificarMudanca()
+  })
+}
+
+function inscrever(ouvir: () => void): () => void {
+  ouvintesMudanca.add(ouvir)
+  return () => ouvintesMudanca.delete(ouvir)
+}
+
 export function usePwaInstall() {
-  const [evento, setEvento] = useState<EventoInstalarPwa | null>(null)
-  const [instalado, setInstalado] = useState(jaInstalado())
+  const evento = useSyncExternalStore(inscrever, () => eventoCapturado)
+  const instalado = useSyncExternalStore(inscrever, () => instaladoCompartilhado)
   const [modalIosAberto, setModalIosAberto] = useState(false)
   const { toast } = useToast()
-
-  useEffect(() => {
-    function aoFicarInstalavel(e: Event) {
-      e.preventDefault()
-      setEvento(e as EventoInstalarPwa)
-    }
-    function aoInstalar() {
-      setInstalado(true)
-      setEvento(null)
-    }
-    window.addEventListener('beforeinstallprompt', aoFicarInstalavel)
-    window.addEventListener('appinstalled', aoInstalar)
-    return () => {
-      window.removeEventListener('beforeinstallprompt', aoFicarInstalavel)
-      window.removeEventListener('appinstalled', aoInstalar)
-    }
-  }, [])
 
   const podeInstalarNativo = evento != null && !instalado
   const podeInstalarIos = ehIos() && !instalado
@@ -60,12 +82,13 @@ export function usePwaInstall() {
   const podeInstalar = podeInstalarNativo || podeInstalarIos
 
   const instalar = useCallback(async (): Promise<'accepted' | 'dismissed' | 'indisponivel'> => {
-    if (!evento) return 'indisponivel'
-    await evento.prompt()
-    const escolha = await evento.userChoice
-    setEvento(null)
+    if (!eventoCapturado) return 'indisponivel'
+    await eventoCapturado.prompt()
+    const escolha = await eventoCapturado.userChoice
+    eventoCapturado = null
+    notificarMudanca()
     return escolha.outcome
-  }, [evento])
+  }, [])
 
   // Handler único pro botão "Instalar app", reaproveitado no menu do
   // avatar (Home) e na tela de Login — prompt nativo quando o navegador

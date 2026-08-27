@@ -205,6 +205,16 @@ com um app nativo do que um site comum:
     sozinha em poucos segundos — e avisa que só funciona pelo Safari:
     abrir o link num navegador in-app (WhatsApp, Instagram) ou no
     Chrome para iOS não oferece essa opção no compartilhamento.
+  - **O evento `beforeinstallprompt` capturado vive em módulo, não em
+    `useState` do hook** — ele só dispara UMA VEZ por carregamento de
+    página inteiro, nunca de novo só por causa de uma navegação da SPA.
+    Se ficasse em estado local, deslogar e voltar pro Login (ou
+    qualquer desmontar/remontar de quem chama `usePwaInstall`) criava
+    uma instância nova com o evento zerado, e o botão "Instalar app"
+    sumia pra sempre até recarregar a página inteira — mesmo a
+    instalação continuando disponível de verdade (bug confirmado e
+    corrigido). `useSyncExternalStore` mantém todo componente que usa o
+    hook sincronizado com esse estado compartilhado.
 - **Aviso de nova versão** — `registerType: 'autoUpdate'` (vite.config.ts)
   ativa o service worker novo sozinho em segundo plano, mas isso não
   troca os módulos JS já carregados numa aba que já estava aberta. O
