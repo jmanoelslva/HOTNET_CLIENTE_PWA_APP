@@ -75,6 +75,18 @@ async function gerarPdf(url: string, titulo: string): Promise<File> {
     const corpo = documento?.body
     if (!corpo) throw new Error('Não foi possível acessar o conteúdo da página de impressão.')
 
+    // Se a sessão não estiver mais válida quando o iframe carrega (ex:
+    // expirou por inatividade durante a navegação), o Controllr manda
+    // pra tela de login em vez do boleto — sem isso dar erro nenhum, o
+    // html2canvas capturaria o formulário de login (bem menor que a
+    // página inteira) igual se fosse a página certa: um PDF "cortado",
+    // com cara de foto de uma tela pequena perdida numa folha A4 (já
+    // confirmado acontecer na prática). Um campo de senha é o sinal mais
+    // simples e confiável de "isto é uma tela de login".
+    if (corpo.querySelector('input[type="password"]')) {
+      throw new Error('A página de impressão redirecionou pro login (sessão expirada).')
+    }
+
     // O evento "load" do iframe já espera o HTML e as imagens "normais"
     // carregarem, mas dá uma folga extra pra qualquer coisa mais lenta
     // (fonte web, imagem carregada via JS) antes de tirar o "print".
