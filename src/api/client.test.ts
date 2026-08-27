@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, SessaoExpiradaError, post } from './client'
+import { ApiError, SessaoExpiradaError, aoExpirarSessao, post } from './client'
 
 function mockFetchUmaVez(resposta: { status: number; ok: boolean; json: unknown }) {
   vi.stubGlobal(
@@ -14,6 +14,7 @@ function mockFetchUmaVez(resposta: { status: number; ok: boolean; json: unknown 
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  aoExpirarSessao(null)
 })
 
 // Mesmo quirk do SessionExpiredInterceptor do app Android (ver client.ts):
@@ -48,5 +49,35 @@ describe('post — tratamento de 401 e "Login Failure"', () => {
     mockFetchUmaVez({ status: 200, ok: true, json: { success: true, results: [] } })
     const resultado = await post('invoice_ctl/invoice/list', {})
     expect(resultado).toEqual({ success: true, results: [] })
+  })
+})
+
+// Ouvinte global registrado por SessionContext.tsx — é o que substituiu o
+// antigo logout automático de 2min por inatividade: qualquer 401 real
+// (sessão expirada pelo lease do Controllr) agora avisa o app inteiro,
+// não só a tela que fez a chamada.
+describe('post — ouvinte global de sessão expirada (aoExpirarSessao)', () => {
+  it('é chamado quando um 401 "de verdade" acontece', async () => {
+    const ouvinte = vi.fn()
+    aoExpirarSessao(ouvinte)
+    mockFetchUmaVez({ status: 401, ok: false, json: { success: false } })
+    await expect(post('invoice_ctl/invoice/list', {})).rejects.toBeInstanceOf(SessaoExpiradaError)
+    expect(ouvinte).toHaveBeenCalledTimes(1)
+  })
+
+  it('NÃO é chamado num 401 em /login (senha errada, não sessão expirada)', async () => {
+    const ouvinte = vi.fn()
+    aoExpirarSessao(ouvinte)
+    mockFetchUmaVez({ status: 401, ok: false, json: { success: false, message: 'Authentication failed' } })
+    await post('login', { username: '1', password: '2' })
+    expect(ouvinte).not.toHaveBeenCalled()
+  })
+
+  it('NÃO é chamado num 401 em session/logout (evita loop: expirou → desloga → logout 401 → "expirou" de novo)', async () => {
+    const ouvinte = vi.fn()
+    aoExpirarSessao(ouvinte)
+    mockFetchUmaVez({ status: 401, ok: false, json: { success: false } })
+    await expect(post('session/logout', {})).rejects.toBeInstanceOf(SessaoExpiradaError)
+    expect(ouvinte).not.toHaveBeenCalled()
   })
 })

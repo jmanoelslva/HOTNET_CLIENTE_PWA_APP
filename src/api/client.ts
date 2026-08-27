@@ -27,6 +27,21 @@ export class ApiError extends Error {
 }
 
 /**
+ * Aviso de sessão expirada pro resto do app — este módulo é código comum
+ * (fora de componente React), não dá pra chamar useSessao()/useToast()
+ * diretamente daqui. `SessionProvider` (SessionContext.tsx) se registra
+ * como ouvinte ao montar, e é quem realmente desloga (sair()) e mostra o
+ * toast — sem isso, um 401 por sessão expirada em qualquer tela (exceto
+ * Boletos, que trata local) passava batido: nada tirava o cliente da tela
+ * protegida nem avisava, ele só via os dados pararem de carregar.
+ */
+let ouvinteSessaoExpirada: (() => void) | null = null
+
+export function aoExpirarSessao(ouvinte: (() => void) | null): void {
+  ouvinteSessaoExpirada = ouvinte
+}
+
+/**
  * POST com corpo application/x-www-form-urlencoded — é o formato que
  * TODOS os endpoints do Controllr esperam (confirmado no app Android).
  * Sempre manda cookies (credentials: 'include'), já que a sessão é
@@ -51,11 +66,17 @@ async function post<T>(path: string, campos: Record<string, string | number | un
   // {"success": false, "message": "Login Failure"/"Authentication failed..."}),
   // mas ali é só uma falha de login normal, não uma sessão que caiu.
   const ehLogin = path === 'login'
+  // session/logout também fica de fora: se a sessão já caiu no servidor,
+  // o próprio logout (chamado pelo ouvinte de sessão expirada, ver acima)
+  // bate 401 de novo — sem essa exceção, isso reacionaria o ouvinte e
+  // entraria num loop (expirou → desloga → logout 401 → "expirou" de novo).
+  const ehLogout = path === 'session/logout'
 
   const json = (await response.json()) as { success?: boolean; message?: string }
 
   if (!ehLogin) {
     if (response.status === 401 || (json.success === false && /login failure|unauthorized/i.test(json.message ?? ''))) {
+      if (!ehLogout) ouvinteSessaoExpirada?.()
       throw new SessaoExpiradaError()
     }
     if (!response.ok) {
@@ -518,6 +539,7 @@ export async function enviarAnexoChamado(ticketPk: number, arquivo: File): Promi
   })
 
   if (response.status === 401) {
+    ouvinteSessaoExpirada?.()
     throw new SessaoExpiradaError()
   }
 

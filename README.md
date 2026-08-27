@@ -65,10 +65,19 @@ caso. Mantém tudo na mesma origem do ponto de vista do navegador, sem CORS.
   ainda vale antes de mandar pro login, então recarregar a página não
   desloga o cliente à toa. Enquanto essa checagem roda (`verificando`),
   `RotaProtegida` mostra um spinner em vez de já redirecionar.
-- **Expiração por inatividade** — sem lógica própria no cliente; quem
-  encerra é o backend, pelo lease de 10min que o Controllr já dá ao
-  token. O front só reage ao 401 resultante (ver "Quirk: 401 no
-  próprio `/login`" abaixo).
+- **Expiração por inatividade** — sem lógica própria no cliente (nada de
+  timer contando 2min sem interação); quem encerra é o backend, pelo
+  lease de 10min que o Controllr já dá ao token.
+- **Aviso de sessão expirada** — quando esse 401 acontece (ver "Quirk:
+  401 no próprio `/login`" abaixo), `src/api/client.ts` chama um ouvinte
+  global (`aoExpirarSessao`) que `SessionContext` registra ao montar: um
+  toast ("Sua sessão expirou. Faça login novamente.") e `sair()`, que por
+  sua vez tira o cliente de qualquer tela protegida (`RotaProtegida`
+  reage a `logado` virar `false`). Sem esse ouvinte, um 401 numa tela
+  qualquer (ex: Consumo, Suporte) simplesmente parava de carregar sem
+  avisar nada — só a tela de Boletos tratava isso localmente. `login` e
+  `session/logout` ficam de fora do ouvinte (ver comentário em
+  `client.ts` — evita loop quando o próprio logout bate 401 de novo).
 
 ### Reverse proxy em produção (obrigatório)
 
