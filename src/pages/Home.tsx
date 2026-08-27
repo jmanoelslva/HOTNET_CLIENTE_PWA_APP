@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente } from '../api/cadastro'
 import { buscarContratos } from '../api/contratos'
@@ -25,6 +25,7 @@ const ITENS_MENU = [
 
 export default function Home() {
   const { cpf, sair } = useSessao()
+  const navigate = useNavigate()
   const [nomeExibido, setNomeExibido] = useState('Cliente')
   const [menuAvatarAberto, setMenuAvatarAberto] = useState(false)
 
@@ -111,7 +112,17 @@ export default function Home() {
             <>
               <div className="home-avatar-menu-fundo" onClick={() => setMenuAvatarAberto(false)} />
               <div className="home-avatar-menu">
-                <button onClick={sair}>Sair</button>
+                <button
+                  onClick={() => {
+                    setMenuAvatarAberto(false)
+                    navigate('/sobre')
+                  }}
+                >
+                  Sobre
+                </button>
+                <button className="home-avatar-menu-sair" onClick={sair}>
+                  Sair
+                </button>
               </div>
             </>
           )}
@@ -125,20 +136,34 @@ export default function Home() {
             <span
               className="home-indicador"
               style={{ background: online === true ? '#20b957' : online === false ? '#f44336' : '#9e9e9e' }}
-            />
-            <span className="home-plano-nome">
-              {contratoSelecionado?.planoNome ?? planoSemConsumo ?? 'Plano não informado'}
+            >
+              📶
             </span>
+            <div className="home-card-status-textos">
+              <span className="home-plano-nome">
+                {contratoSelecionado?.planoNome ?? planoSemConsumo ?? 'Plano não informado'}
+              </span>
+              <p
+                className="home-status-texto"
+                style={{ color: online === true ? '#20b957' : online === false ? '#f44336' : '#9e9e9e' }}
+              >
+                {online === true
+                  ? 'Sua conexão está normal!'
+                  : online === false
+                    ? 'Sua conexão está fora do ar!'
+                    : contratoSelecionado
+                      ? 'Verificando conexão…'
+                      : 'Status indisponível'}
+              </p>
+              <p className="home-status-resumo">
+                {online === true
+                  ? 'Tudo funcionando como deve!'
+                  : online === false
+                    ? 'Verifique seu roteador ou modem.'
+                    : 'Não foi possível verificar sua conexão agora.'}
+              </p>
+            </div>
           </div>
-          <p className="home-status-texto">
-            {online === true
-              ? 'Sua conexão está normal!'
-              : online === false
-                ? 'Sua conexão está fora do ar!'
-                : contratoSelecionado
-                  ? 'Verificando conexão…'
-                  : 'Status indisponível'}
-          </p>
           {consumoContratos.length > 1 && (
             <select
               className="home-seletor-contrato"

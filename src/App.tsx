@@ -9,6 +9,7 @@ import DetalheChamado from './pages/DetalheChamado'
 import Faq from './pages/Faq'
 import Home from './pages/Home'
 import Login from './pages/Login'
+import Sobre from './pages/Sobre'
 import Suporte from './pages/Suporte'
 
 function App() {
@@ -77,6 +78,14 @@ function App() {
           element={
             <RotaProtegida>
               <Faq />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/sobre"
+          element={
+            <RotaProtegida>
+              <Sobre />
             </RotaProtegida>
           }
         />

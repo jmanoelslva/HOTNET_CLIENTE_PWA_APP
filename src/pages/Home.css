@@ -9,7 +9,6 @@
   gap: 12px;
   padding: 24px 20px 32px;
   background: linear-gradient(135deg, #f28f3b, #d94a38);
-  border-radius: 0 0 28px 28px;
 }
 
 .home-header-logo {
@@ -81,12 +80,17 @@
   padding: 12px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: #d94a38;
+  color: #333333;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .home-avatar-menu button:hover {
   background: #f5f5f5;
+}
+
+.home-avatar-menu-sair {
+  color: #d94a38 !important;
 }
 
 .home-conteudo {
@@ -97,8 +101,8 @@
 
 .home-card-status {
   background: #ffffff;
-  border-radius: 16px;
-  padding: 18px 20px;
+  border-radius: 20px;
+  padding: 18px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   margin-bottom: 20px;
 }
@@ -106,26 +110,42 @@
 .home-card-status-topo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
 }
 
 .home-indicador {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 14px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.home-card-status-textos {
+  flex: 1;
+  min-width: 0;
 }
 
 .home-plano-nome {
-  font-weight: 700;
-  color: #333333;
-  font-size: 15px;
+  font-weight: 400;
+  color: #999999;
+  font-size: 12px;
 }
 
 .home-status-texto {
-  margin: 6px 0 0;
-  font-size: 13px;
-  color: #666666;
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.home-status-resumo {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #999999;
 }
 
 .home-seletor-contrato {
