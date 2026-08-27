@@ -73,6 +73,8 @@ expirada (mesmo critério do `SessionExpiredInterceptor` do app Android).
 Todas as telas principais implementadas e validadas contra o backend real:
 
 - **Login/sessão** — autenticação, sessão em memória.
+- **Home** — saudação, botão de WhatsApp, menu de navegação para as
+  demais telas.
 - **Boletos** — abas Em aberto/Pagos, filtro por contrato, cálculo de
   multa/juros para vencidos, copiar código de barras/PIX, QR Code,
   boleto em PDF, informar pagamento.
@@ -86,5 +88,7 @@ Todas as telas principais implementadas e validadas contra o backend real:
   galeria ou arquivo) e compartilhamento de localização.
 - **Avisos** — gate obrigatório em tela cheia quando há avisos não
   confirmados (mesmo comportamento do `AvisoActivity` do app Android).
+- **Meus dados** — informações pessoais, contato e endereços.
+- **Ajuda** — FAQ estático com busca e categorias, mais WhatsApp.
 
 Paridade funcional completa com as telas principais do app Android.
