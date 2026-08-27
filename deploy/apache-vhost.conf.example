@@ -36,15 +36,25 @@
         AllowOverride None
         Require all granted
 
-        # SPA: qualquer rota que não bata em um arquivo real cai no
-        # index.html (o roteamento de fato acontece no react-router-dom).
         RewriteEngine On
         RewriteBase /
+
+        # A tela de impressão do CONTRATO referencia o logo direto em
+        # "/assets/..." (sem o prefixo "/public" que o boleto usa) — só
+        # que "/assets/" também é onde o PRÓPRIO build do Vite guarda
+        # seus arquivos (JS/CSS com hash). Serve o arquivo local se ele
+        # existir; só repassa pro backend (via proxy) quando não existir.
+        RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
+        RewriteRule ^assets/(.*)$ https://hotnet.net.br/assets/$1 [P,L]
+
+        # SPA: qualquer rota que não bata em um arquivo real cai no
+        # index.html (o roteamento de fato acontece no react-router-dom).
         RewriteCond %{REQUEST_FILENAME} !-f
         RewriteCond %{REQUEST_FILENAME} !-d
         RewriteCond %{REQUEST_URI} !^/api/
         RewriteCond %{REQUEST_URI} !^/public/
         RewriteCond %{REQUEST_URI} !^/common/
+        RewriteCond %{REQUEST_URI} !^/assets/
         RewriteRule . /index.html [L]
     </Directory>
 
@@ -67,6 +77,10 @@
     ProxyPassReverse /public/ https://hotnet.net.br/public/
     ProxyPass        /common/ https://hotnet.net.br/common/
     ProxyPassReverse /common/ https://hotnet.net.br/common/
+
+    # Reversão pro proxy via mod_rewrite [P] de /assets/ (ver o
+    # RewriteRule dentro do <Directory> acima).
+    ProxyPassReverse /assets/ https://hotnet.net.br/assets/
 
     # OBRIGATÓRIO: reescreve o domínio do Set-Cookie de hotnet.net.br pra
     # cliente.hotnet.net.br, senão o navegador descarta o cookie de sessão

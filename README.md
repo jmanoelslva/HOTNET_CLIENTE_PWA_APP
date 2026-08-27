@@ -90,6 +90,14 @@ build **precisa** fazer o mesmo reverse proxy do Vite:
   (`invoice_ctl/invoice/print_layout`), referenciam logo/ícones com
   caminho absoluto (ex: `/public/assets/uploaddir/logo/office/1/logo.png`)
   esperando estar em `hotnet.net.br`. Sem isso, essas imagens quebram.
+- Repassar `/assets/*` também — mas só como **fallback**: a tela de
+  impressão do CONTRATO usa esse mesmo caminho pro logo (sem o prefixo
+  `/public` que o boleto usa), só que `/assets/` é também onde o
+  *próprio* build do Vite guarda os arquivos com hash (JS/CSS). O
+  servidor web precisa servir o arquivo local se ele existir e só
+  repassar pro backend quando não existir (`try_files ... @backend;` no
+  Nginx; `RewriteCond ... !-f` antes do `[P]` no Apache) — repassar tudo
+  cegamente quebraria o próprio app.
 
 Sem a reescrita do cookie especificamente, o login funciona (primeira
 resposta chega normalmente) mas a sessão não se mantém entre

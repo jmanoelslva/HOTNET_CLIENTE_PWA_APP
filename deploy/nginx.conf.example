@@ -71,4 +71,18 @@ server {
         proxy_pass https://hotnet.net.br;
         proxy_ssl_server_name on;
     }
+
+    # A tela de impressão do CONTRATO referencia o logo direto em
+    # "/assets/..." (sem o prefixo "/public" que o boleto usa) — só que
+    # "/assets/" também é onde o PRÓPRIO build do Vite guarda seus
+    # arquivos (JS/CSS com hash). Serve o arquivo local se ele existir;
+    # só cai pro backend (named location abaixo) quando não existir.
+    location /assets/ {
+        try_files $uri @assets_backend;
+    }
+
+    location @assets_backend {
+        proxy_pass https://hotnet.net.br;
+        proxy_ssl_server_name on;
+    }
 }

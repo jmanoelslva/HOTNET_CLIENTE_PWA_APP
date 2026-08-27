@@ -82,6 +82,20 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
       },
+      // A tela de impressão do CONTRATO (controllrctl/contract/print, ao
+      // contrário da do boleto) referencia o logo direto em "/assets/...",
+      // sem o prefixo "/public". Em produção isso colide com a própria
+      // pasta /assets/ do build do Vite — lá o servidor web precisa
+      // servir o arquivo local se existir e só cair pro proxy quando não
+      // existir (ver deploy/nginx.conf.example e apache-vhost.conf.example).
+      // Em dev não tem esse problema: o Vite não usa "/assets/" pra nada
+      // próprio enquanto roda em modo desenvolvimento (só na build final),
+      // então repassar direto é seguro aqui.
+      '/assets': {
+        target: 'https://hotnet.net.br',
+        changeOrigin: true,
+        secure: true,
+      },
     },
   },
 })
