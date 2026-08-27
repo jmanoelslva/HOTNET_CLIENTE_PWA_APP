@@ -5,6 +5,7 @@ import { buscarDadosCliente } from '../api/cadastro'
 import { buscarContratos } from '../api/contratos'
 import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, type ConsumoPorContrato } from '../api/consumo'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
+import logoHotnet from '../assets/logo-hotnet.png'
 import './Home.css'
 
 function saudacaoPorHorario(primeiroNome: string): string {
@@ -25,6 +26,7 @@ const ITENS_MENU = [
 export default function Home() {
   const { cpf, sair } = useSessao()
   const [nomeExibido, setNomeExibido] = useState('Cliente')
+  const [menuAvatarAberto, setMenuAvatarAberto] = useState(false)
 
   const [consumoContratos, setConsumoContratos] = useState<ConsumoPorContrato[]>([])
   const [cpePkSelecionado, setCpePkSelecionado] = useState<number | null>(null)
@@ -90,10 +92,33 @@ export default function Home() {
   return (
     <div className="home-tela">
       <header className="home-cabecalho">
-        <span className="home-saudacao">{saudacaoPorHorario(nomeExibido)}</span>
-        <p className="home-subtitulo">O que você precisa hoje?</p>
+        <img src={logoHotnet} alt="HOTNET" className="home-header-logo" />
+
+        <div className="home-header-saudacao">
+          <span className="home-saudacao">{saudacaoPorHorario(nomeExibido)}</span>
+          <p className="home-subtitulo">O que você precisa hoje?</p>
+        </div>
+
+        <div className="home-avatar-wrapper">
+          <button
+            className="home-avatar"
+            onClick={() => setMenuAvatarAberto((v) => !v)}
+            aria-label="Menu do usuário"
+          >
+            👤
+          </button>
+          {menuAvatarAberto && (
+            <>
+              <div className="home-avatar-menu-fundo" onClick={() => setMenuAvatarAberto(false)} />
+              <div className="home-avatar-menu">
+                <button onClick={sair}>Sair</button>
+              </div>
+            </>
+          )}
+        </div>
       </header>
 
+      <div className="home-conteudo">
       {(contratoSelecionado || planoSemConsumo) && (
         <div className="home-card-status">
           <div className="home-card-status-topo">
@@ -144,15 +169,12 @@ export default function Home() {
         ))}
       </div>
 
-      <button className="home-sair" onClick={sair}>
-        Sair
-      </button>
-
       <footer className="home-rodape">
         <a href="https://hotnet.net.br/policies/privacy" target="_blank" rel="noreferrer">
           Política de Privacidade
         </a>
       </footer>
+      </div>
     </div>
   )
 }
