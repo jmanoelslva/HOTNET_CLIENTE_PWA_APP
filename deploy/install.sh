@@ -22,7 +22,10 @@ REPO_URL="https://github.com/jmanoelslva/web-app-hotnet.git"
 BACKEND_DOMAIN="hotnet.net.br"
 INSTALL_DIR="/opt/hotnet-web"
 ACME_WEBROOT="/var/www/certbot-acme"
-NODE_MAJOR="20"
+# jsdom (devDependency, só usado por "npm test" — nunca em produção) exige
+# Node 22.22.2+/24.15+/26+; Node 24 é a LTS "Active" atual e evita o aviso
+# EBADENGINE do "npm ci" no passo de build abaixo.
+NODE_MAJOR="24"
 
 # --------------------------------------------------------------------------
 # Saída formatada
@@ -154,7 +157,11 @@ instalar_node() {
   if command -v node >/dev/null 2>&1; then
     local major
     major="$(node -v | sed -E 's/^v([0-9]+).*/\1/')"
-    if [ "$major" -ge 18 ] 2>/dev/null; then
+    # >=22 (não >=18) pra bater com o mínimo que o jsdom exige — ver
+    # comentário em NODE_MAJOR acima. Se o servidor já tiver uma versão
+    # antiga (ex: de uma instalação anterior deste mesmo script), cai pro
+    # "else" abaixo e troca pela NODE_MAJOR atual via NodeSource.
+    if [ "$major" -ge 22 ] 2>/dev/null; then
       ok "Node.js $(node -v) já instalado."
       return
     fi
