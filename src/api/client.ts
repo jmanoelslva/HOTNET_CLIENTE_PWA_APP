@@ -274,6 +274,41 @@ export function buscarSessaoAtual(where: string): Promise<ConnectionSessionRespo
   return post<ConnectionSessionResponse>('aaa_ctl/connection/session', { where })
 }
 
+export interface NoticeDto {
+  notice_pk: number
+  notice_date_cad?: string
+  notice_read_date?: string
+  notice_type?: number
+  contract_pk?: number
+  contract_number?: number
+  invoice_pk?: number
+  invoice_nosso_num?: string
+}
+
+export interface NoticeListResponse {
+  success: boolean
+  message?: string
+  total?: number
+  results?: NoticeDto[]
+}
+
+/**
+ * Avisos do cliente logado (bloqueio, alerta, cancelamento, etc.) — sem
+ * filtro, devolve todos (lidos e não lidos); notice_read_date null =
+ * ainda não confirmado (ver src/api/avisos.ts).
+ */
+export function listarAvisos(): Promise<NoticeListResponse> {
+  return post<NoticeListResponse>('aaa_ctl/notification/list', { action: 'list' })
+}
+
+/**
+ * Marca um aviso como lido/confirmado pelo cliente —
+ * aaa_ctl/notification/update.
+ */
+export function marcarAvisoComoLido(noticePk: number): Promise<NoticeListResponse> {
+  return post<NoticeListResponse>('aaa_ctl/notification/update', { notice_pk: noticePk })
+}
+
 export interface ClientDto {
   client_pk: number
   client_complete_name?: string
