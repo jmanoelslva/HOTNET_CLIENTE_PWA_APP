@@ -67,6 +67,22 @@ expirada (mesmo critério do `SessionExpiredInterceptor` do app Android).
 
 ## Escopo atual
 
-- Login/sessão: implementado e validado contra o backend real.
-- Demais telas (Boletos, Contratos, Consumo, Suporte, Avisos): em
-  desenvolvimento.
+Todas as telas principais implementadas e validadas contra o backend real:
+
+- **Login/sessão** — autenticação, sessão em memória.
+- **Boletos** — abas Em aberto/Pagos, filtro por contrato, cálculo de
+  multa/juros para vencidos, copiar código de barras/PIX, QR Code,
+  boleto em PDF, informar pagamento.
+- **Contratos** — descoberta via faturas (contract/list sem filtro pode
+  voltar vazio para clientes com vários contratos), detalhes, itens do
+  plano, link pro contrato completo em PDF.
+- **Consumo** — uso diário por contrato/CPE, navegação de mês, sessão de
+  conexão ao vivo (IP/MAC/IPv6, duração, download/upload da sessão).
+- **Suporte** — lista de chamados (abas Abertos/Resolvidos), abertura de
+  novo chamado, chat com envio de mensagens e anexos.
+- **Avisos** — gate obrigatório em tela cheia quando há avisos não
+  confirmados (mesmo comportamento do `AvisoActivity` do app Android).
+
+Fora do escopo desta primeira leva (recursos secundários do app Android):
+geolocalização no chat de suporte, captura direta de foto/câmera para
+anexos (o upload via seletor do sistema já funciona).
