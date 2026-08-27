@@ -26,6 +26,12 @@
   text-decoration: none;
   font-size: 11px;
   font-weight: 600;
+  /* O botão "Sair" reaproveita esta classe (mesmo visual dos links de
+     navegação) — reset pra não herdar o estilo padrão de <button>. */
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .bottom-nav-item.ativo {
