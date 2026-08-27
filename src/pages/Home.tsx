@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSessao } from '../auth/SessionContext'
-import { buscarDadosCliente, buscarEnderecos } from '../api/cadastro'
+import { buscarDadosCliente } from '../api/cadastro'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import './Home.css'
 
@@ -37,21 +37,10 @@ export default function Home() {
 
   async function aoClicarWhatsapp() {
     try {
-      const [cliente, enderecos] = await Promise.all([buscarDadosCliente(cpf), buscarEnderecos()])
-      const principal = enderecos.find((e) => e.padrao) ?? enderecos[0]
-      const endereco = principal
-        ? [
-            principal.logradouro,
-            principal.numero ? `, ${principal.numero}` : '',
-            principal.bairro ? ` - ${principal.bairro}` : '',
-            principal.cidade ? ` (${principal.cidade})` : '',
-          ]
-            .join('')
-            .trim() || null
-        : null
-      abrirWhatsappSuporte(cliente.client_complete_name ?? null, cpf, endereco)
+      const cliente = await buscarDadosCliente(cpf)
+      abrirWhatsappSuporte(cliente.client_complete_name ?? null, cpf)
     } catch {
-      abrirWhatsappSuporte(null, cpf, null)
+      abrirWhatsappSuporte(null, cpf)
     }
   }
 

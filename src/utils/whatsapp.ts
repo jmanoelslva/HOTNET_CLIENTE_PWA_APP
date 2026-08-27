@@ -6,11 +6,10 @@ function abrir(mensagem: string) {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
 
-/** Mensagem completa (nome, CPF e endereço), usada pelo botão de WhatsApp da Home. */
-export function abrirWhatsappSuporte(nomeCompleto: string | null, cpf: string | null, endereco: string | null) {
+/** Mensagem com nome e CPF, usada pelo botão de WhatsApp da Home. */
+export function abrirWhatsappSuporte(nomeCompleto: string | null, cpf: string | null) {
   const identificacao = nomeCompleto ? `Sou *${nomeCompleto}*` : 'Sou cliente'
-  const linhaEndereco = endereco ? `\n\nEndereço: *${endereco}*` : ''
-  abrir(`Olá,\n\n${identificacao}\n\nCPF: *${cpf ?? 'Não informado'}*${linhaEndereco}`)
+  abrir(`Olá,\n\n${identificacao}\n\nCPF: *${cpf ?? 'Não informado'}*`)
 }
 
 /** Mensagem simplificada (sem endereço), usada pelo botão de WhatsApp da tela de Ajuda. */
