@@ -65,6 +65,23 @@ export default defineConfig({
           })
         },
       },
+      // Páginas geradas pelo próprio backend (ex: o layout de impressão
+      // do boleto, invoice_ctl/invoice/print_layout, servido via /api)
+      // referenciam logo/ícones com caminho absoluto (ex:
+      // "/public/assets/uploaddir/logo/office/1/logo.png"), esperando
+      // estar em hotnet.net.br — sem repassar essas duas rotas também,
+      // o navegador tenta buscar essas imagens no nosso próprio domínio
+      // e elas quebram. Sem rewrite: mantém o path igual dos dois lados.
+      '/public': {
+        target: 'https://hotnet.net.br',
+        changeOrigin: true,
+        secure: true,
+      },
+      '/common': {
+        target: 'https://hotnet.net.br',
+        changeOrigin: true,
+        secure: true,
+      },
     },
   },
 })

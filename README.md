@@ -84,10 +84,17 @@ build **precisa** fazer o mesmo reverse proxy do Vite:
   cliente.hotnet.net.br;`).
 - Preservar `Content-Type: application/x-www-form-urlencoded` e cookies de
   requisição (`proxy_set_header Cookie $http_cookie;`).
+- Repassar também `/public/*` e `/common/*` pra `https://hotnet.net.br`
+  (sem cortar o prefixo, ao contrário de `/api`) — páginas geradas pelo
+  próprio backend, como o layout de impressão do boleto
+  (`invoice_ctl/invoice/print_layout`), referenciam logo/ícones com
+  caminho absoluto (ex: `/public/assets/uploaddir/logo/office/1/logo.png`)
+  esperando estar em `hotnet.net.br`. Sem isso, essas imagens quebram.
 
-Sem isso, o login funciona (primeira resposta chega normalmente) mas a
-sessão não se mantém entre requisições, porque o cookie nunca é aceito
-pelo navegador para o domínio `cliente.hotnet.net.br`.
+Sem a reescrita do cookie especificamente, o login funciona (primeira
+resposta chega normalmente) mas a sessão não se mantém entre
+requisições, porque o cookie nunca é aceito pelo navegador para o
+domínio `cliente.hotnet.net.br`.
 
 Configuração pronta (Nginx e Apache) e checklist de validação em
 [`deploy/DEPLOY.md`](deploy/DEPLOY.md).

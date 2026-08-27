@@ -43,6 +43,8 @@
         RewriteCond %{REQUEST_FILENAME} !-f
         RewriteCond %{REQUEST_FILENAME} !-d
         RewriteCond %{REQUEST_URI} !^/api/
+        RewriteCond %{REQUEST_URI} !^/public/
+        RewriteCond %{REQUEST_URI} !^/common/
         RewriteRule . /index.html [L]
     </Directory>
 
@@ -53,6 +55,18 @@
     ProxyPreserveHost off
     ProxyPass        /api/ https://hotnet.net.br/
     ProxyPassReverse /api/ https://hotnet.net.br/
+
+    # Páginas geradas pelo próprio backend (ex: o layout de impressão do
+    # boleto, invoice_ctl/invoice/print_layout, servido via /api acima)
+    # referenciam logo/ícones com caminho absoluto (ex:
+    # "/public/assets/uploaddir/logo/office/1/logo.png"), esperando estar
+    # em hotnet.net.br — sem repassar essas duas rotas também, essas
+    # imagens quebram (o navegador tenta buscar no nosso próprio domínio).
+    # Mesmo prefixo dos dois lados: preserva o path (sem cortar nada).
+    ProxyPass        /public/ https://hotnet.net.br/public/
+    ProxyPassReverse /public/ https://hotnet.net.br/public/
+    ProxyPass        /common/ https://hotnet.net.br/common/
+    ProxyPassReverse /common/ https://hotnet.net.br/common/
 
     # OBRIGATÓRIO: reescreve o domínio do Set-Cookie de hotnet.net.br pra
     # cliente.hotnet.net.br, senão o navegador descarta o cookie de sessão

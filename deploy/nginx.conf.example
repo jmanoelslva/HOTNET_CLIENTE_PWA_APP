@@ -54,4 +54,21 @@ server {
         # Preserva o path do lado de baixo (o "/api" some da URL real).
         proxy_ssl_server_name on;
     }
+
+    # Páginas geradas pelo próprio backend (ex: o layout de impressão do
+    # boleto, invoice_ctl/invoice/print_layout, servido via /api acima)
+    # referenciam logo/ícones com caminho absoluto (ex:
+    # "/public/assets/uploaddir/logo/office/1/logo.png"), esperando estar
+    # em hotnet.net.br — sem repassar essas duas rotas também, essas
+    # imagens quebram (o navegador tenta buscar no nosso próprio domínio).
+    # Sem barra no fim do proxy_pass: preserva o path igual dos dois lados.
+    location /public/ {
+        proxy_pass https://hotnet.net.br;
+        proxy_ssl_server_name on;
+    }
+
+    location /common/ {
+        proxy_pass https://hotnet.net.br;
+        proxy_ssl_server_name on;
+    }
 }
