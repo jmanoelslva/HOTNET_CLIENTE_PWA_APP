@@ -63,6 +63,19 @@
     # faz esse papel em produção.
     SSLProxyEngine on
     ProxyPreserveHost off
+
+    # IP de origem do cliente pro backend — sem isso, todo acesso via este
+    # portal aparece pro Controllr com o IP DESTE SERVIDOR (o proxy), não o
+    # do cliente de verdade, o que atrapalha localização/geolocalização e
+    # qualquer log baseado em IP. O mod_proxy do Apache já acrescenta
+    # X-Forwarded-For sozinho por padrão (ProxyAddHeaders não está
+    # desligado); X-Real-IP precisa ser setado à mão porque é convenção do
+    # Nginx, não do Apache — ver o mesmo cabeçalho no nginx.conf.example.
+    # IMPORTANTE: só ter o cabeçalho aqui não basta — o Controllr também
+    # precisa estar configurado do lado dele pra CONFIAR e LER esse
+    # cabeçalho vindo do IP deste servidor (não é algo deste repositório).
+    RequestHeader set X-Real-IP "%{REMOTE_ADDR}e"
+
     ProxyPass        /api/ https://hotnet.net.br/
     ProxyPassReverse /api/ https://hotnet.net.br/
 

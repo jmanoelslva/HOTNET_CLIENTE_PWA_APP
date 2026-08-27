@@ -53,6 +53,12 @@ export default defineConfig({
         target: 'https://hotnet.net.br',
         changeOrigin: true,
         secure: true,
+        // Repassa o IP de origem do cliente pro backend (X-Forwarded-For/
+        // X-Forwarded-Proto) — mesma lógica do Nginx/Apache em produção
+        // (ver deploy/nginx.conf.example e apache-vhost.conf.example).
+        // Sem isso, todo acesso aparece pro Controllr com o IP da própria
+        // máquina rodando "npm run dev", nunca o do cliente de verdade.
+        xfwd: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy) => {
           // Reescreve o domínio do cookie de sessão pro host que o
@@ -82,11 +88,13 @@ export default defineConfig({
         target: 'https://hotnet.net.br',
         changeOrigin: true,
         secure: true,
+        xfwd: true,
       },
       '/common': {
         target: 'https://hotnet.net.br',
         changeOrigin: true,
         secure: true,
+        xfwd: true,
       },
       // A tela de impressão do CONTRATO (controllrctl/contract/print, ao
       // contrário da do boleto) referencia o logo direto em "/assets/...",
@@ -101,6 +109,7 @@ export default defineConfig({
         target: 'https://hotnet.net.br',
         changeOrigin: true,
         secure: true,
+        xfwd: true,
       },
     },
   },

@@ -42,6 +42,14 @@ server {
         proxy_pass https://hotnet.net.br/;
 
         proxy_set_header Host hotnet.net.br;
+        # IP de origem do cliente pro backend — sem isso, todo acesso via
+        # este portal aparece pro Controllr com o IP DESTE SERVIDOR (o
+        # proxy), não o do cliente de verdade, atrapalhando
+        # localização/geolocalização e qualquer log baseado em IP.
+        # IMPORTANTE: só mandar o cabeçalho aqui não basta — o Controllr
+        # também precisa estar configurado do lado dele pra CONFIAR e LER
+        # esse cabeçalho vindo do IP deste servidor (não é algo deste
+        # repositório).
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;

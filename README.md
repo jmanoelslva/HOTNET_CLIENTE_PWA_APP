@@ -108,6 +108,20 @@ build **precisa** fazer o mesmo reverse proxy do Vite:
   repassar pro backend quando não existir (`try_files ... @backend;` no
   Nginx; `RewriteCond ... !-f` antes do `[P]` no Apache) — repassar tudo
   cegamente quebraria o próprio app.
+- **Repassar o IP de origem do cliente** (`X-Real-IP`/`X-Forwarded-For`)
+  — sem isso, todo acesso via este portal chega no Controllr com o IP
+  do próprio servidor de proxy, nunca o do cliente de verdade, o que
+  atrapalha localização/geolocalização e qualquer log baseado em IP. O
+  Nginx já vem assim no exemplo (`nginx.conf.example`); o Apache
+  precisou de uma linha a mais (`RequestHeader set X-Real-IP
+  "%{REMOTE_ADDR}e"` em `apache-vhost.conf.example`) porque o `X-Real-IP`
+  é convenção do Nginx, não vem de graça no `mod_proxy` do Apache (o
+  `X-Forwarded-For` esse sim já vem sozinho nos dois). O proxy de
+  desenvolvimento do Vite faz o mesmo via `xfwd: true`
+  (`vite.config.ts`). **Importante:** só mandar o cabeçalho não basta —
+  o Controllr também precisa estar configurado do lado dele pra
+  **confiar e ler** esse cabeçalho vindo do IP deste servidor
+  (configuração do backend, fora do alcance deste repositório).
 
 Sem a reescrita do cookie especificamente, o login funciona (primeira
 resposta chega normalmente) mas a sessão não se mantém entre
