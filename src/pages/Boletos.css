@@ -204,19 +204,38 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 24px;
   z-index: 100;
 }
 
 .boletos-modal {
   background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 320px;
+  border-radius: 20px 20px 0 0;
+  padding: 12px 24px 28px;
+  max-width: 420px;
   width: 100%;
   text-align: center;
+  animation: boletos-modal-subir 0.2s ease;
+}
+
+.boletos-modal::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: #e0e0e0;
+  margin: 0 auto 16px;
+}
+
+@keyframes boletos-modal-subir {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .boletos-modal img {

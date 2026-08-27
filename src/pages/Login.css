@@ -129,18 +129,37 @@
   z-index: 10;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 24px;
 }
 
 .login-modal {
   background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 340px;
+  border-radius: 20px 20px 0 0;
+  padding: 12px 24px 28px;
+  max-width: 420px;
   width: 100%;
   text-align: left;
+  animation: login-modal-subir 0.2s ease;
+}
+
+.login-modal::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: #e0e0e0;
+  margin: 0 auto 16px;
+}
+
+@keyframes login-modal-subir {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .login-modal h2 {
