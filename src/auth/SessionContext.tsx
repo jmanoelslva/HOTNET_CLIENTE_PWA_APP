@@ -5,6 +5,11 @@ interface SessionState {
   logado: boolean
   carregando: boolean
   erro: string | null
+  // CPF/CNPJ (só dígitos) usado no login — guardado em memória (nunca em
+  // localStorage/sessionStorage) só pra resolver o client_pk ao abrir um
+  // chamado de suporte, igual ao SessionManager.getSavedUsername() do
+  // app Android.
+  cpf: string | null
   entrar: (usuario: string, senha: string) => Promise<boolean>
   sair: () => Promise<void>
 }
@@ -21,6 +26,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [logado, setLogado] = useState(false)
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
+  const [cpf, setCpf] = useState<string | null>(null)
 
   const entrar = useCallback(async (usuario: string, senha: string) => {
     setCarregando(true)
@@ -30,6 +36,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       const resposta = await apiLogin(somenteDigitos, senha)
       if (resposta.success) {
         setLogado(true)
+        setCpf(somenteDigitos)
         return true
       }
       // A mensagem do servidor (ex: "Authentication failed for user [X]") é
@@ -50,11 +57,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       await apiLogout()
     } finally {
       setLogado(false)
+      setCpf(null)
     }
   }, [])
 
   return (
-    <SessionContext.Provider value={{ logado, carregando, erro, entrar, sair }}>
+    <SessionContext.Provider value={{ logado, carregando, erro, cpf, entrar, sair }}>
       {children}
     </SessionContext.Provider>
   )

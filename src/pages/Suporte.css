@@ -1,0 +1,235 @@
+.suporte-tela {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 20px 96px;
+  position: relative;
+  min-height: 100vh;
+}
+
+.suporte-cabecalho h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.suporte-cabecalho p {
+  margin: 4px 0 20px;
+  color: #999999;
+  font-size: 14px;
+}
+
+.suporte-abas {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.aba-chip {
+  flex: 1;
+  height: 40px;
+  border-radius: 20px;
+  border: 1.5px solid #f28f3b;
+  background: transparent;
+  color: #f28f3b;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.aba-chip.aba-resolvidos {
+  border-color: #4caf50;
+  color: #4caf50;
+}
+
+.aba-chip.ativa {
+  background: #f28f3b;
+  color: #ffffff;
+}
+
+.aba-chip.aba-resolvidos.ativa {
+  background: #4caf50;
+  color: #ffffff;
+}
+
+.suporte-status {
+  color: #666666;
+  font-size: 14px;
+  text-align: center;
+  padding: 32px 0;
+}
+
+.suporte-status button {
+  margin-top: 12px;
+  height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+}
+
+.suporte-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ticket-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+.ticket-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ticket-assunto {
+  font-weight: 700;
+  color: #333333;
+  font-size: 15px;
+}
+
+.ticket-status-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.badge-aberto {
+  background: #f28f3b;
+}
+
+.badge-fechado {
+  background: #4caf50;
+}
+
+.ticket-protocolo,
+.ticket-categoria,
+.ticket-data {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #999999;
+}
+
+.ticket-descricao {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+.suporte-carregar-mais {
+  display: block;
+  margin: 20px auto 0;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  color: #333333;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.suporte-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  color: #ffffff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  box-shadow: 0 4px 16px rgba(217, 74, 56, 0.4);
+}
+
+.suporte-modal-fundo {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.suporte-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 380px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.suporte-modal h2 {
+  margin: 0 0 16px;
+  font-size: 17px;
+  color: #333333;
+}
+
+.suporte-modal label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #666666;
+  margin-top: 12px;
+}
+
+.suporte-modal select,
+.suporte-modal input,
+.suporte-modal textarea {
+  margin-top: 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #333333;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.suporte-modal-acoes {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.suporte-modal-acoes button {
+  flex: 1;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #f5f5f5;
+  color: #333333;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.suporte-modal-acoes button.suporte-btn-primario {
+  border: none;
+  color: #ffffff;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+}

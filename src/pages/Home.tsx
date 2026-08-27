@@ -14,6 +14,8 @@ export default function Home() {
         <Link to="/contratos">Ver contratos</Link>
         {' · '}
         <Link to="/consumo">Ver consumo</Link>
+        {' · '}
+        <Link to="/suporte">Ver suporte</Link>
       </p>
       <button onClick={sair}>Sair</button>
     </div>

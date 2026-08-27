@@ -274,4 +274,191 @@ export function buscarSessaoAtual(where: string): Promise<ConnectionSessionRespo
   return post<ConnectionSessionResponse>('aaa_ctl/connection/session', { where })
 }
 
+export interface ClientDto {
+  client_pk: number
+  client_complete_name?: string
+  client_doc1?: string
+}
+
+/**
+ * Dados cadastrais do cliente logado — controllrctl/cadastre/info. Usado
+ * só pra resolver o client_pk (obrigatório pra abrir chamado de suporte);
+ * formato da resposta não é 100% documentado, por isso "results" é
+ * tratado como array OU objeto único (ver src/api/suporte.ts).
+ */
+export function buscarCadastroInfo(): Promise<{
+  success?: boolean
+  message?: string
+  results?: ClientDto | ClientDto[]
+} & Partial<ClientDto>> {
+  return post('controllrctl/cadastre/info', { action: 'info' })
+}
+
+/**
+ * Fallback pra resolver o client_pk quando cadastre/info falha —
+ * controllrctl/client/list filtrado por CPF/CNPJ.
+ */
+export function buscarClientePorCpf(cpf: string): Promise<{ success?: boolean; message?: string; results?: ClientDto[] }> {
+  return post('controllrctl/client/list', {
+    action: 'list',
+    where: whereJson([{ field: 'client_doc1', oper: 5, value: cpf }]),
+    page: 1,
+    start: 0,
+    limit: 1,
+  })
+}
+
+export interface TicketDto {
+  ticket_pk?: number
+  ticket_protocol?: string
+  ticket_title?: string
+  ticket_desc?: string
+  ticket_status?: number
+  ticket_date_create?: string
+  ticket_date_last?: string
+  ticket_date_close?: string
+  category_name?: string
+  contract_number?: number
+}
+
+export interface TicketListResponse {
+  success?: boolean
+  message?: string
+  total?: number
+  results?: TicketDto | TicketDto[]
+}
+
+/**
+ * Lista os chamados de suporte do cliente logado — support_ctl/ticket/list.
+ */
+export function listarChamados(start: number, limit = 20): Promise<TicketListResponse> {
+  return post<TicketListResponse>('support_ctl/ticket/list', { action: 'list', start, limit })
+}
+
+export interface CategoriaDto {
+  category_pk: number
+  category_name?: string
+}
+
+export interface CategoriaListResponse {
+  success?: boolean
+  message?: string
+  results?: CategoriaDto[]
+}
+
+/**
+ * Categorias de chamado disponíveis (não é lista fixa — configurada no
+ * painel do Controllr) — support_ctl/category/list.
+ */
+export function listarCategoriasSuporte(): Promise<CategoriaListResponse> {
+  return post<CategoriaListResponse>('support_ctl/category/list', { action: 'list' })
+}
+
+export interface TicketCreateResultDto {
+  client_pk?: number
+  contract_pk?: number
+  ticket_pk?: number
+  ticket_protocol?: string
+}
+
+export interface TicketCreateResponse {
+  success?: boolean
+  message?: string
+  results?: TicketCreateResultDto[]
+}
+
+/**
+ * Abre um novo chamado — support_ctl/ticket/create. Campos fixos
+ * (priority/sla/client_show/client_active) conforme documentação oficial
+ * da BRbyte, mesmos valores usados pelo app Android.
+ */
+export function abrirChamado(parametros: {
+  clientPk: number
+  categoryPk: number
+  ticketTitle: string
+  ticketDesc: string
+}): Promise<TicketCreateResponse> {
+  return post<TicketCreateResponse>('support_ctl/ticket/create', {
+    client_pk: parametros.clientPk,
+    category_pk: parametros.categoryPk,
+    ticket_priority: 5,
+    ticket_sla: 2880,
+    ticket_client_show: 2,
+    ticket_client_active: 1,
+    ticket_title: parametros.ticketTitle,
+    ticket_desc: parametros.ticketDesc,
+  })
+}
+
+export interface OperacaoDto {
+  op_pk?: number
+  op_desc?: string
+  op_file?: string
+  op_date_create?: string
+  op_client?: boolean
+}
+
+export interface OperacaoListResponse {
+  success?: boolean
+  message?: string
+  results?: OperacaoDto[]
+}
+
+/**
+ * Histórico de mensagens/anexos de um chamado — support_ctl/op/list.
+ */
+export function listarOperacoesChamado(ticketPk: number): Promise<OperacaoListResponse> {
+  return post<OperacaoListResponse>('support_ctl/op/list', {
+    where: whereJson([{ field: 'ticket_pk', oper: 5, value: String(ticketPk) }]),
+  })
+}
+
+/**
+ * Envia uma nova mensagem de texto num chamado existente —
+ * support_ctl/op/create.
+ */
+export function criarOperacaoChamado(
+  ticketPk: number,
+  opDesc: string,
+): Promise<{ success?: boolean; message?: string }> {
+  return post('support_ctl/op/create', { ticket_pk: ticketPk, op_type: 0, op_code: 0, op_desc: opDesc })
+}
+
+/**
+ * URL de um anexo de chamado, pronta pra exibir/baixar — mesmo esquema
+ * de proxy das outras URLs de impressão (ver urlImpressaoBoleto).
+ */
+export function urlAnexoChamado(ticketPk: number, arquivo: string): string {
+  return `${API_BASE}/support_ctl/annex/view/${ticketPk}/${arquivo}`
+}
+
+/**
+ * Envia um anexo (foto, vídeo ou qualquer arquivo) a um chamado —
+ * support_ctl/annex/upload, multipart com só "file" e "ticket_pk". Não
+ * reaproveita post() porque o corpo aqui é FormData (o navegador define
+ * o Content-Type/boundary sozinho — definir manualmente quebraria o
+ * multipart).
+ */
+export async function enviarAnexoChamado(ticketPk: number, arquivo: File): Promise<{ success?: boolean; message?: string }> {
+  const corpo = new FormData()
+  corpo.append('file', arquivo)
+  corpo.append('ticket_pk', String(ticketPk))
+
+  const response = await fetch(`${API_BASE}/support_ctl/annex/upload`, {
+    method: 'POST',
+    credentials: 'include',
+    body: corpo,
+  })
+
+  if (response.status === 401) {
+    throw new SessaoExpiradaError()
+  }
+
+  const json = (await response.json()) as { success?: boolean; message?: string }
+  if (!response.ok || json.success === false) {
+    throw new ApiError(json.message ?? 'Não foi possível enviar o anexo.')
+  }
+  return json
+}
+
 export { post }

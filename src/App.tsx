@@ -3,8 +3,10 @@ import RotaProtegida from './components/RotaProtegida'
 import Boletos from './pages/Boletos'
 import Consumo from './pages/Consumo'
 import Contratos from './pages/Contratos'
+import DetalheChamado from './pages/DetalheChamado'
 import Home from './pages/Home'
 import Login from './pages/Login'
+import Suporte from './pages/Suporte'
 
 function App() {
   return (
@@ -39,6 +41,22 @@ function App() {
         element={
           <RotaProtegida>
             <Consumo />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/suporte"
+        element={
+          <RotaProtegida>
+            <Suporte />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/suporte/:ticketPk"
+        element={
+          <RotaProtegida>
+            <DetalheChamado />
           </RotaProtegida>
         }
       />
