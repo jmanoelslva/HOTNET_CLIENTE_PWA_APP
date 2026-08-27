@@ -1,0 +1,98 @@
+.cadastro-tela {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+.cadastro-cabecalho h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.cadastro-cabecalho p {
+  margin: 4px 0 20px;
+  color: #999999;
+  font-size: 14px;
+}
+
+.cadastro-status {
+  color: #666666;
+  font-size: 14px;
+  text-align: center;
+  padding: 32px 0;
+}
+
+.cadastro-status button {
+  margin-top: 12px;
+  height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+}
+
+.cadastro-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  margin-bottom: 16px;
+}
+
+.cadastro-card-titulo {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333333;
+  margin-bottom: 8px;
+}
+
+.cadastro-endereco-titulo {
+  color: #f28f3b;
+}
+
+.cadastro-linha {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.cadastro-linha:last-child {
+  border-bottom: none;
+}
+
+.cadastro-linha span {
+  color: #999999;
+  flex-shrink: 0;
+}
+
+.cadastro-linha strong {
+  color: #333333;
+  font-weight: 600;
+  text-align: right;
+}
+
+.cadastro-secao-titulo {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #333333;
+  margin: 8px 0 12px;
+}
+
+.cadastro-endereco-indisponivel {
+  color: #999999;
+  font-size: 13px;
+}

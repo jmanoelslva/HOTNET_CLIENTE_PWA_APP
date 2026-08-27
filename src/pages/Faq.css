@@ -1,0 +1,144 @@
+.faq-tela {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+.faq-cabecalho h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.faq-cabecalho p {
+  margin: 4px 0 20px;
+  color: #999999;
+  font-size: 14px;
+}
+
+.faq-busca {
+  width: 100%;
+  height: 44px;
+  border-radius: 22px;
+  border: 1px solid #e0e0e0;
+  padding: 0 18px;
+  font-size: 14px;
+  color: #333333;
+  background: #ffffff;
+  margin-bottom: 20px;
+}
+
+.faq-categorias {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.faq-categoria {
+  background: #ffffff;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.faq-categoria.ativa {
+  border-color: #f28f3b;
+}
+
+.faq-categoria-icone {
+  font-size: 20px;
+}
+
+.faq-categoria-nome {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333333;
+}
+
+.faq-categoria-subtitulo {
+  font-size: 11px;
+  color: #999999;
+}
+
+.faq-titulo-lista {
+  font-size: 15px;
+  font-weight: 700;
+  color: #333333;
+  margin: 0 0 12px;
+}
+
+.faq-vazio {
+  color: #999999;
+  font-size: 13px;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.faq-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.faq-item {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+.faq-item-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.faq-item-pergunta {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.faq-item-seta {
+  color: #f28f3b;
+  font-size: 18px;
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.faq-item-seta.aberta {
+  transform: rotate(90deg);
+}
+
+.faq-item-resposta {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #666666;
+  line-height: 1.5;
+}
+
+.faq-whatsapp {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #25d366, #1da851);
+}

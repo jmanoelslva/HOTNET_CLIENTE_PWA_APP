@@ -313,6 +313,38 @@ export interface ClientDto {
   client_pk: number
   client_complete_name?: string
   client_doc1?: string
+  client_doc2?: string
+  client_phones?: string
+  client_emails?: string
+  client_date_cad?: string
+}
+
+export interface EnderecoDto {
+  address_pk?: number
+  address_identification?: string
+  address?: string
+  address_number?: string
+  address_neighborhood?: string
+  address_zipcode?: string
+  address_province?: string
+  address_state?: string
+  address_completation?: string
+  address_default?: number
+}
+
+/**
+ * TODOS os endereços cadastrados pro cliente logado (pode ter mais de
+ * um, ex: um por contrato/instalação) — controllrctl/cadastre/address.
+ * IMPORTANTE, confirmado no app Android: esse endpoint exige corpo
+ * VAZIO (sem "action" nem nenhum outro campo) — mandar algo faz o
+ * servidor devolver os dados de cadastre/info por engano.
+ */
+export function buscarCadastroEnderecos(): Promise<{
+  success?: boolean
+  message?: string
+  results?: EnderecoDto | EnderecoDto[]
+}> {
+  return post('controllrctl/cadastre/address', {})
 }
 
 /**

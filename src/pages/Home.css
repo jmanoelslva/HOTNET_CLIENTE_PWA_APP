@@ -1,0 +1,78 @@
+.home-tela {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.home-saudacao {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.home-subtitulo {
+  margin: 4px 0 24px;
+  color: #999999;
+  font-size: 14px;
+}
+
+.home-whatsapp {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 14px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #25d366, #1da851);
+  margin-bottom: 24px;
+}
+
+.home-menu {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.home-menu-item {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.home-menu-icone {
+  font-size: 26px;
+}
+
+.home-menu-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+}
+
+.home-sair {
+  display: block;
+  margin: 0 auto;
+  height: 40px;
+  padding: 0 24px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  color: #666666;
+  font-weight: 600;
+  cursor: pointer;
+}
