@@ -20,6 +20,7 @@ interface CategoriaFaq {
   nome: string
   subtitulo: string
   Icone: IconType
+  cor: string
 }
 
 interface PerguntaFrequente {
@@ -28,14 +29,20 @@ interface PerguntaFrequente {
   resposta: string
 }
 
+// Mesmas cores usadas nos badges equivalentes na Home, pra manter a
+// associação visual entre uma categoria de dúvida e a tela que ela trata.
 const CATEGORIAS: CategoriaFaq[] = [
-  { id: 'atendimento', nome: 'Atendimento', subtitulo: 'Horários e canais', Icone: MdSupportAgent },
-  { id: 'wifi', nome: 'Internet e Wi-Fi', subtitulo: 'Velocidade e sinal', Icone: MdWifi },
-  { id: 'cobrancas', nome: 'Cobranças', subtitulo: 'Boletos e pagamentos', Icone: MdPayments },
-  { id: 'contratos', nome: 'Contratos', subtitulo: 'Planos e contratos', Icone: MdDescription },
-  { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', Icone: MdDataUsage },
-  { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', Icone: MdLock },
+  { id: 'atendimento', nome: 'Atendimento', subtitulo: 'Horários e canais', Icone: MdSupportAgent, cor: '#0f8a45' },
+  { id: 'wifi', nome: 'Internet e Wi-Fi', subtitulo: 'Velocidade e sinal', Icone: MdWifi, cor: '#2a72b8' },
+  { id: 'cobrancas', nome: 'Cobranças', subtitulo: 'Boletos e pagamentos', Icone: MdPayments, cor: '#d94a38' },
+  { id: 'contratos', nome: 'Contratos', subtitulo: 'Planos e contratos', Icone: MdDescription, cor: '#4a5c7a' },
+  { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', Icone: MdDataUsage, cor: '#18afc0' },
+  { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', Icone: MdLock, cor: '#7a4bc4' },
 ]
+
+function categoriaDe(id: string): CategoriaFaq {
+  return CATEGORIAS.find((c) => c.id === id) ?? CATEGORIAS[0]
+}
 
 const PERGUNTAS: PerguntaFrequente[] = [
   {
@@ -154,9 +161,10 @@ export default function Faq() {
           <button
             key={categoria.id}
             className={`faq-categoria ${categoriaFiltro === categoria.id ? 'ativa' : ''}`}
+            style={{ borderColor: categoriaFiltro === categoria.id ? categoria.cor : undefined }}
             onClick={() => selecionarCategoria(categoria.id)}
           >
-            <span className="faq-categoria-icone">
+            <span className="faq-categoria-icone" style={{ background: `${categoria.cor}1a`, color: categoria.cor }}>
               <categoria.Icone size={22} />
             </span>
             <span className="faq-categoria-nome">{categoria.nome}</span>
@@ -179,9 +187,16 @@ export default function Faq() {
         <div className="faq-lista">
           {listaExibida.map((pergunta, indice) => {
             const aberta = abertaId === indice
+            const categoria = categoriaDe(pergunta.categoriaId)
             return (
               <div key={indice} className="faq-item" onClick={() => setAbertaId(aberta ? null : indice)}>
                 <div className="faq-item-topo">
+                  <span
+                    className="faq-item-icone"
+                    style={{ background: `${categoria.cor}1a`, color: categoria.cor }}
+                  >
+                    <categoria.Icone size={18} />
+                  </span>
                   <span className="faq-item-pergunta">{pergunta.pergunta}</span>
                   <span className={`faq-item-seta ${aberta ? 'aberta' : ''}`}>›</span>
                 </div>

@@ -57,7 +57,13 @@
 }
 
 .faq-categoria-icone {
-  color: #f28f3b;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
 }
 
 .faq-categoria-nome {
@@ -103,11 +109,21 @@
 .faq-item-topo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
 }
 
+.faq-item-icone {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .faq-item-pergunta {
+  flex: 1;
   font-size: 14px;
   font-weight: 600;
   color: #333333;
@@ -129,6 +145,7 @@
   font-size: 13px;
   color: #666666;
   line-height: 1.5;
+  text-align: justify;
 }
 
 .faq-whatsapp {

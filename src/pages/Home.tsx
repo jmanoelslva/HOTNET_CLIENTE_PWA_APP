@@ -6,6 +6,8 @@ import {
   MdDataUsage,
   MdDescription,
   MdHelp,
+  MdInfoOutline,
+  MdLogout,
   MdPayments,
   MdSupportAgent,
   MdWifi,
@@ -131,10 +133,10 @@ export default function Home() {
                     navigate('/sobre')
                   }}
                 >
-                  Sobre
+                  <MdInfoOutline size={18} /> Sobre
                 </button>
                 <button className="home-avatar-menu-sair" onClick={sair}>
-                  Sair
+                  <MdLogout size={18} /> Sair
                 </button>
               </div>
             </>
@@ -188,10 +190,6 @@ export default function Home() {
         </div>
       )}
 
-      <button className="home-whatsapp" onClick={aoClicarWhatsapp}>
-        <FaWhatsapp size={20} /> Falar com a gente no WhatsApp
-      </button>
-
       <div className="home-menu">
         {ITENS_MENU.map((item) => (
           <Link key={item.to} to={item.to} className="home-menu-item">
@@ -202,6 +200,10 @@ export default function Home() {
           </Link>
         ))}
       </div>
+
+      <button className="home-whatsapp" onClick={aoClicarWhatsapp}>
+        <FaWhatsapp size={20} /> Falar com a gente no WhatsApp
+      </button>
 
       <footer className="home-rodape">
         <a href="https://hotnet.net.br/policies/privacy" target="_blank" rel="noreferrer">

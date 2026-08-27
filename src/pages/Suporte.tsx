@@ -6,6 +6,7 @@ import {
   MdCampaign,
   MdClose,
   MdConstruction,
+  MdExpandMore,
   MdPayments,
   MdSell,
   MdSupportAgent,
@@ -63,6 +64,7 @@ export default function Suporte() {
   const [categorias, setCategorias] = useState<CategoriaDto[]>([])
   const [dialogAberto, setDialogAberto] = useState(false)
   const [categoriaPk, setCategoriaPk] = useState<number | null>(null)
+  const [categoriaMenuAberto, setCategoriaMenuAberto] = useState(false)
   const [assunto, setAssunto] = useState('')
   const [descricao, setDescricao] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -107,6 +109,7 @@ export default function Suporte() {
       window.alert('Categorias não carregadas ainda, tente novamente em instantes.')
     }
     setCategoriaPk(categorias[0]?.category_pk ?? null)
+    setCategoriaMenuAberto(false)
     setAssunto('')
     setDescricao('')
     setDialogAberto(true)
@@ -214,19 +217,65 @@ export default function Suporte() {
             <h2>Novo chamado</h2>
 
             <label>Categoria</label>
-            <select value={categoriaPk ?? ''} onChange={(evento) => setCategoriaPk(Number(evento.target.value))}>
-              {categorias.map((categoria) => (
-                <option key={categoria.category_pk} value={categoria.category_pk}>
-                  {categoria.category_name ?? `Categoria ${categoria.category_pk}`}
-                </option>
-              ))}
-            </select>
+            {(() => {
+              const categoriaSelecionada = categorias.find((c) => c.category_pk === categoriaPk) ?? null
+              const IconeSelecionado = iconeParaCategoria(categoriaSelecionada?.category_name ?? '')
+              return (
+                <div className="suporte-dropdown-wrapper">
+                  <button
+                    type="button"
+                    className="suporte-dropdown-btn"
+                    onClick={() => setCategoriaMenuAberto((v) => !v)}
+                  >
+                    <span className="suporte-dropdown-btn-conteudo">
+                      <IconeSelecionado className="suporte-dropdown-icone" />
+                      {categoriaSelecionada?.category_name ?? 'Selecione uma categoria'}
+                    </span>
+                    <MdExpandMore />
+                  </button>
+                  {categoriaMenuAberto && (
+                    <>
+                      <div className="suporte-dropdown-fundo" onClick={() => setCategoriaMenuAberto(false)} />
+                      <div className="suporte-dropdown-lista">
+                        {categorias.map((categoria) => {
+                          const Icone = iconeParaCategoria(categoria.category_name ?? '')
+                          return (
+                            <button
+                              type="button"
+                              key={categoria.category_pk}
+                              className="suporte-dropdown-item"
+                              onClick={() => {
+                                setCategoriaPk(categoria.category_pk)
+                                setCategoriaMenuAberto(false)
+                              }}
+                            >
+                              <Icone className="suporte-dropdown-icone" />
+                              {categoria.category_name ?? `Categoria ${categoria.category_pk}`}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            })()}
 
             <label>Assunto</label>
-            <input value={assunto} onChange={(evento) => setAssunto(evento.target.value)} maxLength={120} />
+            <input
+              value={assunto}
+              onChange={(evento) => setAssunto(evento.target.value)}
+              placeholder="Resuma o problema em poucas palavras"
+              maxLength={120}
+            />
 
             <label>Descrição</label>
-            <textarea value={descricao} onChange={(evento) => setDescricao(evento.target.value)} rows={4} />
+            <textarea
+              value={descricao}
+              onChange={(evento) => setDescricao(evento.target.value)}
+              placeholder="Descreva o problema com detalhes"
+              rows={4}
+            />
 
             <div className="suporte-modal-acoes">
               <button onClick={() => setDialogAberto(false)}>Cancelar</button>

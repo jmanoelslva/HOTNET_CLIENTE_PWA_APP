@@ -51,6 +51,7 @@ export default function Login() {
               type={mostrarSenha ? 'text' : 'password'}
               value={senha}
               onChange={(evento) => setSenha(evento.target.value)}
+              placeholder="Digite sua senha"
               required
             />
             <button
