@@ -38,6 +38,10 @@ export default function DetalheChamado() {
   const [erro, setErro] = useState<string | null>(null)
   const [mensagem, setMensagem] = useState('')
   const [enviando, setEnviando] = useState(false)
+  const [menuAnexoAberto, setMenuAnexoAberto] = useState(false)
+  const [confirmandoLocalizacao, setConfirmandoLocalizacao] = useState(false)
+  const inputFotoRef = useRef<HTMLInputElement>(null)
+  const inputGaleriaRef = useRef<HTMLInputElement>(null)
   const inputArquivoRef = useRef<HTMLInputElement>(null)
   const fimDaListaRef = useRef<HTMLDivElement>(null)
 
@@ -63,13 +67,12 @@ export default function DetalheChamado() {
     }
   }
 
-  async function aoEnviarMensagem() {
-    const texto = mensagem.trim()
-    if (!texto) return
+  /** Envia qualquer texto pro chamado — reaproveitado pela mensagem digitada e pela localização. */
+  async function aoEnviarTexto(texto: string, aoConcluir?: () => void) {
     setEnviando(true)
     try {
       await enviarMensagem(pk, texto)
-      setMensagem('')
+      aoConcluir?.()
       await carregar(false)
     } catch (excecao) {
       window.alert(excecao instanceof Error ? excecao.message : 'Não foi possível enviar a mensagem.')
@@ -78,9 +81,16 @@ export default function DetalheChamado() {
     }
   }
 
+  function aoEnviarMensagem() {
+    const texto = mensagem.trim()
+    if (!texto) return
+    aoEnviarTexto(texto, () => setMensagem(''))
+  }
+
   async function aoSelecionarArquivo(evento: React.ChangeEvent<HTMLInputElement>) {
     const arquivo = evento.target.files?.[0]
     evento.target.value = ''
+    setMenuAnexoAberto(false)
     if (!arquivo) return
     setEnviando(true)
     try {
@@ -91,6 +101,26 @@ export default function DetalheChamado() {
     } finally {
       setEnviando(false)
     }
+  }
+
+  function confirmarEnviarLocalizacao() {
+    if (!navigator.geolocation) {
+      window.alert('Este navegador não suporta compartilhar localização.')
+      return
+    }
+    setConfirmandoLocalizacao(false)
+    setEnviando(true)
+    navigator.geolocation.getCurrentPosition(
+      (posicao) => {
+        const { latitude, longitude } = posicao.coords
+        const link = `https://www.google.com/maps?q=${latitude},${longitude}`
+        aoEnviarTexto(`Minha localização atual: ${link}`)
+      },
+      () => {
+        setEnviando(false)
+        window.alert('Não foi possível obter a localização agora. Verifique a permissão do navegador.')
+      },
+    )
   }
 
   if (!Number.isFinite(pk)) {
@@ -161,15 +191,53 @@ export default function DetalheChamado() {
 
       {!resolvido && (
         <div className="detalhe-envio">
+          <input
+            ref={inputFotoRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            style={{ display: 'none' }}
+            onChange={aoSelecionarArquivo}
+          />
+          <input
+            ref={inputGaleriaRef}
+            type="file"
+            accept="image/*,video/*"
+            style={{ display: 'none' }}
+            onChange={aoSelecionarArquivo}
+          />
           <input ref={inputArquivoRef} type="file" style={{ display: 'none' }} onChange={aoSelecionarArquivo} />
+
+          <div className="detalhe-anexo-wrapper">
+            <button
+              className="detalhe-btn-anexar"
+              disabled={enviando}
+              onClick={() => setMenuAnexoAberto((v) => !v)}
+              aria-label="Anexar"
+            >
+              📎
+            </button>
+            {menuAnexoAberto && (
+              <>
+                <div className="detalhe-menu-fundo" onClick={() => setMenuAnexoAberto(false)} />
+                <div className="detalhe-menu-anexo">
+                  <button onClick={() => inputFotoRef.current?.click()}>📷 Tirar foto</button>
+                  <button onClick={() => inputGaleriaRef.current?.click()}>🖼️ Galeria</button>
+                  <button onClick={() => inputArquivoRef.current?.click()}>📄 Arquivo</button>
+                </div>
+              </>
+            )}
+          </div>
+
           <button
             className="detalhe-btn-anexar"
             disabled={enviando}
-            onClick={() => inputArquivoRef.current?.click()}
-            aria-label="Anexar arquivo"
+            onClick={() => setConfirmandoLocalizacao(true)}
+            aria-label="Enviar localização"
           >
-            📎
+            📍
           </button>
+
           <input
             className="detalhe-input-mensagem"
             value={mensagem}
@@ -181,6 +249,24 @@ export default function DetalheChamado() {
           <button className="detalhe-btn-enviar" disabled={enviando || !mensagem.trim()} onClick={aoEnviarMensagem}>
             Enviar
           </button>
+        </div>
+      )}
+
+      {confirmandoLocalizacao && (
+        <div className="suporte-modal-fundo" onClick={() => setConfirmandoLocalizacao(false)}>
+          <div className="suporte-modal" onClick={(evento) => evento.stopPropagation()}>
+            <h2>Enviar sua localização?</h2>
+            <p className="detalhe-confirmar-texto">
+              Isso manda sua localização atual como mensagem neste chamado — útil pra equipe encontrar o endereço numa
+              visita técnica.
+            </p>
+            <div className="suporte-modal-acoes">
+              <button onClick={() => setConfirmandoLocalizacao(false)}>Cancelar</button>
+              <button className="suporte-btn-primario" onClick={confirmarEnviarLocalizacao}>
+                Sim, enviar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
