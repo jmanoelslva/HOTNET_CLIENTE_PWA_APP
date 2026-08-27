@@ -11,6 +11,8 @@ compartilhado.
 - [Vite](https://vite.dev/) + [React](https://react.dev/) + TypeScript
 - `react-router-dom` para as rotas
 - React Context (`SessionContext`) para o estado de sessão, em memória
+- `react-icons` (subconjunto Material Symbols, `react-icons/md`) para os
+  ícones — mesma linguagem visual dos `ic_ms_*` do app Android
 
 ## Rodando localmente
 
@@ -89,6 +91,8 @@ Todas as telas principais implementadas e validadas contra o backend real:
 - **Avisos** — gate obrigatório em tela cheia quando há avisos não
   confirmados (mesmo comportamento do `AvisoActivity` do app Android).
 - **Meus dados** — informações pessoais, contato e endereços.
-- **Ajuda** — FAQ estático com busca e categorias, mais WhatsApp.
+- **Ajuda** — FAQ estático com busca, categorias coloridas e WhatsApp.
+- **Sobre** — logotipo, descrição do portal e WhatsApp, acessível pelo
+  menu do avatar na Home.
 
 Paridade funcional completa com as telas principais do app Android.
