@@ -130,6 +130,17 @@ apt-get install -y curl git rsync ca-certificates gnupg certbot
 # --------------------------------------------------------------------------
 if [ -d "$INSTALL_DIR/.git" ]; then
   info "Projeto já clonado em $INSTALL_DIR, atualizando..."
+  # Descarta qualquer modificação local em arquivo rastreado antes de
+  # atualizar — esta pasta é só um artefato de deploy, nunca editada à mão.
+  # "npm install" já rodou aqui antes e pode ter deixado o package-lock.json
+  # localmente diferente do commitado (o lockfile foi gerado numa máquina
+  # Windows; "npm install" no servidor Linux resolve os binários nativos
+  # pra Linux e reescreve o arquivo) — sem isso, "pull --ff-only" falha
+  # exigindo intervenção manual toda vez que isso acontecer de novo.
+  if [ -n "$(git -C "$INSTALL_DIR" status --porcelain)" ]; then
+    warn "Descartando alterações locais em $INSTALL_DIR (artefato de deploy, não deveria ter edição manual)..."
+    git -C "$INSTALL_DIR" checkout -- .
+  fi
   git -C "$INSTALL_DIR" pull --ff-only
 else
   info "Clonando $REPO_URL em $INSTALL_DIR..."
@@ -158,7 +169,10 @@ instalar_node
 # 7. Build
 # --------------------------------------------------------------------------
 info "Instalando dependências do projeto e gerando build de produção..."
-( cd "$INSTALL_DIR" && npm install && npm run build )
+# "npm ci" (não "npm install") instala exatamente o que está no
+# package-lock.json commitado e nunca reescreve o arquivo — é o que evita
+# o problema acima se repetir numa próxima atualização.
+( cd "$INSTALL_DIR" && npm ci && npm run build )
 ok "Build gerado em $INSTALL_DIR/dist"
 
 # --------------------------------------------------------------------------
@@ -309,6 +323,6 @@ cat <<RESUMO
 
   Pra atualizar o portal depois (novo build + republicar), rode este
   mesmo script de novo — ele detecta o que já está feito e só refaz o
-  que mudou (git pull, npm install, npm run build, republica o dist/).
+  que mudou (git pull, npm ci, npm run build, republica o dist/).
 
 RESUMO
