@@ -1,0 +1,289 @@
+.boletos-tela {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+.boletos-cabecalho h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.boletos-cabecalho p {
+  margin: 4px 0 20px;
+  color: #999999;
+  font-size: 14px;
+}
+
+.boletos-abas {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.aba-chip {
+  flex: 1;
+  height: 40px;
+  border-radius: 20px;
+  border: 1.5px solid #2a72b8;
+  background: transparent;
+  color: #2a72b8;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.aba-chip.aba-pagos {
+  border-color: #4caf50;
+  color: #4caf50;
+}
+
+.aba-chip.ativa {
+  background: #2a72b8;
+  color: #ffffff;
+}
+
+.aba-chip.aba-pagos.ativa {
+  background: #4caf50;
+  color: #ffffff;
+}
+
+.boletos-filtro-contrato {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #333333;
+  background: #ffffff;
+  margin-bottom: 20px;
+}
+
+.boletos-status {
+  color: #666666;
+  font-size: 14px;
+  text-align: center;
+  padding: 32px 0;
+}
+
+.boletos-status button {
+  margin-top: 12px;
+  height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+}
+
+.boletos-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.boleto-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.boleto-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.boleto-titulo {
+  font-weight: 700;
+  color: #333333;
+  font-size: 15px;
+}
+
+.boleto-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 4px 10px;
+}
+
+.badge-em-dia {
+  background: #2a72b8;
+}
+
+.badge-vencida {
+  background: #f44336;
+}
+
+.badge-paga {
+  background: #4caf50;
+}
+
+.boleto-vencimento {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+.boleto-aviso {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.boleto-aviso-paga {
+  color: #4caf50;
+}
+
+.boleto-aviso-vencida {
+  color: #f44336;
+}
+
+.boleto-label-valor {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #999999;
+}
+
+.boleto-valor {
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #333333;
+}
+
+.boleto-valor-original {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #999999;
+  text-decoration: line-through;
+}
+
+.boleto-taxas {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: #999999;
+}
+
+.boleto-contrato {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #999999;
+}
+
+.boleto-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.boleto-acoes button {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1px solid #e0e0e0;
+  background: #f5f5f5;
+  color: #333333;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boleto-acoes button.boleto-btn-informar {
+  border: none;
+  color: #ffffff;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+}
+
+.boletos-ver-mais {
+  display: block;
+  margin: 20px auto 0;
+  border: none;
+  background: transparent;
+  color: #999999;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boletos-modal-fundo {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.boletos-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+}
+
+.boletos-modal img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.boletos-modal button {
+  margin-top: 16px;
+  height: 40px;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+}
+
+.boletos-modal-confirmar h2 {
+  margin: 0;
+  font-size: 17px;
+  color: #333333;
+}
+
+.boletos-modal-confirmar p {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #666666;
+  text-align: left;
+}
+
+.boletos-modal-acoes {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.boletos-modal-acoes button {
+  margin-top: 0;
+  flex: 1;
+}
+
+.boletos-modal-acoes button:first-child {
+  background: #f5f5f5;
+  color: #333333;
+}

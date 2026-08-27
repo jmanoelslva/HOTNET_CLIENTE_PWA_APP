@@ -84,4 +84,67 @@ export function logout(): Promise<{ success: boolean }> {
   return post('session/logout', {})
 }
 
+export interface FaturaDto {
+  invoice_pk: number
+  contract_pk?: number
+  contract_number?: number
+  invoice_date_due?: string
+  invoice_amount_document?: string
+  days_late?: string
+  invoice_barcode?: string
+  invoice_qrcode?: string
+  invoice_qrcode_image?: string
+  invoice_date_credit?: string
+  obs_pk?: number
+  add_observation?: boolean
+  // Taxas percentuais (não valor em R$) usadas pra calcular o valor com
+  // encargos no cliente — "invoice_amount_document" é sempre o valor
+  // ORIGINAL, sem multa/juros (confirmado no painel do cliente).
+  invoice_rate_fine?: string
+  invoice_rate_interest?: string
+}
+
+export interface FaturaListResponse {
+  success: boolean
+  message?: string
+  results?: FaturaDto[]
+}
+
+/**
+ * Lista os boletos do cliente logado — mesmo endpoint do app Android
+ * (invoice_ctl/invoice/list), mesma ordenação por vencimento decrescente.
+ */
+export function listarBoletos(): Promise<FaturaListResponse> {
+  return post<FaturaListResponse>('invoice_ctl/invoice/list', {
+    action: 'list',
+    sort: 'invoice_date_due',
+    dir: 'DESC',
+  })
+}
+
+export interface InformarPagamentoResponse {
+  success: boolean
+  message?: string
+}
+
+/**
+ * Informa pagamento de um boleto pra liberação temporária da conexão.
+ */
+export function informarPagamento(invoicePk: number, contractPk: number): Promise<InformarPagamentoResponse> {
+  return post<InformarPagamentoResponse>('invoice_ctl/invoice/inform', {
+    invoice_pk: invoicePk,
+    contract_pk: contractPk,
+    obs_text: 'Informado pelo Portal Web do Cliente',
+  })
+}
+
+/**
+ * URL do boleto em PDF/impressão, pronta pra abrir em nova aba — passa
+ * pelo mesmo proxy de "/api" (ver vite.config.ts / README, seção de
+ * produção), então os cookies de sessão já rewriteados valem aqui também.
+ */
+export function urlImpressaoBoleto(invoicePk: number): string {
+  return `${API_BASE}/invoice_ctl/invoice/print_layout?invoice_pk=${invoicePk}`
+}
+
 export { post }
