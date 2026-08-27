@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { MdDataUsage } from 'react-icons/md'
 import {
   buscarConsumoDoMes,
   buscarSessaoAtualPorCpe,
@@ -10,6 +11,7 @@ import {
 } from '../api/consumo'
 import { formatarBytes, formatarDuracao } from '../utils/formatacao'
 import VoltarInicio from '../components/VoltarInicio'
+import CabecalhoTela from '../components/CabecalhoTela'
 import './Consumo.css'
 
 const NOMES_DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -118,10 +120,12 @@ export default function Consumo() {
   return (
     <div className="consumo-tela">
       <VoltarInicio />
-      <header className="consumo-cabecalho">
-        <h1>Consumo</h1>
-        <p>Acompanhe o uso diário da sua internet.</p>
-      </header>
+      <CabecalhoTela
+        icone={MdDataUsage}
+        cor="#18afc0"
+        titulo="Consumo"
+        subtitulo="Acompanhe o uso diário da sua internet."
+      />
 
       <div className="consumo-seletor-mes">
         <button onClick={irParaMesAnterior} aria-label="Mês anterior">‹</button>

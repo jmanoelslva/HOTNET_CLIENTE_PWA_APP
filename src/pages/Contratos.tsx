@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { MdDescription } from 'react-icons/md'
 import { urlImpressaoContrato } from '../api/client'
 import { buscarContratos, type Contrato } from '../api/contratos'
 import VoltarInicio from '../components/VoltarInicio'
+import CabecalhoTela from '../components/CabecalhoTela'
 import './Contratos.css'
 
 // Valores confirmados na documentação oficial do contract_status.
@@ -58,10 +60,12 @@ export default function Contratos() {
   return (
     <div className="contratos-tela">
       <VoltarInicio />
-      <header className="contratos-cabecalho">
-        <h1>Contratos</h1>
-        <p>Seus contratos, planos e itens contratados.</p>
-      </header>
+      <CabecalhoTela
+        icone={MdDescription}
+        cor="#4a5c7a"
+        titulo="Contratos"
+        subtitulo="Seus contratos, planos e itens contratados."
+      />
 
       {carregando && <p className="contratos-status">Carregando contratos…</p>}
 

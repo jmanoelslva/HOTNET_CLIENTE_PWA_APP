@@ -6,22 +6,6 @@
   min-height: 100vh;
 }
 
-.suporte-cabecalho h1 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #f28f3b, #d94a38);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.suporte-cabecalho p {
-  margin: 4px 0 20px;
-  color: #999999;
-  font-size: 14px;
-}
-
 .suporte-abas {
   display: flex;
   gap: 8px;

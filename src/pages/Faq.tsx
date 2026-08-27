@@ -3,6 +3,7 @@ import type { IconType } from 'react-icons'
 import {
   MdDataUsage,
   MdDescription,
+  MdHelp,
   MdLock,
   MdPayments,
   MdSupportAgent,
@@ -13,6 +14,7 @@ import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente } from '../api/cadastro'
 import { abrirWhatsappAjuda } from '../utils/whatsapp'
 import VoltarInicio from '../components/VoltarInicio'
+import CabecalhoTela from '../components/CabecalhoTela'
 import './Faq.css'
 
 interface CategoriaFaq {
@@ -141,10 +143,12 @@ export default function Faq() {
   return (
     <div className="faq-tela">
       <VoltarInicio />
-      <header className="faq-cabecalho">
-        <h1>Ajuda</h1>
-        <p>Perguntas frequentes e nossos canais de contato.</p>
-      </header>
+      <CabecalhoTela
+        icone={MdHelp}
+        cor="#2a72b8"
+        titulo="Ajuda"
+        subtitulo="Perguntas frequentes e nossos canais de contato."
+      />
 
       <input
         className="faq-busca"

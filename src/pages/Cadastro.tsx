@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import { MdBadge } from 'react-icons/md'
 import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente, buscarEnderecos, formatarContatos, rotuloDocumento, tipoCadastro, type Endereco } from '../api/cadastro'
 import type { ClientDto } from '../api/client'
 import VoltarInicio from '../components/VoltarInicio'
+import CabecalhoTela from '../components/CabecalhoTela'
 import './Cadastro.css'
 
 function formatarData(raw: string | null | undefined): string | null {
@@ -64,10 +66,12 @@ export default function Cadastro() {
   return (
     <div className="cadastro-tela">
       <VoltarInicio />
-      <header className="cadastro-cabecalho">
-        <h1>Meus dados</h1>
-        <p>Suas informações cadastrais na HOTNET.</p>
-      </header>
+      <CabecalhoTela
+        icone={MdBadge}
+        cor="#7a4bc4"
+        titulo="Meus dados"
+        subtitulo="Suas informações cadastrais na HOTNET."
+      />
 
       {carregando && <p className="cadastro-status">Carregando seus dados…</p>}
 

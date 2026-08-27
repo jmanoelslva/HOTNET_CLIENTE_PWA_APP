@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { MdPayments } from 'react-icons/md'
 import VoltarInicio from '../components/VoltarInicio'
+import CabecalhoTela from '../components/CabecalhoTela'
 import {
   ApiError,
   SessaoExpiradaError,
@@ -166,10 +168,12 @@ export default function Boletos() {
   return (
     <div className="boletos-tela">
       <VoltarInicio />
-      <header className="boletos-cabecalho">
-        <h1>Boletos</h1>
-        <p>Acompanhe seus boletos em aberto e pagos.</p>
-      </header>
+      <CabecalhoTela
+        icone={MdPayments}
+        cor="#d94a38"
+        titulo="Boletos"
+        subtitulo="Acompanhe seus boletos em aberto e pagos."
+      />
 
       <div className="boletos-abas">
         <button
@@ -275,17 +279,17 @@ export default function Boletos() {
 
                 {!paga && (
                   <div className="boleto-acoes">
-                    <button onClick={() => aoCopiar(`barcode-${fatura.invoice_pk}`, fatura.invoice_barcode)}>
-                      {copiado === `barcode-${fatura.invoice_pk}` ? '✓ Copiado!' : 'Copiar código de barras'}
-                    </button>
                     <button onClick={() => aoCopiar(`pix-${fatura.invoice_pk}`, fatura.invoice_qrcode)}>
-                      {copiado === `pix-${fatura.invoice_pk}` ? '✓ Copiado!' : 'Copiar PIX'}
+                      {copiado === `pix-${fatura.invoice_pk}` ? '✓ Código PIX Copiado!' : 'Pagar com PIX'}
                     </button>
                     {fatura.invoice_qrcode_image && (
-                      <button onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}>Ver QR Code</button>
+                      <button onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}>QR Code PIX</button>
                     )}
+                    <button onClick={() => aoCopiar(`barcode-${fatura.invoice_pk}`, fatura.invoice_barcode)}>
+                      {copiado === `barcode-${fatura.invoice_pk}` ? '✓ Copiado!' : 'Código de Barras'}
+                    </button>
                     <button onClick={() => window.open(urlImpressaoBoleto(fatura.invoice_pk), '_blank')}>
-                      Ver boleto em PDF
+                      Imprimir / Salvar PDF
                     </button>
                     {!jaInformado && fatura.contract_pk != null && (
                       <button
@@ -293,7 +297,7 @@ export default function Boletos() {
                         disabled={informando === fatura.invoice_pk}
                         onClick={() => setConfirmando(fatura)}
                       >
-                        {informando === fatura.invoice_pk ? 'Enviando…' : 'Informar pagamento'}
+                        {informando === fatura.invoice_pk ? 'Enviando…' : 'Já paguei este boleto'}
                       </button>
                     )}
                   </div>

@@ -17,6 +17,7 @@ import { useSessao } from '../auth/SessionContext'
 import { buscarCategorias, buscarChamados, chamadoResolvido, abrirChamado as apiAbrirChamado } from '../api/suporte'
 import type { CategoriaDto, TicketDto } from '../api/client'
 import VoltarInicio from '../components/VoltarInicio'
+import CabecalhoTela from '../components/CabecalhoTela'
 import './Suporte.css'
 
 const TAMANHO_PAGINA = 20
@@ -136,10 +137,7 @@ export default function Suporte() {
   return (
     <div className="suporte-tela">
       <VoltarInicio />
-      <header className="suporte-cabecalho">
-        <h1>Suporte</h1>
-        <p>Seus chamados de suporte.</p>
-      </header>
+      <CabecalhoTela icone={MdSupportAgent} cor="#0f8a45" titulo="Suporte" subtitulo="Seus chamados de suporte." />
 
       <div className="suporte-abas">
         <button className={`aba-chip aba-abertos ${aba === 'abertos' ? 'ativa' : ''}`} onClick={() => setAba('abertos')}>
