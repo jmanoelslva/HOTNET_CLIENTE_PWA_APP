@@ -15,6 +15,8 @@ compartilhado.
   ícones — mesma linguagem visual dos `ic_ms_*` do app Android
 - `vite-plugin-pwa` — manifest + service worker (ver "Experiência de
   app" abaixo)
+- `vitest` + `@testing-library/react` para os testes (ver "Testes e CI"
+  abaixo)
 - **Design tokens** — paleta, tipografia e sombras centralizadas em
   `src/index.css` (CSS custom properties) e espelhadas em
   `src/utils/cores.ts` (`CORES`, pra uso em estilo inline/JS). Fonte
@@ -170,6 +172,13 @@ com um app nativo do que um site comum:
   que só funciona pelo Safari — abrir o link num navegador in-app
   (WhatsApp, Instagram) ou no Chrome para iOS não oferece essa opção
   no compartilhamento. Ver `src/hooks/usePwaInstall.ts`.
+- **Aviso de nova versão** — `registerType: 'autoUpdate'` (vite.config.ts)
+  ativa o service worker novo sozinho em segundo plano, mas isso não
+  troca os módulos JS já carregados numa aba que já estava aberta. O
+  registro é feito manualmente por `useRegisterSW` (`virtual:pwa-register/react`,
+  `injectRegister: false`) em vez do script mínimo auto-injetado, só pra
+  ter acesso ao callback `onNeedRefresh` — uma faixa fixa no topo
+  (`StatusBanners.tsx`) avisa e só recarrega quando o cliente confirmar.
 - **Barra de navegação inferior** (`BottomNav`) fixa nas telas
   autenticadas, com atalho colorido pras 5 telas mais usadas.
 - **Toasts** (`ToastProvider`/`useToast`) no lugar de `window.alert()`.
@@ -200,3 +209,37 @@ com um app nativo do que um site comum:
   Boletos) têm no mínimo 44px de altura, o recomendado por WCAG 2.5.5 /
   Material Design; links secundários pequenos (ex: "Ver mais boletos
   pagos") ganham padding extra só pra aumentar a área de toque.
+
+## Robustez e performance
+
+- **Error Boundary** (`src/components/ErrorBoundary.tsx`) — envolve o app
+  inteiro em `main.tsx`. Sem isso, um erro de render em QUALQUER tela
+  derruba o app pra uma página branca (React não segura exceção de
+  render sozinho, só um boundary de verdade faz isso). Mostra uma tela
+  de erro amigável com botão de recarregar em vez disso.
+- **Faixa de status** (`src/components/StatusBanners.tsx`) — avisa quando
+  o navegador fica offline (`useOnline`, eventos `online`/`offline`) e
+  quando há uma versão nova do app pra atualizar (ver "Aviso de nova
+  versão" acima). Offline tem prioridade sobre o aviso de atualização.
+- **Code-splitting por rota** — cada tela em `src/pages/` é importada com
+  `React.lazy` em `App.tsx`, dentro de um único `<Suspense>` (fallback:
+  `Spinner tela`). Em vez de um bundle JS inicial só, o cliente baixa
+  apenas o código da tela que está acessando.
+
+## Testes e CI
+
+```bash
+npm test        # roda a suíte uma vez (vitest run)
+npm run test:watch
+npm run lint     # oxlint
+```
+
+Testes em `*.test.ts(x)` ao lado do arquivo testado (`vitest` +
+`@testing-library/react`, config em `vitest.config.ts`). Cobertura
+propositalmente focada no que é mais arriscado quebrar em silêncio, não
+exaustiva: a lógica de sessão expirada em `src/api/client.ts` (o quirk do
+401/"Login Failure", ver acima), `ErrorBoundary`, `StatusBanners` e
+`useOnline`.
+
+`.github/workflows/ci.yml` roda lint + testes + build a cada push/PR pra
+`master`.

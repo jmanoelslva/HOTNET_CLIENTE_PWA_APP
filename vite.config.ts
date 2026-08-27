@@ -8,6 +8,12 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Registro manual via useRegisterSW (StatusBanners.tsx), não o
+      // script mínimo auto-injetado — precisamos do callback onNeedRefresh
+      // pra avisar o cliente e só recarregar quando ele confirmar, já que
+      // "autoUpdate" ativa a versão nova sozinho mas isso NÃO atualiza os
+      // módulos JS já carregados na aba aberta.
+      injectRegister: false,
       // Nunca cachear /api/* — são sempre dados dinâmicos e ligados à
       // sessão (boletos, consumo, chamados...); o service worker só
       // deve cuidar dos arquivos estáticos do próprio app.
