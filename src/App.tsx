@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import RotaProtegida from './components/RotaProtegida'
 import Boletos from './pages/Boletos'
+import Contratos from './pages/Contratos'
 import Home from './pages/Home'
 import Login from './pages/Login'
 
@@ -21,6 +22,14 @@ function App() {
         element={
           <RotaProtegida>
             <Boletos />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/contratos"
+        element={
+          <RotaProtegida>
+            <Contratos />
           </RotaProtegida>
         }
       />

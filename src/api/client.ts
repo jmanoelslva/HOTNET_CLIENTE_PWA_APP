@@ -113,12 +113,76 @@ export interface FaturaListResponse {
 /**
  * Lista os boletos do cliente logado — mesmo endpoint do app Android
  * (invoice_ctl/invoice/list), mesma ordenação por vencimento decrescente.
+ * `limit` é usado pra descobrir todos os contratos do cliente a partir
+ * das faturas (ver src/api/contratos.ts) — invoice/list nunca falha em
+ * trazer todos os contract_pk, ao contrário do contract/list puro.
  */
-export function listarBoletos(): Promise<FaturaListResponse> {
+export function listarBoletos(opcoes?: { limit?: number }): Promise<FaturaListResponse> {
   return post<FaturaListResponse>('invoice_ctl/invoice/list', {
     action: 'list',
     sort: 'invoice_date_due',
     dir: 'DESC',
+    limit: opcoes?.limit,
+  })
+}
+
+function whereJson(condicoes: Array<{ field: string; oper: number; value: string }>): string {
+  return JSON.stringify(condicoes)
+}
+
+export interface ContratoDto {
+  contract_pk: number
+  contract_number?: number
+  contract_status?: number
+  contract_pay_day?: number
+  contract_date_activation?: string
+  contract_date_cad?: string
+  contract_amount?: string
+  contract_value?: string
+}
+
+/**
+ * Detalhes de UM contrato específico (status, valor, dia de pagamento,
+ * data de ativação) — controllrctl/contract/list SEM filtro pode voltar
+ * vazio mesmo para clientes com contratos (bug do backend confirmado no
+ * app Android), por isso sempre filtramos por contract_pk (oper 5 = "=").
+ * `results` pode vir como array ou objeto único, dependendo do backend.
+ */
+export function buscarDetalhesContrato(
+  contractPk: number,
+): Promise<{ success?: boolean; message?: string; results?: ContratoDto | ContratoDto[] }> {
+  return post('controllrctl/contract/list', {
+    action: 'list',
+    where: whereJson([{ field: 'contract_pk', oper: 5, value: String(contractPk) }]),
+  })
+}
+
+export interface ItemServicoDto {
+  item_pk?: number
+  contract_pk?: number
+  item_name?: string
+  item_amount?: string
+  item_type?: number
+  item_rent?: boolean
+  plan_name?: string
+  plan_pk?: number
+}
+
+export interface ContractSvcListResponse {
+  success: boolean
+  message?: string
+  results?: ItemServicoDto[]
+}
+
+/**
+ * Itens/serviços de um contrato (plano, equipamentos alugados) —
+ * controllrctl/contract/svclist, mesmo filtro/ordenação do app Android.
+ */
+export function listarItensContrato(contractPk: number): Promise<ContractSvcListResponse> {
+  return post<ContractSvcListResponse>('controllrctl/contract/svclist', {
+    where: whereJson([{ field: 'item.contract_pk', oper: 5, value: String(contractPk) }]),
+    sort: 'contract_pk',
+    dir: 'ASC',
   })
 }
 
@@ -145,6 +209,14 @@ export function informarPagamento(invoicePk: number, contractPk: number): Promis
  */
 export function urlImpressaoBoleto(invoicePk: number): string {
   return `${API_BASE}/invoice_ctl/invoice/print_layout?invoice_pk=${invoicePk}`
+}
+
+/**
+ * URL do contrato completo em PDF/impressão (mesmo endpoint usado pelo
+ * WebView do app Android: controllrctl/contract/print/{contractPk}).
+ */
+export function urlImpressaoContrato(contractPk: number): string {
+  return `${API_BASE}/controllrctl/contract/print/${contractPk}`
 }
 
 export { post }

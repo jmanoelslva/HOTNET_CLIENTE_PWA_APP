@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   ApiError,
   SessaoExpiradaError,
@@ -60,12 +61,15 @@ async function copiarTexto(texto: string): Promise<boolean> {
 }
 
 export default function Boletos() {
+  const location = useLocation()
+  const contratoPreSelecionado = (location.state as { contratoPk?: number } | null)?.contratoPk ?? null
+
   const [faturas, setFaturas] = useState<FaturaDto[]>([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
 
   const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>('aberto')
-  const [filtroContrato, setFiltroContrato] = useState<number | null>(null)
+  const [filtroContrato, setFiltroContrato] = useState<number | null>(contratoPreSelecionado)
   const [mostrarTodosPagos, setMostrarTodosPagos] = useState(false)
 
   const [copiado, setCopiado] = useState<string | null>(null)

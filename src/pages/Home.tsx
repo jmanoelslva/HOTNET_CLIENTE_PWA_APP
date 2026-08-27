@@ -10,6 +10,8 @@ export default function Home() {
       <p>Login realizado com sucesso. As telas de contratos, consumo e suporte entram aqui, uma de cada vez.</p>
       <p>
         <Link to="/boletos">Ver boletos</Link>
+        {' · '}
+        <Link to="/contratos">Ver contratos</Link>
       </p>
       <button onClick={sair}>Sair</button>
     </div>
