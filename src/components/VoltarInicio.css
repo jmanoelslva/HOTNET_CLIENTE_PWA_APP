@@ -1,0 +1,12 @@
+.voltar-inicio {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f28f3b;
+  text-decoration: none;
+}
+
+.voltar-inicio:hover {
+  text-decoration: underline;
+}

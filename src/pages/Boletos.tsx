@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import VoltarInicio from '../components/VoltarInicio'
 import {
   ApiError,
   SessaoExpiradaError,
@@ -164,6 +165,7 @@ export default function Boletos() {
 
   return (
     <div className="boletos-tela">
+      <VoltarInicio />
       <header className="boletos-cabecalho">
         <h1>Boletos</h1>
         <p>Acompanhe seus boletos em aberto e pagos.</p>

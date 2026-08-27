@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { urlImpressaoContrato } from '../api/client'
 import { buscarContratos, type Contrato } from '../api/contratos'
+import VoltarInicio from '../components/VoltarInicio'
 import './Contratos.css'
 
 // Valores confirmados na documentação oficial do contract_status.
@@ -56,6 +57,7 @@ export default function Contratos() {
 
   return (
     <div className="contratos-tela">
+      <VoltarInicio />
       <header className="contratos-cabecalho">
         <h1>Contratos</h1>
         <p>Seus contratos, planos e itens contratados.</p>

@@ -9,6 +9,7 @@ import {
   type SessaoAtual,
 } from '../api/consumo'
 import { formatarBytes, formatarDuracao } from '../utils/formatacao'
+import VoltarInicio from '../components/VoltarInicio'
 import './Consumo.css'
 
 const NOMES_DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -116,6 +117,7 @@ export default function Consumo() {
 
   return (
     <div className="consumo-tela">
+      <VoltarInicio />
       <header className="consumo-cabecalho">
         <h1>Consumo</h1>
         <p>Acompanhe o uso diário da sua internet.</p>

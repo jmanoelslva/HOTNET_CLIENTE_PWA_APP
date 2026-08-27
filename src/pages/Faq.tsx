@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente } from '../api/cadastro'
 import { abrirWhatsappAjuda } from '../utils/whatsapp'
+import VoltarInicio from '../components/VoltarInicio'
 import './Faq.css'
 
 interface CategoriaFaq {
@@ -122,6 +123,7 @@ export default function Faq() {
 
   return (
     <div className="faq-tela">
+      <VoltarInicio />
       <header className="faq-cabecalho">
         <h1>Ajuda</h1>
         <p>Perguntas frequentes e nossos canais de contato.</p>

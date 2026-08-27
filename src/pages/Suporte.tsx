@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useSessao } from '../auth/SessionContext'
 import { buscarCategorias, buscarChamados, chamadoResolvido, abrirChamado as apiAbrirChamado } from '../api/suporte'
 import type { CategoriaDto, TicketDto } from '../api/client'
+import VoltarInicio from '../components/VoltarInicio'
 import './Suporte.css'
 
 const TAMANHO_PAGINA = 20
@@ -119,6 +120,7 @@ export default function Suporte() {
 
   return (
     <div className="suporte-tela">
+      <VoltarInicio />
       <header className="suporte-cabecalho">
         <h1>Suporte</h1>
         <p>Seus chamados de suporte.</p>
