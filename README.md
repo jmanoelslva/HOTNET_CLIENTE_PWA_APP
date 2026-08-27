@@ -159,6 +159,18 @@ com um app nativo do que um site comum:
   próprio app — nunca as chamadas `/api/*`, que são sempre dinâmicas.
   Ícones em `public/icons/` (gerados a partir do logotipo por
   `scripts/gerar-icones-pwa.mjs`, reexecutar se o logotipo mudar).
+  Chrome/Edge (Android e desktop) disparam `beforeinstallprompt`
+  sozinhos e o botão "Instalar app" (menu do avatar, `Home.tsx`) usa
+  o prompt nativo do navegador. **Safari no iOS nunca dispara esse
+  evento** (limitação da própria Apple, não tem prompt automático em
+  hipótese alguma) — lá o mesmo botão abre um modal em bottom-sheet
+  com o passo a passo manual (compartilhar → "Adicionar à Tela de
+  Início"), em vez de um toast: a instalação exige sair do app pra ir
+  até o Safari, então a instrução precisa ficar na tela até o cliente
+  fechar, não sumir sozinha em poucos segundos. O modal também avisa
+  que só funciona pelo Safari — abrir o link num navegador in-app
+  (WhatsApp, Instagram) ou no Chrome para iOS não oferece essa opção
+  no compartilhamento. Ver `src/hooks/usePwaInstall.ts`.
 - **Barra de navegação inferior** (`BottomNav`) fixa nas telas
   autenticadas, com atalho colorido pras 5 telas mais usadas.
 - **Toasts** (`ToastProvider`/`useToast`) no lugar de `window.alert()`.
