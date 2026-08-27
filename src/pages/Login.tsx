@@ -70,14 +70,16 @@ export default function Login() {
         </form>
 
         <button type="button" className="login-nao-consigo" onClick={() => setAjudaAberta(true)}>
-          🆘 Não consigo entrar?
+          Não consigo entrar?
         </button>
       </div>
 
       {ajudaAberta && (
         <div className="login-modal-fundo" onClick={() => setAjudaAberta(false)}>
           <div className="login-modal" onClick={(evento) => evento.stopPropagation()}>
-            <h2>Precisando de ajuda?</h2>
+            <h2>
+              <span className="login-modal-icone">🛟</span> Precisando de ajuda?
+            </h2>
             <p>
               Usuário e senha são o mesmo número: seu CPF ou CNPJ, sem pontos nem traço. Se o problema persistir,
               fale com a gente pelo WhatsApp.

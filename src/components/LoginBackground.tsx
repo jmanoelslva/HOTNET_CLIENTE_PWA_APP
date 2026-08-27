@@ -8,12 +8,12 @@ interface Ponto {
   vy: number
 }
 
-const QUANTIDADE_PONTOS = 42
+const QUANTIDADE_PONTOS = 56
 const RAIO_PONTO = 2
-const DISTANCIA_CONEXAO = 110
+const DISTANCIA_CONEXAO = 150
 const VELOCIDADE_MAXIMA = 0.12
-const ALPHA_MAXIMO_LINHA = 126 / 255
-const ALPHA_PONTO = 110 / 255
+const ALPHA_MAXIMO_LINHA = 200 / 255
+const ALPHA_PONTO = 150 / 255
 const COR_RGB = '242, 143, 59' // #F28F3B — login_orange_gradient_start
 
 /**
