@@ -1,5 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import {
+  MdAccountCircle,
+  MdBadge,
+  MdDataUsage,
+  MdDescription,
+  MdHelp,
+  MdPayments,
+  MdSupportAgent,
+  MdWifi,
+} from 'react-icons/md'
+import { FaWhatsapp } from 'react-icons/fa'
 import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente } from '../api/cadastro'
 import { buscarContratos } from '../api/contratos'
@@ -15,12 +26,12 @@ function saudacaoPorHorario(primeiroNome: string): string {
 }
 
 const ITENS_MENU = [
-  { to: '/boletos', icone: '💳', label: 'Boletos' },
-  { to: '/contratos', icone: '📄', label: 'Contratos' },
-  { to: '/consumo', icone: '📊', label: 'Consumo' },
-  { to: '/suporte', icone: '🎧', label: 'Suporte' },
-  { to: '/cadastro', icone: '👤', label: 'Meus dados' },
-  { to: '/faq', icone: '❓', label: 'Ajuda' },
+  { to: '/boletos', Icone: MdPayments, cor: '#d94a38', label: 'Boletos' },
+  { to: '/contratos', Icone: MdDescription, cor: '#4a5c7a', label: 'Contratos' },
+  { to: '/consumo', Icone: MdDataUsage, cor: '#18afc0', label: 'Consumo' },
+  { to: '/suporte', Icone: MdSupportAgent, cor: '#0f8a45', label: 'Suporte' },
+  { to: '/cadastro', Icone: MdBadge, cor: '#7a4bc4', label: 'Meus dados' },
+  { to: '/faq', Icone: MdHelp, cor: '#2a72b8', label: 'Ajuda' },
 ]
 
 export default function Home() {
@@ -90,6 +101,8 @@ export default function Home() {
     }
   }
 
+  const corStatus = online === true ? '#20b957' : online === false ? '#f44336' : '#9e9e9e'
+
   return (
     <div className="home-tela">
       <header className="home-cabecalho">
@@ -106,7 +119,7 @@ export default function Home() {
             onClick={() => setMenuAvatarAberto((v) => !v)}
             aria-label="Menu do usuário"
           >
-            👤
+            <MdAccountCircle size={26} />
           </button>
           {menuAvatarAberto && (
             <>
@@ -133,20 +146,14 @@ export default function Home() {
       {(contratoSelecionado || planoSemConsumo) && (
         <div className="home-card-status">
           <div className="home-card-status-topo">
-            <span
-              className="home-indicador"
-              style={{ background: online === true ? '#20b957' : online === false ? '#f44336' : '#9e9e9e' }}
-            >
-              📶
+            <span className="home-indicador" style={{ background: corStatus }}>
+              <MdWifi size={22} color="#ffffff" />
             </span>
             <div className="home-card-status-textos">
               <span className="home-plano-nome">
                 {contratoSelecionado?.planoNome ?? planoSemConsumo ?? 'Plano não informado'}
               </span>
-              <p
-                className="home-status-texto"
-                style={{ color: online === true ? '#20b957' : online === false ? '#f44336' : '#9e9e9e' }}
-              >
+              <p className="home-status-texto" style={{ color: corStatus }}>
                 {online === true
                   ? 'Sua conexão está normal!'
                   : online === false
@@ -182,13 +189,15 @@ export default function Home() {
       )}
 
       <button className="home-whatsapp" onClick={aoClicarWhatsapp}>
-        💬 Falar com a gente no WhatsApp
+        <FaWhatsapp size={20} /> Falar com a gente no WhatsApp
       </button>
 
       <div className="home-menu">
         {ITENS_MENU.map((item) => (
           <Link key={item.to} to={item.to} className="home-menu-item">
-            <span className="home-menu-icone">{item.icone}</span>
+            <span className="home-menu-icone" style={{ background: item.cor }}>
+              <item.Icone size={26} color="#ffffff" />
+            </span>
             <span className="home-menu-label">{item.label}</span>
           </Link>
         ))}

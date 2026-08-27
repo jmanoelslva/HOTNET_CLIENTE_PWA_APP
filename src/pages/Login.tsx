@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { MdAccountCircle, MdLock, MdSupportAgent, MdVisibility, MdVisibilityOff } from 'react-icons/md'
 import { useSessao } from '../auth/SessionContext'
 import LoginBackground from '../components/LoginBackground'
 import logoHotnet from '../assets/logo-hotnet.png'
@@ -29,7 +30,7 @@ export default function Login() {
 
         <form onSubmit={aoEnviar}>
           <label htmlFor="usuario">
-            <span className="login-label-icone">👤</span> CPF ou CNPJ
+            <MdAccountCircle className="login-label-icone" /> CPF ou CNPJ
           </label>
           <input
             id="usuario"
@@ -42,7 +43,7 @@ export default function Login() {
           />
 
           <label htmlFor="senha">
-            <span className="login-label-icone">🔒</span> Senha
+            <MdLock className="login-label-icone" /> Senha
           </label>
           <div className="login-campo-senha">
             <input
@@ -58,7 +59,7 @@ export default function Login() {
               onClick={() => setMostrarSenha((v) => !v)}
               aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
             >
-              {mostrarSenha ? '🙈' : '👁️'}
+              {mostrarSenha ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
             </button>
           </div>
 
@@ -78,7 +79,7 @@ export default function Login() {
         <div className="login-modal-fundo" onClick={() => setAjudaAberta(false)}>
           <div className="login-modal" onClick={(evento) => evento.stopPropagation()}>
             <h2>
-              <span className="login-modal-icone">🛟</span> Precisando de ajuda?
+              <MdSupportAgent className="login-modal-icone" /> Precisando de ajuda?
             </h2>
             <p>
               Usuário e senha são o mesmo número: seu CPF ou CNPJ, sem pontos nem traço. Se o problema persistir,

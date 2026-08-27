@@ -1,3 +1,4 @@
+import { FaWhatsapp } from 'react-icons/fa'
 import VoltarInicio from '../components/VoltarInicio'
 import logoHotnet from '../assets/logo-hotnet.png'
 import './Sobre.css'
@@ -22,7 +23,7 @@ export default function Sobre() {
         </p>
 
         <button className="sobre-whatsapp" onClick={abrirWhatsappSobre}>
-          💬 Falar com a gente
+          <FaWhatsapp size={18} /> Falar com a gente
         </button>
 
         <a className="sobre-link" href="https://hotnet.net.br/policies/privacy" target="_blank" rel="noreferrer">

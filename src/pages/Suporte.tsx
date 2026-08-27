@@ -1,5 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import type { IconType } from 'react-icons'
+import {
+  MdAdd,
+  MdCampaign,
+  MdClose,
+  MdConstruction,
+  MdPayments,
+  MdSell,
+  MdSupportAgent,
+  MdSwapHoriz,
+  MdWarning,
+} from 'react-icons/md'
 import { useSessao } from '../auth/SessionContext'
 import { buscarCategorias, buscarChamados, chamadoResolvido, abrirChamado as apiAbrirChamado } from '../api/suporte'
 import type { CategoriaDto, TicketDto } from '../api/client'
@@ -12,20 +24,20 @@ type Aba = 'abertos' | 'resolvidos'
 
 // Ícone de cada categoria pelo nome exato configurado no painel do
 // Controllr (não é lista fixa) — categoria desconhecida cai no padrão.
-const ICONE_PADRAO = '🎧'
-const ICONES_CATEGORIA: Record<string, string> = {
-  'suporte técnico': '🎧',
-  'financeiro e pagamentos': '💳',
-  'vendas e comercial': '🛒',
-  'alteração de plano': '🔄',
-  'reclamação': '⚠️',
-  cancelamento: '✖️',
-  'ouvidoria e adminstrativo': '📢',
-  'ouvidoria e administrativo': '📢',
-  instalação: '🛠️',
+const ICONE_PADRAO = MdSupportAgent
+const ICONES_CATEGORIA: Record<string, IconType> = {
+  'suporte técnico': MdSupportAgent,
+  'financeiro e pagamentos': MdPayments,
+  'vendas e comercial': MdSell,
+  'alteração de plano': MdSwapHoriz,
+  'reclamação': MdWarning,
+  cancelamento: MdClose,
+  'ouvidoria e adminstrativo': MdCampaign,
+  'ouvidoria e administrativo': MdCampaign,
+  instalação: MdConstruction,
 }
 
-function iconeParaCategoria(nome: string): string {
+function iconeParaCategoria(nome: string): IconType {
   return ICONES_CATEGORIA[nome.trim().toLowerCase()] ?? ICONE_PADRAO
 }
 
@@ -171,7 +183,11 @@ export default function Suporte() {
                 </div>
                 {chamado.ticket_protocol && <p className="ticket-protocolo">Protocolo: {chamado.ticket_protocol}</p>}
                 <p className="ticket-categoria">
-                  {iconeParaCategoria(chamado.category_name ?? '')} {chamado.category_name ?? 'Categoria não informada'}
+                  {(() => {
+                    const IconeCategoria = iconeParaCategoria(chamado.category_name ?? '')
+                    return <IconeCategoria className="ticket-categoria-icone" />
+                  })()}{' '}
+                  {chamado.category_name ?? 'Categoria não informada'}
                 </p>
                 <p className="ticket-data">Aberto em {formatarData(chamado.ticket_date_create) ?? 'data não informada'}</p>
                 {resolvido && <p className="ticket-data">Fechado em {formatarData(chamado.ticket_date_close) ?? '-'}</p>}
@@ -189,7 +205,7 @@ export default function Suporte() {
       )}
 
       <button className="suporte-fab" onClick={abrirDialog} aria-label="Novo chamado">
-        +
+        <MdAdd size={28} />
       </button>
 
       {dialogAberto && (
@@ -201,7 +217,7 @@ export default function Suporte() {
             <select value={categoriaPk ?? ''} onChange={(evento) => setCategoriaPk(Number(evento.target.value))}>
               {categorias.map((categoria) => (
                 <option key={categoria.category_pk} value={categoria.category_pk}>
-                  {iconeParaCategoria(categoria.category_name ?? '')} {categoria.category_name ?? `Categoria ${categoria.category_pk}`}
+                  {categoria.category_name ?? `Categoria ${categoria.category_pk}`}
                 </option>
               ))}
             </select>

@@ -57,7 +57,7 @@
 }
 
 .faq-categoria-icone {
-  font-size: 20px;
+  color: #f28f3b;
 }
 
 .faq-categoria-nome {
@@ -141,4 +141,8 @@
   font-weight: 700;
   cursor: pointer;
   background: linear-gradient(135deg, #25d366, #1da851);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }

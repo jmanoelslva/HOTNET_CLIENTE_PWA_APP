@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { MdArrowBack, MdAttachFile, MdCameraAlt, MdDescription, MdImage, MdLocationOn } from 'react-icons/md'
 import {
   buscarOperacoes,
   chamadoResolvido,
@@ -131,7 +132,7 @@ export default function DetalheChamado() {
     <div className="detalhe-tela">
       <header className="detalhe-cabecalho">
         <button className="detalhe-voltar" onClick={() => navigate('/suporte')}>
-          ← Voltar
+          <MdArrowBack size={16} /> Voltar
         </button>
         {chamado && (
           <div className="detalhe-resumo">
@@ -178,7 +179,7 @@ export default function DetalheChamado() {
                 )}
                 {op.urlAnexo && !ehArquivoDeImagem(op.arquivo) && !ehArquivoDeVideo(op.arquivo) && (
                   <a href={op.urlAnexo} target="_blank" rel="noreferrer" className="balao-anexo-arquivo">
-                    📎 {op.arquivo}
+                    <MdAttachFile /> {op.arquivo}
                   </a>
                 )}
 
@@ -215,15 +216,21 @@ export default function DetalheChamado() {
               onClick={() => setMenuAnexoAberto((v) => !v)}
               aria-label="Anexar"
             >
-              📎
+              <MdAttachFile size={20} />
             </button>
             {menuAnexoAberto && (
               <>
                 <div className="detalhe-menu-fundo" onClick={() => setMenuAnexoAberto(false)} />
                 <div className="detalhe-menu-anexo">
-                  <button onClick={() => inputFotoRef.current?.click()}>📷 Tirar foto</button>
-                  <button onClick={() => inputGaleriaRef.current?.click()}>🖼️ Galeria</button>
-                  <button onClick={() => inputArquivoRef.current?.click()}>📄 Arquivo</button>
+                  <button onClick={() => inputFotoRef.current?.click()}>
+                    <MdCameraAlt /> Tirar foto
+                  </button>
+                  <button onClick={() => inputGaleriaRef.current?.click()}>
+                    <MdImage /> Galeria
+                  </button>
+                  <button onClick={() => inputArquivoRef.current?.click()}>
+                    <MdDescription /> Arquivo
+                  </button>
                 </div>
               </>
             )}
@@ -235,7 +242,7 @@ export default function DetalheChamado() {
             onClick={() => setConfirmandoLocalizacao(true)}
             aria-label="Enviar localização"
           >
-            📍
+            <MdLocationOn size={20} />
           </button>
 
           <input

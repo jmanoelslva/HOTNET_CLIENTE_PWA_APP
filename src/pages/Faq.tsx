@@ -1,4 +1,14 @@
 import { useMemo, useState } from 'react'
+import type { IconType } from 'react-icons'
+import {
+  MdDataUsage,
+  MdDescription,
+  MdLock,
+  MdPayments,
+  MdSupportAgent,
+  MdWifi,
+} from 'react-icons/md'
+import { FaWhatsapp } from 'react-icons/fa'
 import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente } from '../api/cadastro'
 import { abrirWhatsappAjuda } from '../utils/whatsapp'
@@ -9,7 +19,7 @@ interface CategoriaFaq {
   id: string
   nome: string
   subtitulo: string
-  icone: string
+  Icone: IconType
 }
 
 interface PerguntaFrequente {
@@ -19,12 +29,12 @@ interface PerguntaFrequente {
 }
 
 const CATEGORIAS: CategoriaFaq[] = [
-  { id: 'atendimento', nome: 'Atendimento', subtitulo: 'Horários e canais', icone: '🎧' },
-  { id: 'wifi', nome: 'Internet e Wi-Fi', subtitulo: 'Velocidade e sinal', icone: '📶' },
-  { id: 'cobrancas', nome: 'Cobranças', subtitulo: 'Boletos e pagamentos', icone: '💳' },
-  { id: 'contratos', nome: 'Contratos', subtitulo: 'Planos e contratos', icone: '📄' },
-  { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', icone: '📊' },
-  { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', icone: '🔒' },
+  { id: 'atendimento', nome: 'Atendimento', subtitulo: 'Horários e canais', Icone: MdSupportAgent },
+  { id: 'wifi', nome: 'Internet e Wi-Fi', subtitulo: 'Velocidade e sinal', Icone: MdWifi },
+  { id: 'cobrancas', nome: 'Cobranças', subtitulo: 'Boletos e pagamentos', Icone: MdPayments },
+  { id: 'contratos', nome: 'Contratos', subtitulo: 'Planos e contratos', Icone: MdDescription },
+  { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', Icone: MdDataUsage },
+  { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', Icone: MdLock },
 ]
 
 const PERGUNTAS: PerguntaFrequente[] = [
@@ -146,7 +156,9 @@ export default function Faq() {
             className={`faq-categoria ${categoriaFiltro === categoria.id ? 'ativa' : ''}`}
             onClick={() => selecionarCategoria(categoria.id)}
           >
-            <span className="faq-categoria-icone">{categoria.icone}</span>
+            <span className="faq-categoria-icone">
+              <categoria.Icone size={22} />
+            </span>
             <span className="faq-categoria-nome">{categoria.nome}</span>
             <span className="faq-categoria-subtitulo">{categoria.subtitulo}</span>
           </button>
@@ -181,7 +193,7 @@ export default function Faq() {
       )}
 
       <button className="faq-whatsapp" onClick={aoClicarWhatsapp}>
-        💬 Não encontrei minha dúvida — falar com a gente
+        <FaWhatsapp size={18} /> Não encontrei minha dúvida — falar com a gente
       </button>
     </div>
   )
