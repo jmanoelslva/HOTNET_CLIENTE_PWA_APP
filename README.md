@@ -177,16 +177,17 @@ com um app nativo do que um site comum:
   - **Safari no iOS nunca dispara esse evento** (limitação da própria
     Apple, não tem prompt automático em hipótese alguma — detecção por
     `navigator.userAgent`/touch, cobre também iPad que se identifica
-    como Mac). Como não tem como saber sozinho quando o cliente já
-    olhou a tela de login antes, a tela de Login abre automaticamente
-    o passo a passo (`ModalInstalarIos.tsx`, compartilhar →
-    "Adicionar à Tela de Início") na primeira visita em iOS, antes
-    mesmo de logar — lembrado via `localStorage` pra não repetir a
-    cada acesso. Fora da primeira vez (ou se o cliente fechar o
-    modal), o mesmo botão "Instalar app" na tela de Login continua
-    disponível pra abrir de novo quando quiser. Modal em vez de toast
-    porque a instalação exige sair do app pra ir até o Safari, então a
-    instrução precisa ficar na tela até o cliente fechar, não sumir
+    como Mac). A tela de Login abre automaticamente o passo a passo
+    (`ModalInstalarIos.tsx`, compartilhar → "Adicionar à Tela de
+    Início") **toda vez** que um cliente em iOS acessa a tela, antes
+    mesmo de logar, enquanto o app não estiver instalado — não é "só
+    uma vez" (sem flag em `localStorage`), de propósito: se o cliente
+    ignorar ou fechar sem seguir o passo a passo, o botão "Instalar
+    app" continua ali mesmo assim, mas o aviso automático segue
+    aparecendo nas próximas visitas em vez de desistir depois da
+    primeira. Modal em vez de toast porque a instalação exige sair do
+    app pra ir até o Safari, então a instrução precisa ficar na tela
+    até o cliente fechar, não sumir
     sozinha em poucos segundos — e avisa que só funciona pelo Safari:
     abrir o link num navegador in-app (WhatsApp, Instagram) ou no
     Chrome para iOS não oferece essa opção no compartilhamento.

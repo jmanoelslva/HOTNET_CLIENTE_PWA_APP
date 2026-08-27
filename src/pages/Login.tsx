@@ -9,12 +9,6 @@ import logoHotnet from '../assets/logo-hotnet.png'
 import { abrirWhatsappLogin } from '../utils/whatsapp'
 import './Login.css'
 
-// Só pra não abrir o modal de instrução do iOS sozinho em toda visita à
-// tela de login — mostra automaticamente uma vez só; depois disso, o
-// botão "Instalar app" continua disponível pra quem quiser instalar
-// depois (ver JSX abaixo).
-const CHAVE_SUGESTAO_IOS_MOSTRADA = 'hotnet-pwa-ios-sugestao-mostrada'
-
 export default function Login() {
   const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
@@ -26,11 +20,14 @@ export default function Login() {
 
   // Em iOS não existe prompt automático do navegador (ver usePwaInstall.ts)
   // — esse é o jeito de aparecer "sozinho" logo na tela de login, já que é
-  // a primeira tela que o cliente vê antes mesmo de entrar.
+  // a primeira tela que o cliente vê antes mesmo de entrar. Aparece de
+  // novo a cada visita à tela de login enquanto o app não for instalado
+  // (sem "só uma vez" salvo em localStorage) — se o cliente ignorar ou
+  // fechar sem seguir o passo a passo, o botão "Instalar app" abaixo
+  // continua disponível a qualquer momento, sem depender de ver esse aviso
+  // de novo.
   useEffect(() => {
     if (!podeInstalarIos) return
-    if (localStorage.getItem(CHAVE_SUGESTAO_IOS_MOSTRADA)) return
-    localStorage.setItem(CHAVE_SUGESTAO_IOS_MOSTRADA, '1')
     aoClicarInstalar()
   }, [podeInstalarIos, aoClicarInstalar])
 
