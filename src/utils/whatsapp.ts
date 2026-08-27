@@ -18,3 +18,8 @@ export function abrirWhatsappAjuda(nomeCompleto: string | null, cpf: string | nu
     `Olá!\nSou *${nomeCompleto ?? 'Não informado'}*\nCPF: *${cpf ?? 'Não informado'}*\n\nNão encontrei minha dúvida nas Perguntas Frequentes do aplicativo.`,
   )
 }
+
+/** Mensagem fixa usada pelo "Não consigo entrar?" da tela de login (sem nome/CPF — o cliente ainda não está logado). */
+export function abrirWhatsappLogin() {
+  abrir('Olá, preciso de ajuda para entrar no aplicativo.')
+}

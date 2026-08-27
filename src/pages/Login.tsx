@@ -1,12 +1,15 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSessao } from '../auth/SessionContext'
+import LoginBackground from '../components/LoginBackground'
 import logoHotnet from '../assets/logo-hotnet.png'
+import { abrirWhatsappLogin } from '../utils/whatsapp'
 import './Login.css'
 
 export default function Login() {
   const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
+  const [ajudaAberta, setAjudaAberta] = useState(false)
   const { entrar, carregando, erro } = useSessao()
   const navigate = useNavigate()
 
@@ -18,9 +21,10 @@ export default function Login() {
 
   return (
     <div className="login-tela">
+      <LoginBackground />
+
       <div className="login-card">
         <img src={logoHotnet} alt="HOTNET" className="login-logo" />
-        <p className="login-subtitulo">Acesse com seu CPF ou CNPJ</p>
 
         <form onSubmit={aoEnviar}>
           <label htmlFor="usuario">CPF ou CNPJ</label>
@@ -49,7 +53,35 @@ export default function Login() {
             {carregando ? 'Entrando…' : 'Entrar'}
           </button>
         </form>
+
+        <button type="button" className="login-nao-consigo" onClick={() => setAjudaAberta(true)}>
+          Não consigo entrar?
+        </button>
       </div>
+
+      {ajudaAberta && (
+        <div className="login-modal-fundo" onClick={() => setAjudaAberta(false)}>
+          <div className="login-modal" onClick={(evento) => evento.stopPropagation()}>
+            <h2>Precisando de ajuda?</h2>
+            <p>
+              Usuário e senha são o mesmo número: seu CPF ou CNPJ, sem pontos nem traço. Se o problema persistir,
+              fale com a gente pelo WhatsApp.
+            </p>
+            <div className="login-modal-acoes">
+              <button onClick={() => setAjudaAberta(false)}>Entendi</button>
+              <button
+                className="login-modal-whatsapp"
+                onClick={() => {
+                  setAjudaAberta(false)
+                  abrirWhatsappLogin()
+                }}
+              >
+                Falar com a gente
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

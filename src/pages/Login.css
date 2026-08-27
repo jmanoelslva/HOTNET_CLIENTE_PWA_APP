@@ -1,37 +1,37 @@
 .login-tela {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f5f5f5;
   padding: 24px;
+  overflow: hidden;
 }
 
 .login-card {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 380px;
   background: #ffffff;
   border-radius: 24px;
   padding: 32px 28px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  text-align: center;
 }
 
 .login-logo {
   display: block;
-  height: 56px;
+  height: 64px;
   width: auto;
-  margin: 0 0 4px;
-}
-
-.login-subtitulo {
-  margin: 4px 0 24px;
-  color: #999999;
-  font-size: 14px;
+  margin: 0 auto 24px;
 }
 
 .login-card form {
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 
 .login-card label {
@@ -64,7 +64,7 @@
   font-weight: 600;
 }
 
-.login-card button {
+.login-card form button {
   margin-top: 24px;
   height: 52px;
   border: none;
@@ -76,7 +76,74 @@
   background: linear-gradient(135deg, #f28f3b, #d94a38);
 }
 
-.login-card button:disabled {
+.login-card form button:disabled {
   opacity: 0.7;
   cursor: default;
+}
+
+.login-nao-consigo {
+  margin-top: 16px;
+  border: none;
+  background: transparent;
+  color: #f28f3b;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.login-modal-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 340px;
+  width: 100%;
+  text-align: left;
+}
+
+.login-modal h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  color: #333333;
+}
+
+.login-modal p {
+  margin: 0;
+  font-size: 13px;
+  color: #666666;
+  line-height: 1.5;
+}
+
+.login-modal-acoes {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.login-modal-acoes button {
+  flex: 1;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #f5f5f5;
+  color: #333333;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-modal-acoes button.login-modal-whatsapp {
+  border: none;
+  color: #ffffff;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
 }
