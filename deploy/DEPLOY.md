@@ -63,3 +63,42 @@ caminho padrão do Certbot. Sem HTTPS, o cookie de sessão do Controllr
 - [ ] Testar "Ver boletos em PDF" e "Ver contrato completo" (abrem
       `/api/...` em nova aba) — confirma que o proxy também funciona
       fora das chamadas fetch/XHR.
+
+## Teste temporário via IP puro (sem domínio, sem HTTPS)
+
+Pra testar rapidinho num smartphone antes de ter domínio/certificado
+prontos (ex: `http://45.237.95.186:8080/`), use
+[`apache-vhost-teste-ip.conf.example`](apache-vhost-teste-ip.conf.example)
+em vez do vhost de produção. A diferença principal: como não tem HTTPS,
+ele também remove a flag `Secure` do cookie de sessão (obrigatório —
+sem isso o navegador recusa guardar o cookie numa conexão HTTP pura, e
+a sessão nunca persiste, mesmo com o domínio do cookie certo).
+
+Passo a passo no servidor (Ubuntu/Debian com Apache2 já instalado):
+
+```bash
+# 1. Habilita os módulos necessários (idempotente, pode rodar sempre)
+sudo a2enmod proxy proxy_http headers rewrite
+
+# 2. Garante que a porta 8080 está sendo escutada
+echo "Listen 8080" | sudo tee -a /etc/apache2/ports.conf
+
+# 3. Cria o diretório e publica o build (rode isso NO SEU COMPUTADOR,
+#    trocando USUARIO pelo seu usuário SSH no servidor)
+scp -r dist USUARIO@45.237.95.186:/tmp/hotnet-web-dist
+ssh USUARIO@45.237.95.186 "sudo mkdir -p /var/www/hotnet-web-teste && sudo mv /tmp/hotnet-web-dist /var/www/hotnet-web-teste/dist"
+
+# 4. Copia o vhost de exemplo pro servidor e ativa
+#    (envie o arquivo apache-vhost-teste-ip.conf.example também, ex:
+#    via scp, salvando como hotnet-web-teste.conf)
+sudo cp apache-vhost-teste-ip.conf.example /etc/apache2/sites-available/hotnet-web-teste.conf
+sudo a2ensite hotnet-web-teste.conf
+sudo systemctl reload apache2
+```
+
+Depois, abre `http://45.237.95.186:8080/` no navegador do celular — igual
+a qualquer outro deploy, confirme login/sessão persistindo entre telas.
+
+**Esse vhost é só pra teste** — quando for pra produção de verdade em
+`cliente.hotnet.net.br`, use `apache-vhost.conf.example` (com HTTPS de
+verdade) e desative/remova este.

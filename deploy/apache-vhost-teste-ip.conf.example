@@ -1,0 +1,57 @@
+# Exemplo de VirtualHost Apache para teste TEMPORÁRIO via IP puro,
+# sem domínio nem HTTPS — só pra abrir direto de um smartphone durante
+# o desenvolvimento (ex: http://45.237.95.186:8080/).
+#
+# Diferente do vhost de produção real (apache-vhost.conf.example, que
+# usa cliente.hotnet.net.br com HTTPS), este aqui roda em HTTP puro.
+# Por isso tem um passo A MAIS, obrigatório: remover a flag "Secure"
+# do cookie de sessão do backend (invoice/BRBOSCookie) — sem isso, o
+# navegador RECUSA guardar o cookie numa conexão HTTP sem TLS, e o
+# login parece funcionar mas a sessão nunca persiste entre requisições.
+#
+# Requer os módulos: proxy, proxy_http, headers, rewrite
+# (a2enmod proxy proxy_http headers rewrite)
+#
+# Ajuste o DocumentRoot pro local real onde o conteúdo de dist/ for
+# publicado nesse servidor.
+
+# Garanta que a porta 8080 está sendo escutada (uma vez só, no
+# arquivo /etc/apache2/ports.conf, se ainda não tiver essa linha):
+#   Listen 8080
+
+<VirtualHost *:8080>
+    # Sem ServerName: responde em qualquer nome/IP nessa porta —
+    # não tem domínio nenhum ainda, é só teste.
+
+    DocumentRoot /var/www/hotnet-web-teste/dist
+
+    <Directory /var/www/hotnet-web-teste/dist>
+        Options -Indexes
+        AllowOverride None
+        Require all granted
+
+        # SPA: qualquer rota que não bata em um arquivo real cai no
+        # index.html (o roteamento de fato acontece no react-router-dom).
+        RewriteEngine On
+        RewriteBase /
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_URI} !^/api/
+        RewriteRule . /index.html [L]
+    </Directory>
+
+    # Reverse proxy do backend Controllr/BRbyte — mesma lógica do proxy
+    # de desenvolvimento do Vite (vite.config.ts).
+    SSLProxyEngine on
+    ProxyPreserveHost off
+    ProxyPass        /api/ https://hotnet.net.br/
+    ProxyPassReverse /api/ https://hotnet.net.br/
+
+    # Reescreve o domínio do cookie de hotnet.net.br pro IP:porta atual.
+    Header edit* Set-Cookie "domain=hotnet\.net\.br" "domain=45.237.95.186"
+
+    # OBRIGATÓRIO nesse teste sem HTTPS: remove a flag "Secure" do
+    # cookie — o navegador descarta cookies Secure recebidos numa
+    # conexão HTTP pura, mesmo com o domínio certo.
+    Header edit* Set-Cookie "; ?[Ss]ecure" ""
+</VirtualHost>
