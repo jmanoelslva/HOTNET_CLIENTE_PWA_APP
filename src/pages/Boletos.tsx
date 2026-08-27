@@ -8,6 +8,7 @@ import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
 import { useToast } from '../components/Toast/ToastContext'
 import { CORES, comAlpha } from '../utils/cores'
+import { abrirEImprimir } from '../utils/impressao'
 import {
   ApiError,
   SessaoExpiradaError,
@@ -338,7 +339,7 @@ export default function Boletos() {
                     {/* Utilitário + confirmação pós-pagamento, em par. */}
                     <button
                       style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
-                      onClick={() => window.open(urlImpressaoBoleto(fatura.invoice_pk), '_blank')}
+                      onClick={() => abrirEImprimir(urlImpressaoBoleto(fatura.invoice_pk))}
                     >
                       <MdFileDownload /> Imprimir / Salvar PDF
                     </button>

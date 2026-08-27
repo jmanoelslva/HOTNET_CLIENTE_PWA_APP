@@ -6,6 +6,7 @@ import { buscarContratos, type Contrato } from '../api/contratos'
 import CabecalhoTela from '../components/CabecalhoTela'
 import Skeleton from '../components/Skeleton'
 import { CORES, comAlpha } from '../utils/cores'
+import { abrirEImprimir } from '../utils/impressao'
 import './Contratos.css'
 
 // Valores confirmados na documentação oficial do contract_status.
@@ -161,7 +162,7 @@ export default function Contratos() {
                   </button>
                   <button
                     style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
-                    onClick={() => window.open(urlImpressaoContrato(contrato.id), '_blank')}
+                    onClick={() => abrirEImprimir(urlImpressaoContrato(contrato.id))}
                   >
                     <MdFileDownload /> Ver contrato completo
                   </button>
