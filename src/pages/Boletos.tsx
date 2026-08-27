@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { MdPayments } from 'react-icons/md'
+import { MdCheckCircle, MdFileDownload, MdPayments, MdQrCode2, MdQrCodeScanner } from 'react-icons/md'
+import { FaBarcode } from 'react-icons/fa'
 import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
 import {
@@ -279,24 +280,41 @@ export default function Boletos() {
 
                 {!paga && (
                   <div className="boleto-acoes">
-                    <button onClick={() => aoCopiar(`pix-${fatura.invoice_pk}`, fatura.invoice_qrcode)}>
+                    <button
+                      style={{ background: '#00a8841a', color: '#00a884' }}
+                      onClick={() => aoCopiar(`pix-${fatura.invoice_pk}`, fatura.invoice_qrcode)}
+                    >
+                      <MdQrCode2 />
                       {copiado === `pix-${fatura.invoice_pk}` ? '✓ Código PIX Copiado!' : 'Pagar com PIX'}
                     </button>
                     {fatura.invoice_qrcode_image && (
-                      <button onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}>QR Code PIX</button>
+                      <button
+                        style={{ background: '#2a72b81a', color: '#2a72b8' }}
+                        onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}
+                      >
+                        <MdQrCodeScanner /> QR Code PIX
+                      </button>
                     )}
-                    <button onClick={() => aoCopiar(`barcode-${fatura.invoice_pk}`, fatura.invoice_barcode)}>
+                    <button
+                      style={{ background: '#4a5c7a1a', color: '#4a5c7a' }}
+                      onClick={() => aoCopiar(`barcode-${fatura.invoice_pk}`, fatura.invoice_barcode)}
+                    >
+                      <FaBarcode />
                       {copiado === `barcode-${fatura.invoice_pk}` ? '✓ Copiado!' : 'Código de Barras'}
                     </button>
-                    <button onClick={() => window.open(urlImpressaoBoleto(fatura.invoice_pk), '_blank')}>
-                      Imprimir / Salvar PDF
+                    <button
+                      style={{ background: '#f28f3b1a', color: '#f28f3b' }}
+                      onClick={() => window.open(urlImpressaoBoleto(fatura.invoice_pk), '_blank')}
+                    >
+                      <MdFileDownload /> Imprimir / Salvar PDF
                     </button>
                     {!jaInformado && fatura.contract_pk != null && (
                       <button
-                        className="boleto-btn-informar"
+                        style={{ background: '#20b9571a', color: '#20b957' }}
                         disabled={informando === fatura.invoice_pk}
                         onClick={() => setConfirmando(fatura)}
                       >
+                        <MdCheckCircle />
                         {informando === fatura.invoice_pk ? 'Enviando…' : 'Já paguei este boleto'}
                       </button>
                     )}

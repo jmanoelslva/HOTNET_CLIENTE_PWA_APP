@@ -15,7 +15,7 @@ interface Props {
  */
 export default function CabecalhoTela({ icone: Icone, cor, titulo, subtitulo }: Props) {
   return (
-    <header className="cabecalho-tela">
+    <header className="cabecalho-tela" style={{ background: `${cor}14`, borderColor: `${cor}33` }}>
       <span className="cabecalho-tela-icone" style={{ background: cor }}>
         <Icone size={24} color="#ffffff" />
       </span>
