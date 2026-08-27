@@ -1,0 +1,52 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { ApiError, SessaoExpiradaError, post } from './client'
+
+function mockFetchUmaVez(resposta: { status: number; ok: boolean; json: unknown }) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      status: resposta.status,
+      ok: resposta.ok,
+      json: async () => resposta.json,
+    }),
+  )
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
+// Mesmo quirk do SessionExpiredInterceptor do app Android (ver client.ts):
+// um 401 é normal em /login (senha errada), mas em qualquer outro endpoint
+// significa sessão expirada — comportamento crítico o suficiente (afeta
+// todo o app) pra merecer teste dedicado.
+describe('post — tratamento de 401 e "Login Failure"', () => {
+  it('401 em /login é só falha de login normal, não lança SessaoExpiradaError', async () => {
+    mockFetchUmaVez({ status: 401, ok: false, json: { success: false, message: 'Authentication failed for user [x]' } })
+    const resultado = await post('login', { username: '1', password: '2' })
+    expect(resultado).toEqual({ success: false, message: 'Authentication failed for user [x]' })
+  })
+
+  it('401 em outro endpoint lança SessaoExpiradaError', async () => {
+    mockFetchUmaVez({ status: 401, ok: false, json: { success: false } })
+    await expect(post('invoice_ctl/invoice/list', {})).rejects.toBeInstanceOf(SessaoExpiradaError)
+  })
+
+  it('200 com "Login Failure" em outro endpoint também é tratado como sessão expirada', async () => {
+    mockFetchUmaVez({ status: 200, ok: true, json: { success: false, message: 'Login Failure' } })
+    await expect(post('invoice_ctl/invoice/list', {})).rejects.toBeInstanceOf(SessaoExpiradaError)
+  })
+
+  it('erro comum (não 401, sem "Login Failure") lança ApiError com a mensagem do servidor', async () => {
+    mockFetchUmaVez({ status: 500, ok: false, json: { success: false, message: 'Erro interno' } })
+    await expect(post('invoice_ctl/invoice/list', {})).rejects.toThrow(ApiError)
+    mockFetchUmaVez({ status: 500, ok: false, json: { success: false, message: 'Erro interno' } })
+    await expect(post('invoice_ctl/invoice/list', {})).rejects.toThrow('Erro interno')
+  })
+
+  it('resposta de sucesso normal é devolvida sem lançar nada', async () => {
+    mockFetchUmaVez({ status: 200, ok: true, json: { success: true, results: [] } })
+    const resultado = await post('invoice_ctl/invoice/list', {})
+    expect(resultado).toEqual({ success: true, results: [] })
+  })
+})
