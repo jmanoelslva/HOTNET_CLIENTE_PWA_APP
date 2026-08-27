@@ -1,12 +1,22 @@
 .login-tela {
   position: relative;
+  /* 100vh sozinho é calculado com a barra de endereço do Safari mobile já
+     escondida — com ela visível, a página fica "mais alta" que a área
+     realmente visível, dando aquela sensação de dar pra arrastar/balançar
+     sem rolagem de verdade (rubber-band) mesmo sem conteúdo a mais pra
+     mostrar. 100dvh acompanha a barra indo/vindo (mesmo padrão já usado
+     em Home.css). */
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--cor-fundo);
   padding: 24px;
-  overflow: hidden;
+  /* Sem "overflow: hidden" aqui — quando o cartão fica mais alto que a
+     tela (telas curtas, ou depois do botão "Instalar app"), essa altura
+     mínima cede e a rolagem normal do documento assume, revelando o
+     resto do cartão em vez de cortá-lo. */
 }
 
 .login-card {
