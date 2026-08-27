@@ -339,7 +339,12 @@ export default function Boletos() {
                     {/* Utilitário + confirmação pós-pagamento, em par. */}
                     <button
                       style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
-                      onClick={() => abrirEImprimir(urlImpressaoBoleto(fatura.invoice_pk))}
+                      onClick={() =>
+                        abrirEImprimir(
+                          urlImpressaoBoleto(fatura.invoice_pk),
+                          fatura.contract_number != null ? `Boleto — Contrato ${fatura.contract_number}` : 'Boleto',
+                        )
+                      }
                     >
                       <MdFileDownload /> Imprimir / Salvar PDF
                     </button>

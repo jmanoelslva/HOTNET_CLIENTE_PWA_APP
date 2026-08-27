@@ -162,7 +162,12 @@ export default function Contratos() {
                   </button>
                   <button
                     style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
-                    onClick={() => abrirEImprimir(urlImpressaoContrato(contrato.id))}
+                    onClick={() =>
+                      abrirEImprimir(
+                        urlImpressaoContrato(contrato.id),
+                        contrato.numero != null ? `Contrato ${contrato.numero}` : 'Contrato',
+                      )
+                    }
                   >
                     <MdFileDownload /> Ver contrato completo
                   </button>
