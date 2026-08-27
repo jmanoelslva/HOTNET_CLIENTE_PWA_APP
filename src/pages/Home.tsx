@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente } from '../api/cadastro'
+import { buscarContratos } from '../api/contratos'
+import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, type ConsumoPorContrato } from '../api/consumo'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import './Home.css'
 
@@ -24,6 +26,11 @@ export default function Home() {
   const { cpf, sair } = useSessao()
   const [nomeExibido, setNomeExibido] = useState('Cliente')
 
+  const [consumoContratos, setConsumoContratos] = useState<ConsumoPorContrato[]>([])
+  const [cpePkSelecionado, setCpePkSelecionado] = useState<number | null>(null)
+  const [planoSemConsumo, setPlanoSemConsumo] = useState<string | null>(null)
+  const [online, setOnline] = useState<boolean | null | undefined>(undefined)
+
   useEffect(() => {
     buscarDadosCliente(cpf)
       .then((cliente) => {
@@ -34,6 +41,42 @@ export default function Home() {
       })
       .catch(() => {})
   }, [cpf])
+
+  useEffect(() => {
+    buscarConsumoDoMes(new Date().getFullYear(), new Date().getMonth() + 1)
+      .then((dados) => {
+        setConsumoContratos(dados)
+        if (dados.length > 0) {
+          setCpePkSelecionado(dados[0].cpePk)
+        } else {
+          // Sem consumo registrado ainda (ex: cliente novo) — cai pra lista
+          // de contratos só pro nome do plano, sem indicador de conexão
+          // (sem cpePk não dá pra checar a sessão).
+          buscarContratos()
+            .then((contratos) => setPlanoSemConsumo(contratos[0]?.plano ?? null))
+            .catch(() => {})
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const contratoSelecionado = consumoContratos.find((c) => c.cpePk === cpePkSelecionado) ?? null
+
+  useEffect(() => {
+    if (!contratoSelecionado) return
+    setOnline(undefined)
+    let cancelado = false
+    buscarSessaoAtualPorCpe(contratoSelecionado.cpePk)
+      .then((sessao) => {
+        if (!cancelado) setOnline(sessao != null)
+      })
+      .catch(() => {
+        if (!cancelado) setOnline(null)
+      })
+    return () => {
+      cancelado = true
+    }
+  }, [contratoSelecionado])
 
   async function aoClicarWhatsapp() {
     try {
@@ -51,6 +94,43 @@ export default function Home() {
         <p className="home-subtitulo">O que você precisa hoje?</p>
       </header>
 
+      {(contratoSelecionado || planoSemConsumo) && (
+        <div className="home-card-status">
+          <div className="home-card-status-topo">
+            <span
+              className="home-indicador"
+              style={{ background: online === true ? '#20b957' : online === false ? '#f44336' : '#9e9e9e' }}
+            />
+            <span className="home-plano-nome">
+              {contratoSelecionado?.planoNome ?? planoSemConsumo ?? 'Plano não informado'}
+            </span>
+          </div>
+          <p className="home-status-texto">
+            {online === true
+              ? 'Sua conexão está normal!'
+              : online === false
+                ? 'Sua conexão está fora do ar!'
+                : contratoSelecionado
+                  ? 'Verificando conexão…'
+                  : 'Status indisponível'}
+          </p>
+          {consumoContratos.length > 1 && (
+            <select
+              className="home-seletor-contrato"
+              value={cpePkSelecionado ?? ''}
+              onChange={(evento) => setCpePkSelecionado(Number(evento.target.value))}
+            >
+              {consumoContratos.map((c) => (
+                <option key={c.cpePk} value={c.cpePk}>
+                  {c.planoNome ?? 'Plano não informado'}
+                  {c.contractNumber != null ? ` (Contrato ${c.contractNumber})` : ''}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
+
       <button className="home-whatsapp" onClick={aoClicarWhatsapp}>
         💬 Falar com a gente no WhatsApp
       </button>
@@ -67,6 +147,12 @@ export default function Home() {
       <button className="home-sair" onClick={sair}>
         Sair
       </button>
+
+      <footer className="home-rodape">
+        <a href="https://hotnet.net.br/policies/privacy" target="_blank" rel="noreferrer">
+          Política de Privacidade
+        </a>
+      </footer>
     </div>
   )
 }
