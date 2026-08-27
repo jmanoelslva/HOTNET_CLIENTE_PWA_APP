@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import RotaProtegida from './components/RotaProtegida'
 import Boletos from './pages/Boletos'
+import Consumo from './pages/Consumo'
 import Contratos from './pages/Contratos'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -30,6 +31,14 @@ function App() {
         element={
           <RotaProtegida>
             <Contratos />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/consumo"
+        element={
+          <RotaProtegida>
+            <Consumo />
           </RotaProtegida>
         }
       />

@@ -219,4 +219,59 @@ export function urlImpressaoContrato(contractPk: number): string {
   return `${API_BASE}/controllrctl/contract/print/${contractPk}`
 }
 
+export interface ConsumoDiaDto {
+  cpe_pk?: number
+  contract_pk?: number
+  contract_number?: number
+  plan_name?: string
+  usage_date?: string
+  // Apesar do nome "_byte", confirmado comparando com o painel real que
+  // esses valores vêm em KB — a conversão pra bytes é feita em
+  // src/api/consumo.ts, igual ao app Android.
+  usage_rx_byte?: number
+  usage_tx_byte?: number
+}
+
+export interface UsageListDayResponse {
+  success?: boolean
+  message?: string
+  results?: ConsumoDiaDto[]
+}
+
+/**
+ * Consumo diário de internet do cliente logado — aaa_ctl/usage/list_day,
+ * já escopado pra sessão de cliente, filtrado por período via "where".
+ */
+export function buscarConsumoDiario(where: string): Promise<UsageListDayResponse> {
+  return post<UsageListDayResponse>('aaa_ctl/usage/list_day', { where })
+}
+
+export interface SessaoAtualDto {
+  session_v4_ip?: string
+  session_v6_px?: string
+  session_v6_pd?: string
+  session_mac?: string
+  session_callingid?: string
+  session_date_add?: string
+  session_date_last?: string
+  session_acct_time?: number
+  // Mesmo quirk de KB de usage_rx_byte/usage_tx_byte, ver ConsumoDiaDto.
+  session_rx_byte?: number
+  session_tx_byte?: number
+}
+
+export interface ConnectionSessionResponse {
+  success?: boolean
+  message?: string
+  results?: SessaoAtualDto[]
+}
+
+/**
+ * Sessão de conexão ATUAL (ao vivo) de um CPE — aaa_ctl/connection/session,
+ * filtrando por "aaa_cpe.cpe_pk".
+ */
+export function buscarSessaoAtual(where: string): Promise<ConnectionSessionResponse> {
+  return post<ConnectionSessionResponse>('aaa_ctl/connection/session', { where })
+}
+
 export { post }

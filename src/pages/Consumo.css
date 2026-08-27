@@ -1,0 +1,232 @@
+.consumo-tela {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+.consumo-cabecalho h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.consumo-cabecalho p {
+  margin: 4px 0 20px;
+  color: #999999;
+  font-size: 14px;
+}
+
+.consumo-seletor-mes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.consumo-seletor-mes span {
+  font-weight: 700;
+  color: #333333;
+  font-size: 15px;
+  min-width: 140px;
+  text-align: center;
+}
+
+.consumo-seletor-mes button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  font-size: 18px;
+  cursor: pointer;
+  color: #333333;
+}
+
+.consumo-seletor-mes button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.consumo-filtro-contrato {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #333333;
+  background: #ffffff;
+  margin-bottom: 20px;
+}
+
+.consumo-status {
+  color: #666666;
+  font-size: 14px;
+  text-align: center;
+  padding: 32px 0;
+}
+
+.consumo-status button {
+  margin-top: 12px;
+  height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f28f3b, #d94a38);
+}
+
+.consumo-card-resumo,
+.consumo-card-sessao,
+.consumo-card-historico {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  margin-bottom: 16px;
+}
+
+.consumo-total-label {
+  font-size: 12px;
+  color: #999999;
+}
+
+.consumo-total-valor {
+  margin: 2px 0 12px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #333333;
+}
+
+.consumo-resumo-linhas {
+  display: flex;
+  gap: 24px;
+}
+
+.consumo-resumo-linhas > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.consumo-resumo-linhas span {
+  font-size: 12px;
+  color: #999999;
+}
+
+.consumo-resumo-linhas strong {
+  font-size: 16px;
+  color: #333333;
+}
+
+.consumo-sessao-topo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #333333;
+  font-size: 14px;
+}
+
+.consumo-indicador {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.consumo-toggle-detalhes {
+  margin-top: 12px;
+  border: none;
+  background: transparent;
+  color: #f28f3b;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.consumo-detalhes-sessao {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eeeeee;
+}
+
+.consumo-detalhes-sessao p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+.consumo-detalhes-sessao .consumo-resumo-linhas {
+  margin-top: 12px;
+}
+
+.consumo-historico-titulo {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333333;
+  margin-bottom: 12px;
+}
+
+.consumo-dia {
+  padding: 10px 0;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.consumo-dia:last-child {
+  border-bottom: none;
+}
+
+.consumo-dia-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.consumo-dia-cabecalho span {
+  color: #666666;
+}
+
+.consumo-dia-semana {
+  color: #999999;
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.consumo-chip-hoje {
+  margin-left: 8px;
+  background: #f28f3b;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 2px 8px;
+}
+
+.consumo-dia-cabecalho strong {
+  color: #333333;
+}
+
+.consumo-barra-fundo {
+  height: 8px;
+  border-radius: 4px;
+  background: #f0f0f0;
+  overflow: hidden;
+}
+
+.consumo-barra {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f28f3b, #d94a38);
+}
