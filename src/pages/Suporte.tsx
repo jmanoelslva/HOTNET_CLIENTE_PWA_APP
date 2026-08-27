@@ -16,9 +16,11 @@ import {
 import { useSessao } from '../auth/SessionContext'
 import { buscarCategorias, buscarChamados, chamadoResolvido, abrirChamado as apiAbrirChamado } from '../api/suporte'
 import type { CategoriaDto, TicketDto } from '../api/client'
-import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
 import { useToast } from '../components/Toast/ToastContext'
+import Skeleton from '../components/Skeleton'
+import EstadoVazio from '../components/EstadoVazio'
+import { CORES, comAlpha } from '../utils/cores'
 import './Suporte.css'
 
 const TAMANHO_PAGINA = 20
@@ -42,6 +44,26 @@ const ICONES_CATEGORIA: Record<string, IconType> = {
 
 function iconeParaCategoria(nome: string): IconType {
   return ICONES_CATEGORIA[nome.trim().toLowerCase()] ?? ICONE_PADRAO
+}
+
+// Uma cor por categoria (reaproveitando a mesma paleta usada nos badges
+// do menu/Faq), pra bater o olho na categoria sem precisar ler o texto —
+// categoria desconhecida cai numa cor neutra.
+const COR_PADRAO_CATEGORIA = CORES.textoDesabilitado
+const CORES_CATEGORIA: Record<string, string> = {
+  'suporte técnico': CORES.suporte,
+  'financeiro e pagamentos': CORES.boletos,
+  'vendas e comercial': CORES.dados,
+  'alteração de plano': CORES.consumo,
+  'reclamação': CORES.erro,
+  cancelamento: CORES.contratos,
+  'ouvidoria e adminstrativo': CORES.ajuda,
+  'ouvidoria e administrativo': CORES.ajuda,
+  instalação: CORES.primaria,
+}
+
+function corParaCategoria(nome: string): string {
+  return CORES_CATEGORIA[nome.trim().toLowerCase()] ?? COR_PADRAO_CATEGORIA
 }
 
 function formatarData(data: string | null | undefined): string | null {
@@ -138,9 +160,8 @@ export default function Suporte() {
   }
 
   return (
-    <div className="suporte-tela">
-      <VoltarInicio />
-      <CabecalhoTela icone={MdSupportAgent} cor="#0f8a45" titulo="Suporte" subtitulo="Seus chamados de suporte." />
+    <div className="suporte-tela tela-entrada">
+      <CabecalhoTela icone={MdSupportAgent} cor={CORES.suporte} titulo="Suporte" subtitulo="Seus chamados de suporte." />
 
       <div className="suporte-abas">
         <button className={`aba-chip aba-abertos ${aba === 'abertos' ? 'ativa' : ''}`} onClick={() => setAba('abertos')}>
@@ -154,7 +175,17 @@ export default function Suporte() {
         </button>
       </div>
 
-      {carregando && <p className="suporte-status">Carregando chamados…</p>}
+      {carregando && (
+        <ul className="suporte-lista">
+          {[0, 1, 2].map((indice) => (
+            <li key={indice} className="ticket-card">
+              <Skeleton width="60%" height={15} />
+              <Skeleton width="40%" height={12} />
+              <Skeleton width="50%" height={12} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {!carregando && erro && (
         <div className="suporte-status">
@@ -164,9 +195,11 @@ export default function Suporte() {
       )}
 
       {!carregando && !erro && filtrados.length === 0 && (
-        <p className="suporte-status">
-          {aba === 'resolvidos' ? 'Nenhum chamado resolvido ainda.' : 'Você não tem chamados em aberto.'}
-        </p>
+        <EstadoVazio
+          icone={MdSupportAgent}
+          titulo={aba === 'resolvidos' ? 'Nenhum chamado resolvido ainda' : 'Nenhum chamado em aberto'}
+          subtitulo={aba === 'resolvidos' ? undefined : 'Precisando de ajuda? Toque em "Novo chamado".'}
+        />
       )}
 
       {!carregando && !erro && filtrados.length > 0 && (
@@ -186,13 +219,20 @@ export default function Suporte() {
                   </span>
                 </div>
                 {chamado.ticket_protocol && <p className="ticket-protocolo">Protocolo: {chamado.ticket_protocol}</p>}
-                <p className="ticket-categoria">
-                  {(() => {
-                    const IconeCategoria = iconeParaCategoria(chamado.category_name ?? '')
-                    return <IconeCategoria className="ticket-categoria-icone" />
-                  })()}{' '}
-                  {chamado.category_name ?? 'Categoria não informada'}
-                </p>
+                {(() => {
+                  const nomeCategoria = chamado.category_name ?? ''
+                  const corCategoria = corParaCategoria(nomeCategoria)
+                  const IconeCategoria = iconeParaCategoria(nomeCategoria)
+                  return (
+                    <div
+                      className="ticket-categoria-badge"
+                      style={{ background: comAlpha(corCategoria, 12), color: corCategoria }}
+                    >
+                      <IconeCategoria size={13} />
+                      <span>{chamado.category_name ?? 'Categoria não informada'}</span>
+                    </div>
+                  )
+                })()}
                 <p className="ticket-data">Aberto em {formatarData(chamado.ticket_date_create) ?? 'data não informada'}</p>
                 {resolvido && <p className="ticket-data">Fechado em {formatarData(chamado.ticket_date_close) ?? '-'}</p>}
                 {chamado.ticket_desc && <p className="ticket-descricao">{chamado.ticket_desc}</p>}
@@ -215,7 +255,7 @@ export default function Suporte() {
       {checklistAberto && (
         <div className="suporte-modal-fundo" onClick={() => setChecklistAberto(false)}>
           <div className="suporte-checklist" onClick={(evento) => evento.stopPropagation()}>
-            <MdSupportAgent size={48} color="#f28f3b" className="suporte-checklist-icone" />
+            <MdSupportAgent size={48} color={CORES.primaria} className="suporte-checklist-icone" />
             <h2>Antes de abrir o chamado</h2>
             <p>Esses passos resolvem boa parte dos problemas rapidinho</p>
 
@@ -276,7 +316,10 @@ export default function Suporte() {
                     onClick={() => setCategoriaMenuAberto((v) => !v)}
                   >
                     <span className="suporte-dropdown-btn-conteudo">
-                      <IconeSelecionado className="suporte-dropdown-icone" />
+                      <IconeSelecionado
+                        className="suporte-dropdown-icone"
+                        style={{ color: corParaCategoria(categoriaSelecionada?.category_name ?? '') }}
+                      />
                       {categoriaSelecionada?.category_name ?? 'Selecione uma categoria'}
                     </span>
                     <MdExpandMore />
@@ -297,7 +340,10 @@ export default function Suporte() {
                                 setCategoriaMenuAberto(false)
                               }}
                             >
-                              <Icone className="suporte-dropdown-icone" />
+                              <Icone
+                                className="suporte-dropdown-icone"
+                                style={{ color: corParaCategoria(categoria.category_name ?? '') }}
+                              />
                               {categoria.category_name ?? `Categoria ${categoria.category_pk}`}
                             </button>
                           )

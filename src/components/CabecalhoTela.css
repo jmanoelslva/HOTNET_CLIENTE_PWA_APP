@@ -26,6 +26,6 @@
 
 .cabecalho-tela p {
   margin: 2px 0 0;
-  color: #999999;
+  color: var(--cor-texto-terciario);
   font-size: 13px;
 }

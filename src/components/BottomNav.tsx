@@ -1,13 +1,14 @@
 import { NavLink } from 'react-router-dom'
 import { MdDataUsage, MdDescription, MdHome, MdPayments, MdSupportAgent } from 'react-icons/md'
+import { CORES } from '../utils/cores'
 import './BottomNav.css'
 
 const ITENS = [
-  { to: '/', icone: MdHome, cor: '#f28f3b', label: 'Início', fim: true },
-  { to: '/boletos', icone: MdPayments, cor: '#d94a38', label: 'Boletos' },
-  { to: '/contratos', icone: MdDescription, cor: '#4a5c7a', label: 'Contratos' },
-  { to: '/consumo', icone: MdDataUsage, cor: '#18afc0', label: 'Consumo' },
-  { to: '/suporte', icone: MdSupportAgent, cor: '#0f8a45', label: 'Suporte' },
+  { to: '/', icone: MdHome, cor: CORES.primaria, label: 'Início', fim: true },
+  { to: '/boletos', icone: MdPayments, cor: CORES.boletos, label: 'Boletos' },
+  { to: '/contratos', icone: MdDescription, cor: CORES.contratos, label: 'Contratos' },
+  { to: '/consumo', icone: MdDataUsage, cor: CORES.consumo, label: 'Consumo' },
+  { to: '/suporte', icone: MdSupportAgent, cor: CORES.suporte, label: 'Suporte' },
 ]
 
 /**

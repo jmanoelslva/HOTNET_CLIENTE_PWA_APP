@@ -1,18 +1,29 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
-import { MdAttachFile, MdCameraAlt, MdDescription, MdImage, MdLocationOn } from 'react-icons/md'
+import {
+  MdAttachFile,
+  MdCameraAlt,
+  MdChatBubbleOutline,
+  MdDescription,
+  MdImage,
+  MdLocationOn,
+  MdPictureAsPdf,
+} from 'react-icons/md'
 import VoltarInicio from '../components/VoltarInicio'
+import EstadoVazio from '../components/EstadoVazio'
 import {
   buscarOperacoes,
   chamadoResolvido,
   ehArquivoDeImagem,
   ehArquivoDeVideo,
+  ehArquivoPdf,
   enviarAnexoChamado,
   enviarMensagem,
   type OperacaoChamado,
 } from '../api/suporte'
 import type { TicketDto } from '../api/client'
 import { useToast } from '../components/Toast/ToastContext'
+import Skeleton from '../components/Skeleton'
 import './DetalheChamado.css'
 
 const INTERVALO_ATUALIZACAO_MS = 10_000
@@ -28,6 +39,15 @@ function formatarDataHora(data: string | null): string {
   return data
 }
 
+/** "YYYY-MM-DD HH:mm:ss", mesmo formato que op_date_create — usado só pra
+ * carimbar a mensagem otimista (ver aoEnviarTexto) com algo que
+ * formatarDataHora sabe exibir. */
+function agoraNoFormatoDoServidor(): string {
+  const agora = new Date()
+  const par = (n: number) => String(n).padStart(2, '0')
+  return `${agora.getFullYear()}-${par(agora.getMonth() + 1)}-${par(agora.getDate())} ${par(agora.getHours())}:${par(agora.getMinutes())}:${par(agora.getSeconds())}`
+}
+
 export default function DetalheChamado() {
   const { ticketPk } = useParams<{ ticketPk: string }>()
   const pk = Number(ticketPk)
@@ -37,6 +57,11 @@ export default function DetalheChamado() {
   const resolvido = chamado ? chamadoResolvido(chamado) : false
 
   const [operacoes, setOperacoes] = useState<OperacaoChamado[]>([])
+  // Mensagens de texto enviadas mas ainda não confirmadas pelo servidor —
+  // aparecem na hora, sem esperar o próximo fetch (que pode demorar até
+  // o intervalo de atualização, ou nem trazer a mensagem ainda por
+  // atraso do próprio backend). Removidas assim que o fetch confirma.
+  const [pendentes, setPendentes] = useState<OperacaoChamado[]>([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
   const [mensagem, setMensagem] = useState('')
@@ -46,7 +71,12 @@ export default function DetalheChamado() {
   const inputFotoRef = useRef<HTMLInputElement>(null)
   const inputGaleriaRef = useRef<HTMLInputElement>(null)
   const inputArquivoRef = useRef<HTMLInputElement>(null)
+  const inputMensagemRef = useRef<HTMLInputElement>(null)
   const fimDaListaRef = useRef<HTMLDivElement>(null)
+  // Quantidade de mensagens na última carga — em ref pra comparar sem
+  // depender de "operacoes" no closure do setInterval (que ficaria
+  // desatualizado, já que o efeito só reagenda quando "pk" muda).
+  const qtdMensagensRef = useRef(0)
 
   useEffect(() => {
     if (!Number.isFinite(pk)) return
@@ -60,9 +90,20 @@ export default function DetalheChamado() {
     if (mostrarCarregando) setCarregando(true)
     try {
       const dados = await buscarOperacoes(pk)
+      const chegouMensagemNova = dados.length > qtdMensagensRef.current
+      qtdMensagensRef.current = dados.length
       setOperacoes(dados)
+      // O servidor já confirmou essas mensagens — descarta as otimistas
+      // correspondentes (por texto, já que a temporária não tem opPk real)
+      // pra não duplicar na tela.
+      setPendentes((atual) => atual.filter((p) => !dados.some((d) => d.doCliente && d.texto === p.texto)))
       setErro(null)
-      setTimeout(() => fimDaListaRef.current?.scrollIntoView({ block: 'end' }), 0)
+      // Só rola pro fim na carga inicial ou quando chega mensagem nova —
+      // nas atualizações silenciosas de fundo (a cada 10s) sem novidade,
+      // não puxa a tela de quem estiver lendo mensagens antigas.
+      if (mostrarCarregando || chegouMensagemNova) {
+        setTimeout(() => fimDaListaRef.current?.scrollIntoView({ block: 'end' }), 0)
+      }
     } catch {
       if (mostrarCarregando) setErro('Não foi possível carregar as mensagens deste chamado.')
     } finally {
@@ -73,11 +114,25 @@ export default function DetalheChamado() {
   /** Envia qualquer texto pro chamado — reaproveitado pela mensagem digitada e pela localização. */
   async function aoEnviarTexto(texto: string, aoConcluir?: () => void) {
     setEnviando(true)
+    // Mostra a mensagem na hora (sem esperar o servidor confirmar) e já
+    // rola pro fim — resolve o problema de mandar uma mensagem e ela não
+    // aparecer até a próxima atualização automática.
+    const otimista: OperacaoChamado = {
+      opPk: -Date.now(),
+      texto,
+      arquivo: null,
+      dataCriacao: agoraNoFormatoDoServidor(),
+      doCliente: true,
+      urlAnexo: null,
+    }
+    setPendentes((atual) => [...atual, otimista])
+    setTimeout(() => fimDaListaRef.current?.scrollIntoView({ block: 'end' }), 0)
     try {
       await enviarMensagem(pk, texto)
       aoConcluir?.()
       await carregar(false)
     } catch (excecao) {
+      setPendentes((atual) => atual.filter((p) => p.opPk !== otimista.opPk))
       toast(excecao instanceof Error ? excecao.message : 'Não foi possível enviar a mensagem.')
     } finally {
       setEnviando(false)
@@ -85,9 +140,15 @@ export default function DetalheChamado() {
   }
 
   function aoEnviarMensagem() {
+    if (enviando) return
     const texto = mensagem.trim()
     if (!texto) return
     aoEnviarTexto(texto, () => setMensagem(''))
+    // Clicar em "Enviar" tira o foco do campo de texto e o teclado do
+    // celular fecha sozinho — devolve o foco na hora (ainda dentro do
+    // mesmo gesto do usuário, senão o navegador ignora) pra só fechar
+    // quando o próprio usuário fechar.
+    inputMensagemRef.current?.focus()
   }
 
   async function aoSelecionarArquivo(evento: React.ChangeEvent<HTMLInputElement>) {
@@ -130,8 +191,10 @@ export default function DetalheChamado() {
     return <p className="detalhe-status">Chamado não encontrado.</p>
   }
 
+  const listaExibida = [...operacoes, ...pendentes]
+
   return (
-    <div className="detalhe-tela">
+    <div className="detalhe-tela tela-entrada">
       <header className="detalhe-cabecalho">
         <VoltarInicio to="/suporte" label="Chamados" />
         {chamado && (
@@ -149,7 +212,14 @@ export default function DetalheChamado() {
       </header>
 
       <div className="detalhe-chat">
-        {carregando && <p className="detalhe-status">Carregando mensagens…</p>}
+        {carregando &&
+          [0, 1, 2].map((indice) => (
+            <div key={indice} className={`balao-linha ${indice === 1 ? 'linha-equipe' : 'linha-cliente'}`}>
+              <div className={`balao ${indice === 1 ? 'balao-equipe' : 'balao-cliente'}`}>
+                <Skeleton width={indice === 1 ? 160 : 120} height={13} />
+              </div>
+            </div>
+          ))}
 
         {!carregando && erro && (
           <div className="detalhe-status">
@@ -158,13 +228,13 @@ export default function DetalheChamado() {
           </div>
         )}
 
-        {!carregando && !erro && operacoes.length === 0 && (
-          <p className="detalhe-status">Nenhuma mensagem neste chamado ainda.</p>
+        {!carregando && !erro && listaExibida.length === 0 && (
+          <EstadoVazio icone={MdChatBubbleOutline} titulo="Nenhuma mensagem ainda" subtitulo="Escreva algo pra começar a conversa." />
         )}
 
         {!carregando &&
           !erro &&
-          operacoes.map((op) => (
+          listaExibida.map((op) => (
             <div key={op.opPk} className={`balao-linha ${op.doCliente ? 'linha-cliente' : 'linha-equipe'}`}>
               <div className={`balao ${op.doCliente ? 'balao-cliente' : 'balao-equipe'}`}>
                 {!op.doCliente && <span className="balao-autor">Equipe Hotnet</span>}
@@ -178,8 +248,16 @@ export default function DetalheChamado() {
                   <video src={op.urlAnexo} controls className="balao-anexo-imagem" />
                 )}
                 {op.urlAnexo && !ehArquivoDeImagem(op.arquivo) && !ehArquivoDeVideo(op.arquivo) && (
-                  <a href={op.urlAnexo} target="_blank" rel="noreferrer" className="balao-anexo-arquivo">
-                    <MdAttachFile /> {op.arquivo}
+                  <a
+                    href={op.urlAnexo}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`balao-anexo-documento ${ehArquivoPdf(op.arquivo) ? 'balao-anexo-pdf' : ''}`}
+                  >
+                    <span className="balao-anexo-documento-icone">
+                      {ehArquivoPdf(op.arquivo) ? <MdPictureAsPdf size={20} /> : <MdAttachFile size={20} />}
+                    </span>
+                    <span className="balao-anexo-documento-nome">{op.arquivo}</span>
                   </a>
                 )}
 
@@ -246,12 +324,12 @@ export default function DetalheChamado() {
           </button>
 
           <input
+            ref={inputMensagemRef}
             className="detalhe-input-mensagem"
             value={mensagem}
             onChange={(evento) => setMensagem(evento.target.value)}
             onKeyDown={(evento) => evento.key === 'Enter' && aoEnviarMensagem()}
             placeholder="Digite uma mensagem…"
-            disabled={enviando}
           />
           <button className="detalhe-btn-enviar" disabled={enviando || !mensagem.trim()} onClick={aoEnviarMensagem}>
             Enviar

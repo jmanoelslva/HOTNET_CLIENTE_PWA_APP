@@ -10,8 +10,10 @@ import {
   type SessaoAtual,
 } from '../api/consumo'
 import { formatarBytes, formatarDuracao } from '../utils/formatacao'
-import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
+import Skeleton from '../components/Skeleton'
+import EstadoVazio from '../components/EstadoVazio'
+import { CORES } from '../utils/cores'
 import './Consumo.css'
 
 const NOMES_DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -118,11 +120,10 @@ export default function Consumo() {
   const hojeIso = new Date().toISOString().slice(0, 10)
 
   return (
-    <div className="consumo-tela">
-      <VoltarInicio />
+    <div className="consumo-tela tela-entrada">
       <CabecalhoTela
         icone={MdDataUsage}
-        cor="#18afc0"
+        cor={CORES.consumo}
         titulo="Consumo"
         subtitulo="Acompanhe o uso diário da sua internet."
       />
@@ -147,7 +148,17 @@ export default function Consumo() {
         </select>
       )}
 
-      {carregando && <p className="consumo-status">Carregando consumo…</p>}
+      {carregando && (
+        <>
+          <div className="consumo-card-resumo">
+            <Skeleton width="50%" height={12} />
+            <Skeleton width="70%" height={26} />
+          </div>
+          <div className="consumo-card-sessao">
+            <Skeleton width="40%" height={14} />
+          </div>
+        </>
+      )}
 
       {!carregando && erro && (
         <div className="consumo-status">
@@ -157,7 +168,7 @@ export default function Consumo() {
       )}
 
       {!carregando && !erro && !consumoSelecionado && (
-        <p className="consumo-status">Nenhum consumo registrado neste período.</p>
+        <EstadoVazio icone={MdDataUsage} titulo="Nenhum consumo registrado" subtitulo="Nada por aqui neste período." />
       )}
 
       {!carregando && !erro && consumoSelecionado && (
@@ -181,7 +192,7 @@ export default function Consumo() {
             <div className="consumo-sessao-topo">
               <span
                 className="consumo-indicador"
-                style={{ background: sessaoAtual ? '#4caf50' : '#9e9e9e' }}
+                style={{ background: sessaoAtual ? CORES.sucesso : CORES.textoFraco }}
               />
               <span>
                 {sessaoAtual === undefined ? 'Verificando conexão…' : sessaoAtual ? 'Online Agora' : 'Offline'}

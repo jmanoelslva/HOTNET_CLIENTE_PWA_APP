@@ -18,22 +18,23 @@ import { buscarDadosCliente } from '../api/cadastro'
 import { buscarContratos } from '../api/contratos'
 import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, type ConsumoPorContrato } from '../api/consumo'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
+import { CORES, comAlpha } from '../utils/cores'
 import logoHotnet from '../assets/logo-hotnet.png'
 import './Home.css'
 
 function saudacaoPorHorario(primeiroNome: string): string {
   const hora = new Date().getHours()
   const periodo = hora >= 5 && hora < 12 ? 'Bom dia' : hora >= 12 && hora < 18 ? 'Boa tarde' : 'Boa noite'
-  return `${periodo}, ${primeiroNome}! 👋`
+  return `${periodo}, ${primeiroNome}!`
 }
 
 const ITENS_MENU = [
-  { to: '/boletos', Icone: MdPayments, cor: '#d94a38', label: 'Boletos' },
-  { to: '/contratos', Icone: MdDescription, cor: '#4a5c7a', label: 'Contratos' },
-  { to: '/consumo', Icone: MdDataUsage, cor: '#18afc0', label: 'Consumo' },
-  { to: '/suporte', Icone: MdSupportAgent, cor: '#0f8a45', label: 'Suporte' },
-  { to: '/cadastro', Icone: MdBadge, cor: '#7a4bc4', label: 'Meus dados' },
-  { to: '/faq', Icone: MdHelp, cor: '#2a72b8', label: 'Ajuda' },
+  { to: '/boletos', Icone: MdPayments, cor: CORES.boletos, label: 'Boletos' },
+  { to: '/contratos', Icone: MdDescription, cor: CORES.contratos, label: 'Contratos' },
+  { to: '/consumo', Icone: MdDataUsage, cor: CORES.consumo, label: 'Consumo' },
+  { to: '/suporte', Icone: MdSupportAgent, cor: CORES.suporte, label: 'Suporte' },
+  { to: '/cadastro', Icone: MdBadge, cor: CORES.dados, label: 'Meus dados' },
+  { to: '/faq', Icone: MdHelp, cor: CORES.ajuda, label: 'Ajuda' },
 ]
 
 export default function Home() {
@@ -103,11 +104,15 @@ export default function Home() {
     }
   }
 
-  const corStatus = online === true ? '#20b957' : online === false ? '#f44336' : '#9e9e9e'
+  const corStatus = online === true ? CORES.sucessoVivo : online === false ? CORES.erro : CORES.textoFraco
 
   return (
-    <div className="home-tela">
-      <header className="home-cabecalho">
+    <div className="home-tela tela-entrada">
+      <div className="home-conteudo">
+      <header
+        className="home-cabecalho"
+        style={{ background: comAlpha(CORES.primaria, 8), borderColor: comAlpha(CORES.primaria, 20) }}
+      >
         <img src={logoHotnet} alt="HOTNET" className="home-header-logo" />
 
         <div className="home-header-saudacao">
@@ -144,12 +149,11 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="home-conteudo">
       {(contratoSelecionado || planoSemConsumo) && (
         <div className="home-card-status">
           <div className="home-card-status-topo">
             <span className="home-indicador" style={{ background: corStatus }}>
-              <MdWifi size={22} color="#ffffff" />
+              <MdWifi size={22} color={CORES.branco} />
             </span>
             <div className="home-card-status-textos">
               <span className="home-plano-nome">
@@ -194,7 +198,7 @@ export default function Home() {
         {ITENS_MENU.map((item) => (
           <Link key={item.to} to={item.to} className="home-menu-item">
             <span className="home-menu-icone" style={{ background: item.cor }}>
-              <item.Icone size={26} color="#ffffff" />
+              <item.Icone size={26} color={CORES.branco} />
             </span>
             <span className="home-menu-label">{item.label}</span>
           </Link>

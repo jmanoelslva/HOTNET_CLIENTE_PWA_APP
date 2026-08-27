@@ -6,6 +6,7 @@ import {
   MdHelp,
   MdLock,
   MdPayments,
+  MdSearchOff,
   MdSupportAgent,
   MdWifi,
 } from 'react-icons/md'
@@ -13,8 +14,9 @@ import { FaWhatsapp } from 'react-icons/fa'
 import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente } from '../api/cadastro'
 import { abrirWhatsappAjuda } from '../utils/whatsapp'
-import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
+import EstadoVazio from '../components/EstadoVazio'
+import { CORES, comAlpha } from '../utils/cores'
 import './Faq.css'
 
 interface CategoriaFaq {
@@ -34,12 +36,12 @@ interface PerguntaFrequente {
 // Mesmas cores usadas nos badges equivalentes na Home, pra manter a
 // associação visual entre uma categoria de dúvida e a tela que ela trata.
 const CATEGORIAS: CategoriaFaq[] = [
-  { id: 'atendimento', nome: 'Atendimento', subtitulo: 'Horários e canais', Icone: MdSupportAgent, cor: '#0f8a45' },
-  { id: 'wifi', nome: 'Internet e Wi-Fi', subtitulo: 'Velocidade e sinal', Icone: MdWifi, cor: '#2a72b8' },
-  { id: 'cobrancas', nome: 'Cobranças', subtitulo: 'Boletos e pagamentos', Icone: MdPayments, cor: '#d94a38' },
-  { id: 'contratos', nome: 'Contratos', subtitulo: 'Planos e contratos', Icone: MdDescription, cor: '#4a5c7a' },
-  { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', Icone: MdDataUsage, cor: '#18afc0' },
-  { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', Icone: MdLock, cor: '#7a4bc4' },
+  { id: 'atendimento', nome: 'Atendimento', subtitulo: 'Horários e canais', Icone: MdSupportAgent, cor: CORES.suporte },
+  { id: 'wifi', nome: 'Internet e Wi-Fi', subtitulo: 'Velocidade e sinal', Icone: MdWifi, cor: CORES.ajuda },
+  { id: 'cobrancas', nome: 'Cobranças', subtitulo: 'Boletos e pagamentos', Icone: MdPayments, cor: CORES.boletos },
+  { id: 'contratos', nome: 'Contratos', subtitulo: 'Planos e contratos', Icone: MdDescription, cor: CORES.contratos },
+  { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', Icone: MdDataUsage, cor: CORES.consumo },
+  { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', Icone: MdLock, cor: CORES.dados },
 ]
 
 function categoriaDe(id: string): CategoriaFaq {
@@ -141,11 +143,10 @@ export default function Faq() {
   }
 
   return (
-    <div className="faq-tela">
-      <VoltarInicio />
+    <div className="faq-tela tela-entrada">
       <CabecalhoTela
         icone={MdHelp}
-        cor="#2a72b8"
+        cor={CORES.ajuda}
         titulo="Ajuda"
         subtitulo="Perguntas frequentes e nossos canais de contato."
       />
@@ -168,7 +169,7 @@ export default function Faq() {
             style={{ borderColor: categoriaFiltro === categoria.id ? categoria.cor : undefined }}
             onClick={() => selecionarCategoria(categoria.id)}
           >
-            <span className="faq-categoria-icone" style={{ background: `${categoria.cor}1a`, color: categoria.cor }}>
+            <span className="faq-categoria-icone" style={{ background: comAlpha(categoria.cor, 10), color: categoria.cor }}>
               <categoria.Icone size={22} />
             </span>
             <span className="faq-categoria-nome">{categoria.nome}</span>
@@ -186,7 +187,7 @@ export default function Faq() {
       </h2>
 
       {listaExibida.length === 0 ? (
-        <p className="faq-vazio">Nenhuma pergunta encontrada.</p>
+        <EstadoVazio icone={MdSearchOff} titulo="Nenhuma pergunta encontrada" subtitulo="Tente buscar com outras palavras." />
       ) : (
         <div className="faq-lista">
           {listaExibida.map((pergunta, indice) => {
@@ -197,7 +198,7 @@ export default function Faq() {
                 <div className="faq-item-topo">
                   <span
                     className="faq-item-icone"
-                    style={{ background: `${categoria.cor}1a`, color: categoria.cor }}
+                    style={{ background: comAlpha(categoria.cor, 10), color: categoria.cor }}
                   >
                     <categoria.Icone size={18} />
                   </span>

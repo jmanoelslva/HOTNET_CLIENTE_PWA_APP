@@ -1,21 +1,30 @@
 .home-tela {
-  min-height: 100vh;
-  background: #f5f5f5;
+  /* Trava a altura no espaço realmente visível (descontando os 64px que o
+     body reserva pra barra de navegação fixa, ver index.css) — sem isso
+     a página fica 64px mais alta que a viewport e sempre sobra rolagem,
+     mesmo com o conteúdo cabendo à vontade. */
+  height: calc(100vh - 64px);
+  height: calc(100dvh - 64px);
+  overflow: hidden;
+  background: var(--cor-fundo);
 }
 
 .home-cabecalho {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 24px 20px 32px;
-  background: linear-gradient(135deg, #f49c53, #de6050);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  border: 1px solid transparent;
 }
 
 .home-header-logo {
   height: 44px;
   width: 44px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--cor-superficie);
+  box-shadow: var(--sombra-card);
   padding: 4px;
   flex-shrink: 0;
 }
@@ -29,12 +38,12 @@
   display: block;
   font-size: 18px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--cor-texto);
 }
 
 .home-subtitulo {
   margin: 2px 0 0;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--cor-texto-terciario);
   font-size: 12px;
 }
 
@@ -48,8 +57,9 @@
   height: 44px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  background: var(--cor-superficie);
+  color: var(--cor-primaria);
+  box-shadow: var(--sombra-card);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,7 +77,7 @@
   top: 52px;
   right: 0;
   z-index: 11;
-  background: #ffffff;
+  background: var(--cor-superficie);
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   overflow: hidden;
@@ -85,17 +95,17 @@
   padding: 12px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: #333333;
+  color: var(--cor-texto);
   cursor: pointer;
   white-space: nowrap;
 }
 
 .home-avatar-menu button:hover {
-  background: #f5f5f5;
+  background: var(--cor-fundo);
 }
 
 .home-avatar-menu-sair {
-  color: #d94a38 !important;
+  color: var(--cor-primaria-escura) !important;
 }
 
 .home-conteudo {
@@ -105,10 +115,10 @@
 }
 
 .home-card-status {
-  background: #ffffff;
+  background: var(--cor-superficie);
   border-radius: 20px;
   padding: 18px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--sombra-card);
   margin-bottom: 20px;
 }
 
@@ -136,7 +146,7 @@
 
 .home-plano-nome {
   font-weight: 400;
-  color: #999999;
+  color: var(--cor-texto-terciario);
   font-size: 12px;
 }
 
@@ -149,7 +159,7 @@
 .home-status-resumo {
   margin: 2px 0 0;
   font-size: 12px;
-  color: #999999;
+  color: var(--cor-texto-terciario);
 }
 
 .home-seletor-contrato {
@@ -157,11 +167,11 @@
   height: 40px;
   margin-top: 12px;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--cor-borda);
   padding: 0 12px;
   font-size: 13px;
-  color: #333333;
-  background: #ffffff;
+  color: var(--cor-texto);
+  background: var(--cor-superficie);
 }
 
 .home-whatsapp {
@@ -169,11 +179,11 @@
   height: 52px;
   border: none;
   border-radius: 14px;
-  color: #ffffff;
+  color: var(--cor-branco-fixo);
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, #25d366, #1da851);
+  background: linear-gradient(135deg, var(--cor-whatsapp), var(--cor-whatsapp-escura));
   margin-bottom: 24px;
   display: flex;
   align-items: center;
@@ -189,10 +199,10 @@
 }
 
 .home-menu-item {
-  background: #ffffff;
+  background: var(--cor-superficie);
   border-radius: 16px;
   padding: 20px 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--sombra-card);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -213,7 +223,7 @@
 .home-menu-label {
   font-size: 12px;
   font-weight: 600;
-  color: #333333;
+  color: var(--cor-texto);
   text-align: center;
 }
 
@@ -224,5 +234,5 @@
 
 .home-rodape a {
   font-size: 12px;
-  color: #999999;
+  color: var(--cor-texto-terciario);
 }

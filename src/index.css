@@ -1,6 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 :root {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
-  color-scheme: light;
+  font-family: 'Plus Jakarta Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light dark;
+
+  /* Marca */
+  --cor-primaria: #f28f3b;
+  --cor-primaria-escura: #d94a38;
+  --cor-primaria-clara: #f49c53;
+  --cor-primaria-gradiente-fim: #de6050;
+
+  /* Superfícies */
+  --cor-fundo: #f5f5f5;
+  --cor-superficie: #ffffff;
+  --cor-borda: #e0e0e0;
+  --cor-borda-suave: #eeeeee;
+  --cor-borda-clara: #f0f0f0;
+  /* Branco fixo — pra texto/ícone sobre um fundo de cor sólida (botão
+     gradiente, badge, cabeçalho). NUNCA redefinido no bloco escuro: o
+     badge continua colorido lá, então o texto em cima precisa continuar
+     branco, diferente de --cor-superficie (que vira escura). */
+  --cor-branco-fixo: #ffffff;
+
+  /* Texto */
+  --cor-texto: #333333;
+  --cor-texto-secundario: #666666;
+  --cor-texto-terciario: #999999;
+  --cor-texto-fraco: #9e9e9e;
+  --cor-texto-desabilitado: #757575;
+
+  /* Status/feedback */
+  --cor-sucesso: #4caf50;
+  --cor-sucesso-vivo: #20b957;
+  --cor-alerta: #ff9800;
+  --cor-atencao: #ffc107;
+  --cor-erro: #f44336;
+
+  /* Acentos por tela (mesma linguagem visual do app Android) */
+  --cor-boletos: var(--cor-primaria-escura);
+  --cor-contratos: #4a5c7a;
+  --cor-consumo: #18afc0;
+  --cor-suporte: #0f8a45;
+  --cor-dados: #7a4bc4;
+  --cor-ajuda: #2a72b8;
+  --cor-pix: #00a884;
+  --cor-whatsapp: #25d366;
+  --cor-whatsapp-escura: #1da851;
+
+  /* Sombra dos cards — token à parte porque no escuro uma sombra preta
+     não aparece contra um fundo já escuro (ver bloco dark abaixo). */
+  --sombra-card: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Segue o tema do sistema operacional/navegador automaticamente — sem
+   toggle manual, é só isso que foi pedido por ora. Só as superfícies e o
+   texto mudam; as cores de marca/acento continuam as mesmas porque já têm
+   contraste suficiente contra um fundo escuro. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cor-fundo: #121316;
+    --cor-superficie: #1e2025;
+    --cor-borda: #34373e;
+    --cor-borda-suave: #2b2e34;
+    --cor-borda-clara: #292c32;
+
+    --cor-texto: #f0f0f0;
+    --cor-texto-secundario: #b8b8bc;
+    --cor-texto-terciario: #9a9aa0;
+    --cor-texto-fraco: #86868c;
+    --cor-texto-desabilitado: #6f6f75;
+
+    --sombra-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+
+    /* Alguns acentos de marca são escuros demais pra servir de TEXTO sobre
+       fundo já escuro (ex: botões com fundo translúcido da própria cor) —
+       clareados só aqui; como ícone/badge com texto branco por cima eles
+       já funcionavam bem, então isso não piora esse outro uso. */
+    --cor-contratos: #8fa4c9;
+    --cor-suporte: #3ecb74;
+    --cor-ajuda: #5b9bd9;
+    --cor-dados: #a67bdb;
+  }
 }
 
 * {
@@ -9,12 +89,59 @@
 
 body {
   margin: 0;
-  background: #f5f5f5;
-  color: #333333;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
 }
 
 /* Reserva espaço pro conteúdo não ficar escondido atrás da barra de
    navegação fixa no rodapé, quando ela está presente na página. */
 body:has(.bottom-nav) {
   padding-bottom: 64px;
+}
+
+/* Transição leve de entrada nas telas — aplicada no container raiz de
+   cada página (ver classe "tela-entrada" nos componentes de página). */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tela-entrada {
+  animation: fade-in 0.22s ease;
+}
+
+/* Feedback tátil: qualquer botão, link ou item de lista clicável "afunda"
+   levemente ao toque, no lugar do brilho cinza padrão do navegador — mais
+   parecido com um app nativo. */
+button:not(:disabled),
+a,
+.ticket-card {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+button:not(:disabled):active,
+a:active,
+.ticket-card:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+/* Respeita quem desativou animação no sistema — para tudo (fade-in,
+   skeleton, spinner, feedback de toque) em vez de forçar movimento. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

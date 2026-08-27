@@ -1,5 +1,4 @@
 import { FaWhatsapp } from 'react-icons/fa'
-import VoltarInicio from '../components/VoltarInicio'
 import logoHotnet from '../assets/logo-hotnet.png'
 import './Sobre.css'
 
@@ -11,8 +10,7 @@ function abrirWhatsappSobre() {
 
 export default function Sobre() {
   return (
-    <div className="sobre-tela">
-      <VoltarInicio />
+    <div className="sobre-tela tela-entrada">
 
       <div className="sobre-card">
         <img src={logoHotnet} alt="HOTNET" className="sobre-logo" />

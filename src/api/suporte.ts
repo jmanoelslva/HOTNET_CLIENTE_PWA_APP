@@ -147,3 +147,7 @@ export function ehArquivoDeImagem(nomeArquivo: string | null): boolean {
   const nome = nomeArquivo.toLowerCase()
   return EXTENSOES_IMAGEM.some((ext) => nome.endsWith(ext))
 }
+
+export function ehArquivoPdf(nomeArquivo: string | null): boolean {
+  return !!nomeArquivo && nomeArquivo.toLowerCase().endsWith('.pdf')
+}

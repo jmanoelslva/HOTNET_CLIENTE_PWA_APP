@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
-import { MdCheckCircle, MdFileDownload, MdPayments, MdQrCodeScanner } from 'react-icons/md'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { MdCheckCircle, MdDescription, MdFileDownload, MdPayments, MdQrCodeScanner } from 'react-icons/md'
 import { FaBarcode } from 'react-icons/fa'
 import { SiPix } from 'react-icons/si'
-import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
+import Skeleton from '../components/Skeleton'
+import EstadoVazio from '../components/EstadoVazio'
 import { useToast } from '../components/Toast/ToastContext'
+import { CORES, comAlpha } from '../utils/cores'
 import {
   ApiError,
   SessaoExpiradaError,
@@ -68,6 +70,7 @@ async function copiarTexto(texto: string): Promise<boolean> {
 
 export default function Boletos() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { toast } = useToast()
   const contratoPreSelecionado = (location.state as { contratoPk?: number } | null)?.contratoPk ?? null
 
@@ -174,11 +177,10 @@ export default function Boletos() {
   }
 
   return (
-    <div className="boletos-tela">
-      <VoltarInicio />
+    <div className="boletos-tela tela-entrada">
       <CabecalhoTela
         icone={MdPayments}
-        cor="#d94a38"
+        cor={CORES.boletos}
         titulo="Boletos"
         subtitulo="Acompanhe seus boletos em aberto e pagos."
       />
@@ -213,7 +215,18 @@ export default function Boletos() {
         </select>
       )}
 
-      {carregando && <p className="boletos-status">Carregando boletos…</p>}
+      {carregando && (
+        <ul className="boletos-lista">
+          {[0, 1, 2].map((indice) => (
+            <li key={indice} className="boleto-card">
+              <Skeleton width="55%" height={16} />
+              <Skeleton width="35%" height={12} />
+              <Skeleton width="45%" height={24} />
+              <Skeleton width="30%" height={12} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {!carregando && erro && (
         <div className="boletos-status">
@@ -223,9 +236,11 @@ export default function Boletos() {
       )}
 
       {!carregando && !erro && faturasFiltradas.length === 0 && (
-        <p className="boletos-status">
-          {filtroStatus === 'aberto' ? 'Nenhum boleto em aberto.' : 'Nenhum boleto pago.'}
-        </p>
+        <EstadoVazio
+          icone={MdPayments}
+          titulo={filtroStatus === 'aberto' ? 'Nenhum boleto em aberto' : 'Nenhum boleto pago'}
+          subtitulo={filtroStatus === 'aberto' ? 'Você está em dia por aqui.' : undefined}
+        />
       )}
 
       {!carregando && !erro && faturasExibidas.length > 0 && (
@@ -248,76 +263,88 @@ export default function Boletos() {
                   </span>
                 </div>
 
-                <p className="boleto-vencimento" style={vencida ? { color: '#f44336' } : undefined}>
-                  Vencimento: {formatarData(fatura.invoice_date_due)}
-                </p>
+                {fatura.contract_number != null && (
+                  <button
+                    className="boleto-contrato-chip"
+                    style={{ background: comAlpha(CORES.contratos, 12), color: CORES.contratos }}
+                    onClick={() => navigate('/contratos', { state: { contratoPk: fatura.contract_pk } })}
+                  >
+                    <MdDescription size={14} /> Contrato {fatura.contract_number}
+                  </button>
+                )}
 
-                {paga ? (
-                  <p className="boleto-aviso boleto-aviso-paga">✅ Pago em {formatarData(fatura.invoice_date_credit)}</p>
-                ) : (
-                  <>
+                <div className="boleto-vencimento-valor">
+                  <div className="boleto-coluna-vencimento">
+                    <span className="boleto-label-valor">Vencimento</span>
+                    <p className="boleto-vencimento" style={vencida ? { color: CORES.erro } : undefined}>
+                      {formatarData(fatura.invoice_date_due)}
+                    </p>
                     {vencida && (
                       <p className="boleto-aviso boleto-aviso-vencida">
                         {dias === 1 ? 'Venceu há 1 dia' : `Venceu há ${dias} dias`}
                       </p>
                     )}
-
-                    {valorAtualizado != null ? (
-                      <>
-                        <span className="boleto-label-valor">Valor atualizado</span>
-                        <p className="boleto-valor">R$ {formatarValor(valorAtualizado)}</p>
-                        <p className="boleto-valor-original">Original: R$ {formatarValor(fatura.invoice_amount_document)}</p>
-                        <p className="boleto-taxas">
-                          Multa de {fatura.invoice_rate_fine?.replace('.', ',')}% + juros de{' '}
-                          {fatura.invoice_rate_interest?.replace('.', ',')}% ao dia ({dias}d de atraso)
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <span className="boleto-label-valor">Valor total</span>
-                        <p className="boleto-valor">R$ {formatarValor(fatura.invoice_amount_document)}</p>
-                      </>
+                    {paga && (
+                      <p className="boleto-aviso boleto-aviso-paga">
+                        ✅ Pago em {formatarData(fatura.invoice_date_credit)}
+                      </p>
                     )}
-                  </>
-                )}
+                  </div>
+                  <div className="boleto-coluna-valor">
+                    <span className="boleto-label-valor">{valorAtualizado != null ? 'Valor atualizado' : 'Valor total'}</span>
+                    <p className="boleto-valor">R$ {formatarValor(valorAtualizado ?? fatura.invoice_amount_document)}</p>
+                  </div>
+                </div>
 
-                {fatura.contract_number != null && (
-                  <p className="boleto-contrato">Contrato {fatura.contract_number}</p>
+                {valorAtualizado != null && (
+                  <div className="boleto-detalhes-atraso">
+                    <p className="boleto-valor-original">Original: R$ {formatarValor(fatura.invoice_amount_document)}</p>
+                    <p className="boleto-taxas">
+                      Multa de {fatura.invoice_rate_fine?.replace('.', ',')}% + juros de{' '}
+                      {fatura.invoice_rate_interest?.replace('.', ',')}% ao dia ({dias}d de atraso)
+                    </p>
+                  </div>
                 )}
 
                 {!paga && (
                   <div className="boleto-acoes">
+                    {/* Ação principal, linha inteira no topo. */}
                     <button
-                      style={{ background: '#00a8841a', color: '#00a884' }}
+                      className="boleto-acao-principal"
+                      style={{ background: comAlpha(CORES.pix, 10), color: CORES.pix }}
                       onClick={() => aoCopiar(`pix-${fatura.invoice_pk}`, fatura.invoice_qrcode)}
                     >
                       <SiPix />
                       {copiado === `pix-${fatura.invoice_pk}` ? '✓ Código PIX Copiado!' : 'Pagar com PIX'}
                     </button>
-                    {fatura.invoice_qrcode_image && (
-                      <button
-                        style={{ background: '#2a72b81a', color: '#2a72b8' }}
-                        onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}
-                      >
-                        <MdQrCodeScanner /> QR Code PIX
-                      </button>
-                    )}
+
+                    {/* Outras formas de pegar o código de pagamento, em par. */}
                     <button
-                      style={{ background: '#4a5c7a1a', color: '#4a5c7a' }}
+                      style={{ background: comAlpha(CORES.contratos, 10), color: CORES.contratos }}
                       onClick={() => aoCopiar(`barcode-${fatura.invoice_pk}`, fatura.invoice_barcode)}
                     >
                       <FaBarcode />
                       {copiado === `barcode-${fatura.invoice_pk}` ? '✓ Copiado!' : 'Código de Barras'}
                     </button>
+                    {fatura.invoice_qrcode_image && (
+                      <button
+                        style={{ background: comAlpha(CORES.ajuda, 10), color: CORES.ajuda }}
+                        onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}
+                      >
+                        <MdQrCodeScanner /> QR Code PIX
+                      </button>
+                    )}
+
+                    {/* Utilitário + confirmação pós-pagamento, em par. */}
                     <button
-                      style={{ background: '#f28f3b1a', color: '#f28f3b' }}
+                      style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
                       onClick={() => window.open(urlImpressaoBoleto(fatura.invoice_pk), '_blank')}
                     >
                       <MdFileDownload /> Imprimir / Salvar PDF
                     </button>
                     {!jaInformado && fatura.contract_pk != null && (
                       <button
-                        style={{ background: '#20b9571a', color: '#20b957' }}
+                        style={{ background: comAlpha(CORES.sucessoVivo, 10), color: CORES.sucessoVivo }}
                         disabled={informando === fatura.invoice_pk}
                         onClick={() => setConfirmando(fatura)}
                       >

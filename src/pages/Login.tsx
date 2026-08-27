@@ -22,7 +22,7 @@ export default function Login() {
   }
 
   return (
-    <div className="login-tela">
+    <div className="login-tela tela-entrada">
       <LoginBackground />
 
       <div className="login-card">

@@ -1,20 +1,21 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { MdDescription, MdFileDownload, MdPayments } from 'react-icons/md'
 import { urlImpressaoContrato } from '../api/client'
 import { buscarContratos, type Contrato } from '../api/contratos'
-import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
+import Skeleton from '../components/Skeleton'
+import { CORES, comAlpha } from '../utils/cores'
 import './Contratos.css'
 
 // Valores confirmados na documentação oficial do contract_status.
 const STATUS: Record<number, { texto: string; cor: string }> = {
-  0: { texto: 'Desativado', cor: '#757575' },
-  1: { texto: 'Ativo', cor: '#4caf50' },
-  2: { texto: 'Alertado', cor: '#ff9800' },
-  3: { texto: 'Pendente', cor: '#ffc107' },
-  4: { texto: 'Bloqueado', cor: '#f44336' },
-  5: { texto: 'Cancelado', cor: '#9e9e9e' },
+  0: { texto: 'Desativado', cor: CORES.textoDesabilitado },
+  1: { texto: 'Ativo', cor: CORES.sucesso },
+  2: { texto: 'Alertado', cor: CORES.alerta },
+  3: { texto: 'Pendente', cor: CORES.atencao },
+  4: { texto: 'Bloqueado', cor: CORES.erro },
+  5: { texto: 'Cancelado', cor: CORES.textoFraco },
 }
 
 function formatarMoeda(valorBruto: string | null): string {
@@ -36,10 +37,20 @@ export default function Contratos() {
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
   const navigate = useNavigate()
+  const location = useLocation()
+  // Contrato pra rolar até e destacar quando chegamos aqui a partir de um
+  // boleto (ver Boletos.tsx, mesmo padrão usado no sentido inverso).
+  const contratoAlvo = (location.state as { contratoPk?: number } | null)?.contratoPk ?? null
+  const cardsRef = useRef<Map<number, HTMLLIElement>>(new Map())
 
   useEffect(() => {
     carregar()
   }, [])
+
+  useEffect(() => {
+    if (contratoAlvo == null || contratos.length === 0) return
+    cardsRef.current.get(contratoAlvo)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [contratoAlvo, contratos])
 
   async function carregar() {
     setCarregando(true)
@@ -58,16 +69,26 @@ export default function Contratos() {
   }
 
   return (
-    <div className="contratos-tela">
-      <VoltarInicio />
+    <div className="contratos-tela tela-entrada">
       <CabecalhoTela
         icone={MdDescription}
-        cor="#4a5c7a"
+        cor={CORES.contratos}
         titulo="Contratos"
         subtitulo="Seus contratos, planos e itens contratados."
       />
 
-      {carregando && <p className="contratos-status">Carregando contratos…</p>}
+      {carregando && (
+        <ul className="contratos-lista">
+          {[0, 1].map((indice) => (
+            <li key={indice} className="contrato-card">
+              <Skeleton width="50%" height={16} />
+              <Skeleton width="70%" height={12} />
+              <Skeleton width="60%" height={12} />
+              <Skeleton width="40%" height={12} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {!carregando && erro && contratos.length === 0 && (
         <div className="contratos-status">
@@ -81,11 +102,18 @@ export default function Contratos() {
           {contratos.map((contrato) => {
             const status = (contrato.status != null && STATUS[contrato.status]) || {
               texto: 'Desconhecido',
-              cor: '#757575',
+              cor: CORES.textoDesabilitado,
             }
 
             return (
-              <li key={contrato.id} className="contrato-card">
+              <li
+                key={contrato.id}
+                ref={(elemento) => {
+                  if (elemento) cardsRef.current.set(contrato.id, elemento)
+                  else cardsRef.current.delete(contrato.id)
+                }}
+                className={`contrato-card ${contrato.id === contratoAlvo ? 'contrato-card-destaque' : ''}`}
+              >
                 <div className="contrato-topo">
                   <span className="contrato-numero">Contrato #{contrato.numero ?? contrato.id}</span>
                   <span className="contrato-status-badge" style={{ background: status.cor }}>
@@ -126,13 +154,13 @@ export default function Contratos() {
 
                 <div className="contrato-acoes">
                   <button
-                    style={{ background: '#d94a381a', color: '#d94a38' }}
+                    style={{ background: comAlpha(CORES.boletos, 10), color: CORES.boletos }}
                     onClick={() => navigate('/boletos', { state: { contratoPk: contrato.id } })}
                   >
                     <MdPayments /> Meus boletos
                   </button>
                   <button
-                    style={{ background: '#f28f3b1a', color: '#f28f3b' }}
+                    style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
                     onClick={() => window.open(urlImpressaoContrato(contrato.id), '_blank')}
                   >
                     <MdFileDownload /> Ver contrato completo

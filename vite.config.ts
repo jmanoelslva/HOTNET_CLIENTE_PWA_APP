@@ -32,18 +32,38 @@ export default defineConfig({
     }),
   ],
   server: {
+    // Escuta em todas as interfaces de rede (não só localhost), pra dar
+    // pra abrir o app a partir de outro aparelho na mesma rede Wi-Fi
+    // (ex: celular) usando o IP local da máquina — ver URLs impressas no
+    // terminal ao rodar "npm run dev" (a "Network:").
+    host: true,
     proxy: {
       // Em desenvolvimento, o navegador só fala com o próprio servidor
-      // do Vite (localhost) — ele repassa pra hotnet.net.br por baixo,
-      // então o cookie de sessão (BRBOSCookie) e a origem ficam
-      // consistentes, sem problema de CORS. Em produção, isso precisa
-      // ser feito pelo servidor real (Apache/Nginx) — ver README.md.
+      // do Vite — ele repassa pra hotnet.net.br por baixo, então o
+      // cookie de sessão (BRBOSCookie) e a origem ficam consistentes,
+      // sem problema de CORS. Em produção, isso precisa ser feito pelo
+      // servidor real (Apache/Nginx) — ver README.md.
       '/api': {
         target: 'https://hotnet.net.br',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
-        cookieDomainRewrite: 'localhost',
+        configure: (proxy) => {
+          // Reescreve o domínio do cookie de sessão pro host que o
+          // navegador REALMENTE usou pra falar com o Vite — localhost,
+          // 127.0.0.1 ou o IP da rede local (celular) — em vez de um
+          // valor fixo. Um cookieDomainRewrite fixo (ex: 'localhost')
+          // quebraria o acesso pelo IP: o navegador rejeita cookie de
+          // domínio incompatível com o host que ele está acessando.
+          proxy.on('proxyRes', (proxyRes, req) => {
+            const setCookie = proxyRes.headers['set-cookie']
+            if (!setCookie) return
+            const host = (req.headers.host ?? 'localhost').split(':')[0]
+            proxyRes.headers['set-cookie'] = setCookie.map((cookie) =>
+              cookie.replace(/Domain=[^;]+/i, `Domain=${host}`),
+            )
+          })
+        },
       },
     },
   },

@@ -1,19 +1,26 @@
 .detalhe-tela {
   max-width: 640px;
   margin: 0 auto;
+  /* dvh acompanha a barra de endereço dinâmica do navegador do celular —
+     com 100vh puro, em algumas telas/estados a barra de digitação fica
+     empurrada pra fora da área realmente visível (mesmo ajuste feito na
+     Home, ver Home.css). */
   height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .detalhe-cabecalho {
   padding: 16px 20px 12px;
-  border-bottom: 1px solid #eeeeee;
-  background: #ffffff;
+  border-bottom: 1px solid var(--cor-borda-suave);
+  background: var(--cor-superficie);
 }
 
 .detalhe-resumo {
   margin-top: 0;
+  min-width: 0;
 }
 
 .detalhe-resumo-topo {
@@ -25,31 +32,38 @@
 
 .detalhe-assunto {
   font-weight: 700;
-  color: #333333;
+  color: var(--cor-texto);
   font-size: 15px;
+  /* Item de flex sem limite de largura não encolhe — um assunto de
+     chamado comprido estourava a linha e causava rolagem horizontal na
+     tela inteira; agora trunca com "…" em vez de vazar. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .detalhe-linha-resumo {
   margin: 4px 0 0;
   font-size: 12px;
-  color: #999999;
+  color: var(--cor-texto-terciario);
 }
 
 .ticket-status-badge {
   font-size: 11px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--cor-branco-fixo);
   border-radius: 12px;
   padding: 4px 10px;
   white-space: nowrap;
 }
 
 .badge-aberto {
-  background: #f28f3b;
+  background: var(--cor-primaria);
 }
 
 .badge-fechado {
-  background: #4caf50;
+  background: var(--cor-sucesso);
 }
 
 .detalhe-chat {
@@ -62,7 +76,7 @@
 }
 
 .detalhe-status {
-  color: #666666;
+  color: var(--cor-texto-secundario);
   font-size: 14px;
   text-align: center;
   padding: 32px 0;
@@ -74,10 +88,10 @@
   padding: 0 20px;
   border: none;
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--cor-branco-fixo);
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
 }
 
 .balao-linha {
@@ -101,22 +115,24 @@
 }
 
 .balao-cliente {
-  background: linear-gradient(135deg, #f28f3b, #d94a38);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--cor-primaria) 14%, var(--cor-superficie));
+  border: 1px solid color-mix(in srgb, var(--cor-primaria) 22%, transparent);
+  color: var(--cor-texto);
   border-bottom-right-radius: 4px;
 }
 
 .balao-equipe {
-  background: #ffffff;
-  border: 1px solid #eeeeee;
-  color: #333333;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  box-shadow: var(--sombra-card);
+  color: var(--cor-texto);
   border-bottom-left-radius: 4px;
 }
 
 .balao-autor {
   font-size: 11px;
   font-weight: 700;
-  color: #f28f3b;
+  color: var(--cor-primaria);
   margin-bottom: 2px;
 }
 
@@ -133,13 +149,41 @@
   margin-top: 6px;
 }
 
-.balao-anexo-arquivo {
-  display: inline-flex;
+.balao-anexo-documento {
+  display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
   margin-top: 6px;
-  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
   color: inherit;
+  text-decoration: none;
+  max-width: 100%;
+}
+
+.balao-anexo-documento-icone {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-texto-fraco);
+  color: var(--cor-branco-fixo);
+}
+
+.balao-anexo-pdf .balao-anexo-documento-icone {
+  background: var(--cor-erro);
+}
+
+.balao-anexo-documento-nome {
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   text-decoration: underline;
 }
 
@@ -155,17 +199,17 @@
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  border-top: 1px solid #eeeeee;
-  background: #ffffff;
+  border-top: 1px solid var(--cor-borda-suave);
+  background: var(--cor-superficie);
 }
 
 .detalhe-btn-anexar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid #e0e0e0;
-  background: #f5f5f5;
-  color: #666666;
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-fundo);
+  color: var(--cor-texto-secundario);
   cursor: pointer;
   flex-shrink: 0;
   display: flex;
@@ -175,9 +219,13 @@
 
 .detalhe-input-mensagem {
   flex: 1;
+  /* Sem isso, um <input> não encolhe abaixo da largura mínima padrão do
+     navegador (~170-200px) mesmo com flex:1 — em telas de celular mais
+     estreitas isso empurrava o botão "Enviar" pra fora da área visível. */
+  min-width: 0;
   height: 40px;
   border-radius: 20px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--cor-borda);
   padding: 0 16px;
   font-size: 14px;
 }
@@ -187,10 +235,10 @@
   padding: 0 18px;
   border-radius: 20px;
   border: none;
-  color: #ffffff;
+  color: var(--cor-branco-fixo);
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
   flex-shrink: 0;
 }
 
@@ -216,7 +264,7 @@
   bottom: 48px;
   left: 0;
   z-index: 11;
-  background: #ffffff;
+  background: var(--cor-superficie);
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   display: flex;
@@ -231,7 +279,7 @@
   text-align: left;
   padding: 12px 16px;
   font-size: 14px;
-  color: #333333;
+  color: var(--cor-texto);
   cursor: pointer;
   white-space: nowrap;
   display: flex;
@@ -240,13 +288,13 @@
 }
 
 .detalhe-menu-anexo button:hover {
-  background: #f5f5f5;
+  background: var(--cor-fundo);
 }
 
 .detalhe-confirmar-texto {
   text-align: justify;
   font-size: 13px;
-  color: #666666;
+  color: var(--cor-texto-secundario);
 }
 
 .suporte-modal-fundo {
@@ -261,7 +309,7 @@
 }
 
 .suporte-modal {
-  background: #ffffff;
+  background: var(--cor-superficie);
   border-radius: 16px;
   padding: 24px;
   max-width: 380px;
@@ -273,7 +321,7 @@
 .suporte-modal h2 {
   margin: 0 0 8px;
   font-size: 17px;
-  color: #333333;
+  color: var(--cor-texto);
 }
 
 .suporte-modal-acoes {
@@ -286,15 +334,15 @@
   flex: 1;
   height: 40px;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  background: #f5f5f5;
-  color: #333333;
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
   font-weight: 700;
   cursor: pointer;
 }
 
 .suporte-modal-acoes button.suporte-btn-primario {
   border: none;
-  color: #ffffff;
-  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  color: var(--cor-branco-fixo);
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
 }

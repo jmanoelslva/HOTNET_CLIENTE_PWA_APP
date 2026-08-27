@@ -5,7 +5,7 @@
 }
 
 .cadastro-status {
-  color: #666666;
+  color: var(--cor-texto-secundario);
   font-size: 14px;
   text-align: center;
   padding: 32px 0;
@@ -17,17 +17,17 @@
   padding: 0 20px;
   border: none;
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--cor-branco-fixo);
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, #f28f3b, #d94a38);
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
 }
 
 .cadastro-card {
-  background: #ffffff;
+  background: var(--cor-superficie);
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--sombra-card);
   margin-bottom: 16px;
 }
 
@@ -35,12 +35,12 @@
   display: block;
   font-size: 13px;
   font-weight: 700;
-  color: #333333;
+  color: var(--cor-texto);
   margin-bottom: 8px;
 }
 
 .cadastro-endereco-titulo {
-  color: #f28f3b;
+  color: var(--cor-primaria);
 }
 
 .cadastro-linha {
@@ -50,7 +50,7 @@
   gap: 12px;
   padding: 8px 0;
   font-size: 13px;
-  border-bottom: 1px solid #eeeeee;
+  border-bottom: 1px solid var(--cor-borda-suave);
 }
 
 .cadastro-linha:last-child {
@@ -58,12 +58,12 @@
 }
 
 .cadastro-linha span {
-  color: #999999;
+  color: var(--cor-texto-terciario);
   flex-shrink: 0;
 }
 
 .cadastro-linha strong {
-  color: #333333;
+  color: var(--cor-texto);
   font-weight: 600;
   text-align: right;
 }
@@ -72,11 +72,11 @@
   display: block;
   font-size: 15px;
   font-weight: 700;
-  color: #333333;
+  color: var(--cor-texto);
   margin: 8px 0 12px;
 }
 
 .cadastro-endereco-indisponivel {
-  color: #999999;
+  color: var(--cor-texto-terciario);
   font-size: 13px;
 }

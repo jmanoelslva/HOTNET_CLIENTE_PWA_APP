@@ -1,5 +1,24 @@
 # Deploy em produção — cliente.hotnet.net.br
 
+## Instalação automatizada (servidor Debian novo ou já em uso)
+
+Pra um servidor Debian, [`deploy/install.sh`](install.sh) automatiza os
+passos 1 a 4 abaixo (build, publicação, Apache/Nginx e Let's Encrypt com
+renovação automática) — pergunta o domínio e se é Apache ou Nginx, e não
+mexe em nenhum vhost já existente no servidor:
+
+```bash
+git clone https://github.com/jmanoelslva/web-app-hotnet.git
+sudo bash web-app-hotnet/deploy/install.sh
+```
+
+Rodar de novo (mesmo servidor, mesmo domínio) atualiza o portal: puxa o
+código mais recente, refaz o build e republica — sem reemitir certificado
+nem reconfigurar o que já está pronto.
+
+O passo a passo manual abaixo continua válido pra quem preferir controle
+fino, outro sistema operacional, ou não usar Debian.
+
 ## 1. Gerar o build
 
 ```bash

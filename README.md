@@ -15,6 +15,12 @@ compartilhado.
   ícones — mesma linguagem visual dos `ic_ms_*` do app Android
 - `vite-plugin-pwa` — manifest + service worker (ver "Experiência de
   app" abaixo)
+- **Design tokens** — paleta, tipografia e sombras centralizadas em
+  `src/index.css` (CSS custom properties) e espelhadas em
+  `src/utils/cores.ts` (`CORES`, pra uso em estilo inline/JS). Fonte
+  [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans)
+  via Google Fonts. Trocar a paleta ou o tema escuro é mexer só nesses
+  dois arquivos — o resto do app consome os tokens, nunca hex fixo.
 
 ## Rodando localmente
 
@@ -23,7 +29,12 @@ npm install
 npm run dev
 ```
 
-Abre em `http://localhost:5173`.
+Abre em `http://localhost:5173` (o Vite escuta em todas as interfaces de
+rede — `server.host: true` — então também dá pra abrir a partir de outro
+aparelho na mesma Wi-Fi, ex: celular, usando o IP local da máquina em vez
+de `localhost`; as URLs de rede aparecem no terminal ao rodar `npm run
+dev`). Se a porta 5173 já estiver em uso, o Vite sobe na próxima livre
+(5174, 5175...) e avisa qual foi no terminal.
 
 ## Backend e sessão
 
@@ -34,10 +45,29 @@ o cookie manualmente em `localStorage`/`sessionStorage`.
 
 ### Proxy em desenvolvimento
 
-O navegador só fala com o próprio servidor do Vite (`localhost:5173`).
-O `vite.config.ts` repassa `/api/*` para `https://hotnet.net.br` por baixo
-(`server.proxy`), reescrevendo o domínio do cookie para `localhost`. Isso
-mantém tudo na mesma origem do ponto de vista do navegador, sem CORS.
+O navegador só fala com o próprio servidor do Vite (`localhost:5173` ou o
+IP da rede local, ver "Rodando localmente" acima). O `vite.config.ts`
+repassa `/api/*` para `https://hotnet.net.br` por baixo (`server.proxy`),
+reescrevendo o domínio do cookie de sessão pra bater com o host que o
+navegador *realmente* usou pra acessar o Vite (`req.headers.host`, sem
+porta) — não um valor fixo. Isso é o que permite abrir o portal tanto por
+`localhost` quanto pelo IP da rede local (celular) sem a sessão quebrar:
+um `cookieDomainRewrite` fixo em `'localhost'` funcionaria só no primeiro
+caso. Mantém tudo na mesma origem do ponto de vista do navegador, sem CORS.
+
+### Sessão: persistência e expiração
+
+- **Sobrevive a um F5** — o cookie de sessão (`BRBOSCookie`) é do
+  navegador, não da memória do React; ao montar, `SessionContext`
+  confirma com o servidor (`controllrctl/cadastre/info`) se o cookie
+  ainda vale antes de mandar pro login, então recarregar a página não
+  desloga o cliente à toa. Enquanto essa checagem roda (`verificando`),
+  `RotaProtegida` mostra um spinner em vez de já redirecionar.
+- **Logout automático por inatividade** — 2 minutos sem nenhuma
+  interação (mouse/teclado/toque/scroll), bem abaixo do lease de 10min
+  que o Controllr já dá ao token — margem de segurança pra não deixar
+  sessão web aberta num aparelho esquecido/compartilhado. Ver
+  `LIMITE_INATIVIDADE_MS` em `src/auth/SessionContext.tsx`.
 
 ### Reverse proxy em produção (obrigatório)
 
@@ -87,9 +117,12 @@ Todas as telas principais implementadas e validadas contra o backend real:
   plano, link pro contrato completo em PDF.
 - **Consumo** — uso diário por contrato/CPE, navegação de mês, sessão de
   conexão ao vivo (IP/MAC/IPv6, duração, download/upload da sessão).
-- **Suporte** — lista de chamados (abas Abertos/Resolvidos), abertura de
-  novo chamado, chat com envio de mensagens, anexos (foto/câmera,
-  galeria ou arquivo) e compartilhamento de localização.
+- **Suporte** — lista de chamados (abas Abertos/Resolvidos, categoria
+  destacada com cor própria por tipo), abertura de novo chamado, chat
+  com envio otimista de mensagens (aparece na hora, antes da confirmação
+  do servidor — ver `pendentes` em `DetalheChamado.tsx`), anexos
+  (foto/câmera, galeria ou arquivo, com miniatura pra imagem/PDF) e
+  compartilhamento de localização.
 - **Avisos** — gate obrigatório em tela cheia quando há avisos não
   confirmados (mesmo comportamento do `AvisoActivity` do app Android).
 - **Meus dados** — informações pessoais, contato e endereços.
@@ -116,3 +149,28 @@ com um app nativo do que um site comum:
 - **Toasts** (`ToastProvider`/`useToast`) no lugar de `window.alert()`.
 - **Modais em bottom-sheet** (deslizam de baixo, com alça no topo) em
   vez de aparecer centralizados.
+- **Modo escuro automático** — segue `prefers-color-scheme` do sistema,
+  sem toggle manual. Só superfície/borda/texto mudam no bloco escuro
+  (`src/index.css`); cores de marca/acento continuam as mesmas onde já
+  tinham contraste suficiente, e são clareadas só ali onde não tinham
+  (ver comentário sobre `--cor-contratos`/`--cor-suporte`/etc. no bloco
+  `@media (prefers-color-scheme: dark)`). Cor de texto/ícone sobre um
+  fundo colorido sólido (botão, badge) usa um token à parte,
+  `--cor-branco-fixo`, que **não** muda com o tema — só o texto sobre a
+  superfície do app (`--cor-superficie`) escurece.
+- **Skeleton loaders** (`src/components/Skeleton.tsx`) no lugar de texto
+  "Carregando…" nas listas — mantém a forma do card final, com efeito de
+  brilho. Telas de carregamento de tela inteira (ex: checagem de sessão)
+  usam `Spinner` em vez disso.
+- **Estados vazios com ícone** (`src/components/EstadoVazio.tsx`) — bloco
+  ilustrado no lugar de uma linha de texto solta quando uma lista não
+  tem nada pra mostrar.
+- **Feedback tátil e movimento** — botões/links "afundam" levemente ao
+  toque (`scale(0.96)`) no lugar do brilho cinza padrão do navegador, e
+  cada tela tem um fade-in leve ao entrar (`.tela-entrada`). Tudo isso
+  (incluindo skeleton e spinner) é desativado pra quem tem
+  `prefers-reduced-motion: reduce` no sistema.
+- **Alvos de toque acessíveis** — botões de ação (ex: os da tela de
+  Boletos) têm no mínimo 44px de altura, o recomendado por WCAG 2.5.5 /
+  Material Design; links secundários pequenos (ex: "Ver mais boletos
+  pagos") ganham padding extra só pra aumentar a área de toque.

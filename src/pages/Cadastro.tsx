@@ -3,8 +3,9 @@ import { MdBadge } from 'react-icons/md'
 import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente, buscarEnderecos, formatarContatos, rotuloDocumento, tipoCadastro, type Endereco } from '../api/cadastro'
 import type { ClientDto } from '../api/client'
-import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
+import Skeleton from '../components/Skeleton'
+import { CORES } from '../utils/cores'
 import './Cadastro.css'
 
 function formatarData(raw: string | null | undefined): string | null {
@@ -64,16 +65,27 @@ export default function Cadastro() {
   }
 
   return (
-    <div className="cadastro-tela">
-      <VoltarInicio />
+    <div className="cadastro-tela tela-entrada">
       <CabecalhoTela
         icone={MdBadge}
-        cor="#7a4bc4"
+        cor={CORES.dados}
         titulo="Meus dados"
         subtitulo="Suas informações cadastrais na HOTNET."
       />
 
-      {carregando && <p className="cadastro-status">Carregando seus dados…</p>}
+      {carregando && (
+        <>
+          <div className="cadastro-card">
+            <Skeleton width="45%" height={13} />
+            <Skeleton width="70%" height={13} />
+            <Skeleton width="60%" height={13} />
+          </div>
+          <div className="cadastro-card">
+            <Skeleton width="35%" height={13} />
+            <Skeleton width="55%" height={13} />
+          </div>
+        </>
+      )}
 
       {!carregando && erro && (
         <div className="cadastro-status">
