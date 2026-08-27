@@ -122,6 +122,22 @@ build **precisa** fazer o mesmo reverse proxy do Vite:
   o Controllr também precisa estar configurado do lado dele pra
   **confiar e ler** esse cabeçalho vindo do IP deste servidor
   (configuração do backend, fora do alcance deste repositório).
+- **Cabeçalhos de segurança** (`Content-Security-Policy`, `X-Frame-
+  Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-
+  Policy`, `Strict-Transport-Security`) — configurados nos dois exemplos,
+  mas só na location/Directory que serve o NOSSO build (`location /` no
+  Nginx, `<Directory>` no Apache), nunca em nível de server/vhost. De
+  propósito: as páginas do Controllr repassadas via proxy (`/api`,
+  `/public`, `/common`) são HTML de um sistema legado que não
+  controlamos, provavelmente com `<style>`/`<script>` inline — a mesma
+  CSP restritiva quebraria essas páginas. A CSP não precisa de
+  `'unsafe-inline'` em `style-src`: o React seta estilo inline via
+  propriedade do DOM (CSSOM), não via atributo `style=` no HTML nem
+  `<style>`, então não é bloqueado. `Permissions-Policy` libera só
+  `geolocation` (usado no compartilhamento de localização do Suporte,
+  `DetalheChamado.tsx`) — o anexo de foto usa `<input type="file"
+  capture>`, que abre o app de câmera do sistema sem precisar de
+  permissão via API do navegador, então `camera` fica desligado.
 
 Sem a reescrita do cookie especificamente, o login funciona (primeira
 resposta chega normalmente) mas a sessão não se mantém entre

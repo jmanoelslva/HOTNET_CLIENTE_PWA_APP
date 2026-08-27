@@ -31,8 +31,32 @@ server {
 
     # SPA: qualquer rota que não bata em um arquivo real cai no index.html
     # (o roteamento de fato acontece no react-router-dom, no navegador).
+    #
+    # Cabeçalhos de segurança só aqui em "location /" (não em "server{}"
+    # nem nas locations de proxy abaixo) DE PROPÓSITO: um "add_header" em
+    # "server{}" seria herdado só enquanto a location não tiver o seu
+    # próprio (regra de herança do Nginx) — mas as páginas do Controllr
+    # proxiadas (/api, /public, /common, /assets) são HTML de um sistema
+    # legado que não controlamos, provavelmente com <style>/<script>
+    # inline; aplicar a mesma CSP restritiva nelas quebraria essas
+    # páginas. Aqui é só pro HTML/JS/CSS do NOSSO build.
     location / {
         try_files $uri /index.html;
+
+        # 'unsafe-inline' NÃO é necessário em style-src: o React seta
+        # estilo inline via propriedade do DOM (CSSOM), não via atributo
+        # "style=" no HTML nem <style> — isso não é bloqueado por CSP.
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        # geolocation=(self): usado no compartilhamento de localização do
+        # Suporte (ver DetalheChamado.tsx). O resto vai desligado — nada
+        # aqui usa câmera/microfone/pagamento via API do navegador (o
+        # anexo de foto usa <input type="file" capture>, que abre o app
+        # de câmera do sistema sem precisar de permissão via API).
+        add_header Permissions-Policy "geolocation=(self), camera=(), microphone=(), payment=(), usb=()" always;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     }
 
     # Reverse proxy do backend Controllr/BRbyte — mesma lógica do proxy de

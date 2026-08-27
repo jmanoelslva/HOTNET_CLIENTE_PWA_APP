@@ -36,6 +36,30 @@
         AllowOverride None
         Require all granted
 
+        # Cabeçalhos de segurança só aqui, dentro do <Directory> do NOSSO
+        # build (não em nível de VirtualHost) DE PROPÓSITO: as páginas do
+        # Controllr repassadas via ProxyPass (/api, /public, /common) não
+        # passam por este <Directory> (mod_proxy resolve antes de chegar
+        # no mapeamento de arquivo/diretório) — então a CSP restritiva
+        # abaixo nunca chega nelas. São HTML de um sistema legado que não
+        # controlamos, provavelmente com <style>/<script> inline; aplicar
+        # a mesma CSP nelas quebraria essas páginas.
+        #
+        # 'unsafe-inline' NÃO é necessário em style-src: o React seta
+        # estilo inline via propriedade do DOM (CSSOM), não via atributo
+        # "style=" no HTML nem <style> — isso não é bloqueado por CSP.
+        Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+        Header always set X-Frame-Options "DENY"
+        Header always set X-Content-Type-Options "nosniff"
+        Header always set Referrer-Policy "strict-origin-when-cross-origin"
+        # geolocation=(self): usado no compartilhamento de localização do
+        # Suporte (ver DetalheChamado.tsx). O resto vai desligado — nada
+        # aqui usa câmera/microfone/pagamento via API do navegador (o
+        # anexo de foto usa <input type="file" capture>, que abre o app
+        # de câmera do sistema sem precisar de permissão via API).
+        Header always set Permissions-Policy "geolocation=(self), camera=(), microphone=(), payment=(), usb=()"
+        Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
         RewriteEngine On
         RewriteBase /
 
