@@ -18,6 +18,7 @@ import { buscarCategorias, buscarChamados, chamadoResolvido, abrirChamado as api
 import type { CategoriaDto, TicketDto } from '../api/client'
 import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
+import { useToast } from '../components/Toast/ToastContext'
 import './Suporte.css'
 
 const TAMANHO_PAGINA = 20
@@ -54,6 +55,7 @@ function formatarData(data: string | null | undefined): string | null {
 export default function Suporte() {
   const { cpf } = useSessao()
   const navigate = useNavigate()
+  const { toast } = useToast()
 
   const [chamados, setChamados] = useState<TicketDto[]>([])
   const [totalNoServidor, setTotalNoServidor] = useState(0)
@@ -97,7 +99,7 @@ export default function Suporte() {
       setChamados((atual) => [...atual, ...pagina.chamados])
       setTotalNoServidor(pagina.total)
     } catch {
-      window.alert('Não foi possível carregar mais chamados.')
+      toast('Não foi possível carregar mais chamados.')
     } finally {
       setCarregandoMais(false)
     }
@@ -107,7 +109,7 @@ export default function Suporte() {
 
   function abrirDialog() {
     if (categorias.length === 0) {
-      window.alert('Categorias não carregadas ainda, tente novamente em instantes.')
+      toast('Categorias não carregadas ainda, tente novamente em instantes.')
     }
     setCategoriaPk(categorias[0]?.category_pk ?? null)
     setCategoriaMenuAberto(false)
@@ -118,17 +120,17 @@ export default function Suporte() {
 
   async function enviarChamado() {
     if (categoriaPk == null || !assunto.trim() || !descricao.trim()) {
-      window.alert('Preencha categoria, assunto e descrição.')
+      toast('Preencha categoria, assunto e descrição.')
       return
     }
     setEnviando(true)
     try {
       const mensagem = await apiAbrirChamado(cpf, categoriaPk, assunto.trim(), descricao.trim())
-      window.alert(mensagem)
+      toast(mensagem, 'sucesso')
       setDialogAberto(false)
       carregar()
     } catch (excecao) {
-      window.alert(excecao instanceof Error ? excecao.message : 'Não foi possível abrir o chamado.')
+      toast(excecao instanceof Error ? excecao.message : 'Não foi possível abrir o chamado.')
     } finally {
       setEnviando(false)
     }

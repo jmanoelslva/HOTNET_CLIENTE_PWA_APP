@@ -5,6 +5,7 @@ import { FaBarcode } from 'react-icons/fa'
 import { SiPix } from 'react-icons/si'
 import VoltarInicio from '../components/VoltarInicio'
 import CabecalhoTela from '../components/CabecalhoTela'
+import { useToast } from '../components/Toast/ToastContext'
 import {
   ApiError,
   SessaoExpiradaError,
@@ -67,6 +68,7 @@ async function copiarTexto(texto: string): Promise<boolean> {
 
 export default function Boletos() {
   const location = useLocation()
+  const { toast } = useToast()
   const contratoPreSelecionado = (location.state as { contratoPk?: number } | null)?.contratoPk ?? null
 
   const [faturas, setFaturas] = useState<FaturaDto[]>([])
@@ -143,7 +145,10 @@ export default function Boletos() {
       setCopiado(chave)
       setTimeout(() => setCopiado((atual) => (atual === chave ? null : atual)), 1500)
       if (usandoFallback) {
-        window.alert('Você copiou os dados da empresa (CNPJ). Após realizar o pagamento, envie o comprovante para o nosso WhatsApp.')
+        toast(
+          'Você copiou os dados da empresa (CNPJ). Após realizar o pagamento, envie o comprovante para o nosso WhatsApp.',
+          'info',
+        )
       }
     }
   }
@@ -157,11 +162,12 @@ export default function Boletos() {
       const resposta = await informarPagamento(fatura.invoice_pk, fatura.contract_pk)
       if (resposta.success) {
         setInformados((atual) => new Set(atual).add(fatura.invoice_pk))
+        toast('Pagamento informado com sucesso! Sua conexão será liberada.', 'sucesso')
       } else {
-        window.alert(resposta.message ?? 'Erro ao informar pagamento.')
+        toast(resposta.message ?? 'Erro ao informar pagamento.')
       }
     } catch {
-      window.alert('Não foi possível informar o pagamento agora. Tente novamente.')
+      toast('Não foi possível informar o pagamento agora. Tente novamente.')
     } finally {
       setInformando(null)
     }

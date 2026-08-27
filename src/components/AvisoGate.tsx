@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useSessao } from '../auth/SessionContext'
 import { buscarAvisosNaoLidos, confirmarLeitura, descricaoDoTipo, type Aviso } from '../api/avisos'
+import { useToast } from './Toast/ToastContext'
 import './AvisoGate.css'
 
 /**
@@ -12,6 +13,7 @@ import './AvisoGate.css'
  */
 export default function AvisoGate({ children }: { children: ReactNode }) {
   const { logado } = useSessao()
+  const { toast } = useToast()
   const [avisos, setAvisos] = useState<Aviso[] | null>(null)
   const [indice, setIndice] = useState(0)
   const [confirmando, setConfirmando] = useState(false)
@@ -46,7 +48,7 @@ export default function AvisoGate({ children }: { children: ReactNode }) {
       await confirmarLeitura(aviso.noticePk)
       setIndice((i) => i + 1)
     } catch {
-      window.alert('Não foi possível confirmar agora. Tente novamente.')
+      toast('Não foi possível confirmar agora. Tente novamente.')
     } finally {
       setConfirmando(false)
     }

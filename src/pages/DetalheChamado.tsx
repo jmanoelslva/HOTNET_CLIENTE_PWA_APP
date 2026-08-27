@@ -11,6 +11,7 @@ import {
   type OperacaoChamado,
 } from '../api/suporte'
 import type { TicketDto } from '../api/client'
+import { useToast } from '../components/Toast/ToastContext'
 import './DetalheChamado.css'
 
 const INTERVALO_ATUALIZACAO_MS = 10_000
@@ -31,6 +32,7 @@ export default function DetalheChamado() {
   const pk = Number(ticketPk)
   const navigate = useNavigate()
   const location = useLocation()
+  const { toast } = useToast()
   const chamado = (location.state as { chamado?: TicketDto } | null)?.chamado ?? null
   const resolvido = chamado ? chamadoResolvido(chamado) : false
 
@@ -76,7 +78,7 @@ export default function DetalheChamado() {
       aoConcluir?.()
       await carregar(false)
     } catch (excecao) {
-      window.alert(excecao instanceof Error ? excecao.message : 'Não foi possível enviar a mensagem.')
+      toast(excecao instanceof Error ? excecao.message : 'Não foi possível enviar a mensagem.')
     } finally {
       setEnviando(false)
     }
@@ -98,7 +100,7 @@ export default function DetalheChamado() {
       await enviarAnexoChamado(pk, arquivo)
       await carregar(false)
     } catch (excecao) {
-      window.alert(excecao instanceof Error ? excecao.message : 'Não foi possível enviar o anexo.')
+      toast(excecao instanceof Error ? excecao.message : 'Não foi possível enviar o anexo.')
     } finally {
       setEnviando(false)
     }
@@ -106,7 +108,7 @@ export default function DetalheChamado() {
 
   function confirmarEnviarLocalizacao() {
     if (!navigator.geolocation) {
-      window.alert('Este navegador não suporta compartilhar localização.')
+      toast('Este navegador não suporta compartilhar localização.')
       return
     }
     setConfirmandoLocalizacao(false)
@@ -119,7 +121,7 @@ export default function DetalheChamado() {
       },
       () => {
         setEnviando(false)
-        window.alert('Não foi possível obter a localização agora. Verifique a permissão do navegador.')
+        toast('Não foi possível obter a localização agora. Verifique a permissão do navegador.')
       },
     )
   }
