@@ -13,6 +13,8 @@ compartilhado.
 - React Context (`SessionContext`) para o estado de sessão, em memória
 - `react-icons` (subconjunto Material Symbols, `react-icons/md`) para os
   ícones — mesma linguagem visual dos `ic_ms_*` do app Android
+- `vite-plugin-pwa` — manifest + service worker (ver "Experiência de
+  app" abaixo)
 
 ## Rodando localmente
 
@@ -96,3 +98,21 @@ Todas as telas principais implementadas e validadas contra o backend real:
   menu do avatar na Home.
 
 Paridade funcional completa com as telas principais do app Android.
+
+## Experiência de app
+
+Além das telas em si, o portal tem alguns recursos pra parecer mais
+com um app nativo do que um site comum:
+
+- **PWA instalável** — `vite-plugin-pwa` gera o `manifest.webmanifest`
+  e o service worker (`sw.js`) no build. O cliente pode instalar o
+  portal na tela inicial (ícone próprio, abre em tela cheia, sem barra
+  do navegador). O service worker só cacheia os arquivos estáticos do
+  próprio app — nunca as chamadas `/api/*`, que são sempre dinâmicas.
+  Ícones em `public/icons/` (gerados a partir do logotipo por
+  `scripts/gerar-icones-pwa.mjs`, reexecutar se o logotipo mudar).
+- **Barra de navegação inferior** (`BottomNav`) fixa nas telas
+  autenticadas, com atalho colorido pras 5 telas mais usadas.
+- **Toasts** (`ToastProvider`/`useToast`) no lugar de `window.alert()`.
+- **Modais em bottom-sheet** (deslizam de baixo, com alça no topo) em
+  vez de aparecer centralizados.
