@@ -52,35 +52,42 @@
   --sombra-card: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-/* Segue o tema do sistema operacional/navegador automaticamente — sem
-   toggle manual, é só isso que foi pedido por ora. Só as superfícies e o
-   texto mudam; as cores de marca/acento continuam as mesmas porque já têm
-   contraste suficiente contra um fundo escuro. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --cor-fundo: #121316;
-    --cor-superficie: #1e2025;
-    --cor-borda: #34373e;
-    --cor-borda-suave: #2b2e34;
-    --cor-borda-clara: #292c32;
+/* Tema escuro — dirigido só pelo atributo data-theme no <html>, nunca
+   direto por @media (prefers-color-scheme). src/utils/tema.ts decide se
+   esse atributo reflete a escolha manual do cliente (localStorage) ou o
+   tema do sistema, e mantém sincronizado se o sistema mudar enquanto o
+   cliente não tiver escolhido nada manualmente — um dono só da decisão,
+   em vez de JS e CSS competindo pelo mesmo resultado. Só as superfícies
+   e o texto mudam; as cores de marca/acento continuam as mesmas porque
+   já têm contraste suficiente contra um fundo escuro. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
 
-    --cor-texto: #f0f0f0;
-    --cor-texto-secundario: #b8b8bc;
-    --cor-texto-terciario: #9a9aa0;
-    --cor-texto-fraco: #86868c;
-    --cor-texto-desabilitado: #6f6f75;
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --cor-fundo: #121316;
+  --cor-superficie: #1e2025;
+  --cor-borda: #34373e;
+  --cor-borda-suave: #2b2e34;
+  --cor-borda-clara: #292c32;
 
-    --sombra-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --cor-texto: #f0f0f0;
+  --cor-texto-secundario: #b8b8bc;
+  --cor-texto-terciario: #9a9aa0;
+  --cor-texto-fraco: #86868c;
+  --cor-texto-desabilitado: #6f6f75;
 
-    /* Alguns acentos de marca são escuros demais pra servir de TEXTO sobre
-       fundo já escuro (ex: botões com fundo translúcido da própria cor) —
-       clareados só aqui; como ícone/badge com texto branco por cima eles
-       já funcionavam bem, então isso não piora esse outro uso. */
-    --cor-contratos: #8fa4c9;
-    --cor-suporte: #3ecb74;
-    --cor-ajuda: #5b9bd9;
-    --cor-dados: #a67bdb;
-  }
+  --sombra-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+
+  /* Alguns acentos de marca são escuros demais pra servir de TEXTO sobre
+     fundo já escuro (ex: botões com fundo translúcido da própria cor) —
+     clareados só aqui; como ícone/badge com texto branco por cima eles
+     já funcionavam bem, então isso não piora esse outro uso. */
+  --cor-contratos: #8fa4c9;
+  --cor-suporte: #3ecb74;
+  --cor-ajuda: #5b9bd9;
+  --cor-dados: #a67bdb;
 }
 
 * {
@@ -143,5 +150,37 @@ a:active,
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Transição entre telas — View Transitions API nativa do navegador (sem
+   lib nenhuma), ligada via a prop "viewTransition" do react-router-dom
+   em cada <Link>/<NavLink>/navigate() (ver App.tsx e as páginas). Troca
+   o corte seco de rota por um fade + leve deslize horizontal, parecido
+   com a navegação "empurrada" de um app nativo. Sem suporte no navegador
+   (Firefox, Safari antigo), a prop é ignorada e a navegação continua
+   funcionando normal, só sem a transição — progressive enhancement, não
+   quebra nada. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: tela-sai 0.22s ease both;
+  }
+
+  ::view-transition-new(root) {
+    animation: tela-entra 0.22s ease both;
+  }
+}
+
+@keyframes tela-sai {
+  to {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+}
+
+@keyframes tela-entra {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
   }
 }

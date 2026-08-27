@@ -243,15 +243,46 @@ com um app nativo do que um site comum:
 - **Toasts** (`ToastProvider`/`useToast`) no lugar de `window.alert()`.
 - **Modais em bottom-sheet** (deslizam de baixo, com alça no topo) em
   vez de aparecer centralizados.
-- **Modo escuro automático** — segue `prefers-color-scheme` do sistema,
-  sem toggle manual. Só superfície/borda/texto mudam no bloco escuro
-  (`src/index.css`); cores de marca/acento continuam as mesmas onde já
-  tinham contraste suficiente, e são clareadas só ali onde não tinham
-  (ver comentário sobre `--cor-contratos`/`--cor-suporte`/etc. no bloco
-  `@media (prefers-color-scheme: dark)`). Cor de texto/ícone sobre um
+- **Tema claro/escuro** (`src/utils/tema.ts`, `src/hooks/useTema.ts`) —
+  segue `prefers-color-scheme` do sistema por padrão, mas o cliente pode
+  forçar um dos dois no menu do avatar (Home), e a escolha fica salva
+  (`localStorage`) e sobrepõe o sistema dali em diante. Tudo dirigido só
+  pelo atributo `data-theme` no `<html>` (`:root[data-theme='dark']` em
+  `src/index.css`, nunca `@media (prefers-color-scheme)` direto) — um
+  dono só da decisão em vez de JS e CSS competindo pelo mesmo resultado;
+  se o sistema mudar de tema enquanto o cliente não tiver escolhido nada
+  manualmente, o app acompanha em tempo real. `iniciarTema()` roda em
+  `main.tsx` antes do primeiro render, pra não piscar no tema errado. Só
+  superfície/borda/texto mudam entre os dois; cores de marca/acento
+  continuam as mesmas onde já tinham contraste suficiente, e são
+  clareadas só no escuro onde não tinham (ver comentário sobre
+  `--cor-contratos`/`--cor-suporte`/etc.). Cor de texto/ícone sobre um
   fundo colorido sólido (botão, badge) usa um token à parte,
   `--cor-branco-fixo`, que **não** muda com o tema — só o texto sobre a
   superfície do app (`--cor-superficie`) escurece.
+- **Transição entre telas** — View Transitions API nativa do navegador
+  (sem lib), ligada via a prop `viewTransition` do `react-router-dom` em
+  cada `<Link>`/`<NavLink>`/`navigate()`. Troca o corte seco de rota por
+  um fade + leve deslize horizontal (`::view-transition-old/new(root)`
+  em `src/index.css`), parecido com a navegação "empurrada" de um app
+  nativo. Sem suporte no navegador (Firefox, Safari antigo), a prop é
+  ignorada e a navegação continua normal, só sem a transição —
+  progressive enhancement, não quebra nada.
+- **Vidro fosco** (`backdrop-filter: blur()`) no fundo dos modais (Login,
+  Boletos, Suporte, DetalheChamado, `ModalInstalarIos`) e na barra de
+  navegação inferior — fundo translúcido revelando (borrado) o que está
+  atrás, em vez de superfície sólida.
+- **Indicador deslizante na barra inferior** — um "pill" atrás do ícone
+  ativo desliza pra posição certa em vez de só trocar de cor
+  (`BottomNav.tsx`/`.css`). Desloca em múltiplos de 100% da própria
+  largura (não da barra), então o passo por item é sempre exato, sem
+  acumular erro de arredondamento.
+- **Puxar para atualizar** (`src/components/PullToRefresh.tsx`) nas
+  listas de Boletos e Suporte — puxar a tela pra baixo com a rolagem já
+  no topo dispara a mesma função de recarregar da tela. Feito na mão
+  (sem lib), com listener nativo (não JSX `onTouchMove`) porque precisa
+  de `preventDefault()` durante o arrasto — só funciona com
+  `passive:false`, que o React não oferece direto pra eventos de toque.
 - **Skeleton loaders** (`src/components/Skeleton.tsx`) no lugar de texto
   "Carregando…" nas listas — mantém a forma do card final, com efeito de
   brilho. Telas de carregamento de tela inteira (ex: checagem de sessão)

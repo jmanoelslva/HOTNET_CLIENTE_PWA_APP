@@ -1,7 +1,8 @@
-import { NavLink } from 'react-router-dom'
+import type { CSSProperties } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import { MdDescription, MdHome, MdLogout, MdPayments, MdSupportAgent } from 'react-icons/md'
 import { useSessao } from '../auth/SessionContext'
-import { CORES } from '../utils/cores'
+import { CORES, comAlpha } from '../utils/cores'
 import './BottomNav.css'
 
 const ITENS = [
@@ -20,14 +21,33 @@ const ITENS = [
  */
 export default function BottomNav() {
   const { sair } = useSessao()
+  const location = useLocation()
+
+  // "Sair" não é rota, então não entra nessa lista — o indicador só
+  // acompanha os 4 destinos de navegação de verdade.
+  const indiceAtivo = ITENS.findIndex((item) =>
+    item.fim ? location.pathname === item.to : location.pathname.startsWith(item.to),
+  )
 
   return (
     <nav className="bottom-nav">
+      {indiceAtivo >= 0 && (
+        <span
+          className="bottom-nav-indicador"
+          style={
+            {
+              '--indice': indiceAtivo,
+              '--cor-pill': comAlpha(ITENS[indiceAtivo].cor, 14),
+            } as CSSProperties
+          }
+        />
+      )}
       {ITENS.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
           end={item.fim}
+          viewTransition
           className={({ isActive }) => `bottom-nav-item ${isActive ? 'ativo' : ''}`}
           style={({ isActive }) => ({ color: isActive ? item.cor : undefined })}
         >

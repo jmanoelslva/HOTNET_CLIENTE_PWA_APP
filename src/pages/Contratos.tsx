@@ -156,7 +156,7 @@ export default function Contratos() {
                 <div className="contrato-acoes">
                   <button
                     style={{ background: comAlpha(CORES.boletos, 10), color: CORES.boletos }}
-                    onClick={() => navigate('/boletos', { state: { contratoPk: contrato.id } })}
+                    onClick={() => navigate('/boletos', { state: { contratoPk: contrato.id }, viewTransition: true })}
                   >
                     <MdPayments /> Meus boletos
                   </button>

@@ -20,6 +20,7 @@ import CabecalhoTela from '../components/CabecalhoTela'
 import { useToast } from '../components/Toast/ToastContext'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
+import PullToRefresh from '../components/PullToRefresh'
 import { CORES, comAlpha } from '../utils/cores'
 import './Suporte.css'
 
@@ -160,6 +161,7 @@ export default function Suporte() {
   }
 
   return (
+    <PullToRefresh aoAtualizar={carregar}>
     <div className="suporte-tela tela-entrada">
       <CabecalhoTela icone={MdSupportAgent} cor={CORES.suporte} titulo="Suporte" subtitulo="Seus chamados de suporte." />
 
@@ -210,7 +212,7 @@ export default function Suporte() {
               <li
                 key={chamado.ticket_pk}
                 className="ticket-card"
-                onClick={() => navigate(`/suporte/${chamado.ticket_pk}`, { state: { chamado } })}
+                onClick={() => navigate(`/suporte/${chamado.ticket_pk}`, { state: { chamado }, viewTransition: true })}
               >
                 <div className="ticket-topo">
                   <span className="ticket-assunto">{chamado.ticket_title ?? `Chamado #${chamado.ticket_pk ?? '-'}`}</span>
@@ -381,5 +383,6 @@ export default function Suporte() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   )
 }

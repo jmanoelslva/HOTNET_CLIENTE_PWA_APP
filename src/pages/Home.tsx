@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
   MdAccountCircle,
   MdBadge,
+  MdDarkMode,
   MdDataUsage,
   MdDescription,
   MdGetApp,
   MdHelp,
   MdInfoOutline,
+  MdLightMode,
   MdLogout,
   MdPayments,
   MdSupportAgent,
@@ -21,6 +23,7 @@ import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, type ConsumoPorContrato } 
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import { CORES, comAlpha } from '../utils/cores'
 import { usePwaInstall } from '../hooks/usePwaInstall'
+import { useTema } from '../hooks/useTema'
 import ModalInstalarIos from '../components/ModalInstalarIos'
 import logoHotnet from '../assets/logo-hotnet.png'
 import './Home.css'
@@ -44,6 +47,7 @@ export default function Home() {
   const { cpf, sair } = useSessao()
   const navigate = useNavigate()
   const { podeInstalar, aoClicarInstalar, modalIosAberto, fecharModalIos } = usePwaInstall()
+  const { tema, alternarTema } = useTema()
   const [nomeExibido, setNomeExibido] = useState('Cliente')
   const [menuAvatarAberto, setMenuAvatarAberto] = useState(false)
 
@@ -146,10 +150,14 @@ export default function Home() {
                     <MdGetApp size={18} /> Instalar app
                   </button>
                 )}
+                <button onClick={alternarTema}>
+                  {tema === 'dark' ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
+                  {tema === 'dark' ? 'Tema claro' : 'Tema escuro'}
+                </button>
                 <button
                   onClick={() => {
                     setMenuAvatarAberto(false)
-                    navigate('/sobre')
+                    navigate('/sobre', { viewTransition: true })
                   }}
                 >
                   <MdInfoOutline size={18} /> Sobre
@@ -210,7 +218,7 @@ export default function Home() {
 
       <div className="home-menu">
         {ITENS_MENU.map((item) => (
-          <Link key={item.to} to={item.to} className="home-menu-item">
+          <Link key={item.to} to={item.to} className="home-menu-item" viewTransition>
             <span className="home-menu-icone" style={{ background: item.cor }}>
               <item.Icone size={26} color={CORES.branco} />
             </span>

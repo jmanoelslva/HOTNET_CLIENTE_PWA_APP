@@ -6,6 +6,7 @@ import { SiPix } from 'react-icons/si'
 import CabecalhoTela from '../components/CabecalhoTela'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
+import PullToRefresh from '../components/PullToRefresh'
 import { useToast } from '../components/Toast/ToastContext'
 import { CORES, comAlpha } from '../utils/cores'
 import { abrirEImprimir } from '../utils/impressao'
@@ -178,6 +179,7 @@ export default function Boletos() {
   }
 
   return (
+    <PullToRefresh aoAtualizar={carregar}>
     <div className="boletos-tela tela-entrada">
       <CabecalhoTela
         icone={MdPayments}
@@ -268,7 +270,9 @@ export default function Boletos() {
                   <button
                     className="boleto-contrato-chip"
                     style={{ background: comAlpha(CORES.contratos, 12), color: CORES.contratos }}
-                    onClick={() => navigate('/contratos', { state: { contratoPk: fatura.contract_pk } })}
+                    onClick={() =>
+                      navigate('/contratos', { state: { contratoPk: fatura.contract_pk }, viewTransition: true })
+                    }
                   >
                     <MdDescription size={14} /> Contrato {fatura.contract_number}
                   </button>
@@ -394,5 +398,6 @@ export default function Boletos() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   )
 }

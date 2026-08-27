@@ -10,7 +10,7 @@ interface Props {
 /** Link de volta — usado no topo das telas internas (padrão: pro painel principal). */
 export default function VoltarInicio({ to = '/', label = 'Início' }: Props) {
   return (
-    <Link to={to} className="voltar-inicio">
+    <Link to={to} className="voltar-inicio" viewTransition>
       <MdArrowBack size={16} />
       {label}
     </Link>
