@@ -123,6 +123,23 @@
   padding: 8px;
 }
 
+.login-btn-instalar {
+  margin-top: 16px;
+  height: 44px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-fundo);
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .login-modal-fundo {
   position: fixed;
   inset: 0;

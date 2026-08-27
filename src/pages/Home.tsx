@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   MdAccountCircle,
-  MdAddBox,
   MdBadge,
   MdDataUsage,
   MdDescription,
   MdGetApp,
   MdHelp,
   MdInfoOutline,
-  MdIosShare,
   MdLogout,
   MdPayments,
   MdSupportAgent,
@@ -23,7 +21,7 @@ import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, type ConsumoPorContrato } 
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import { CORES, comAlpha } from '../utils/cores'
 import { usePwaInstall } from '../hooks/usePwaInstall'
-import { useToast } from '../components/Toast/ToastContext'
+import ModalInstalarIos from '../components/ModalInstalarIos'
 import logoHotnet from '../assets/logo-hotnet.png'
 import './Home.css'
 
@@ -45,11 +43,9 @@ const ITENS_MENU = [
 export default function Home() {
   const { cpf, sair } = useSessao()
   const navigate = useNavigate()
-  const { toast } = useToast()
-  const { podeInstalarNativo, podeInstalarIos, instalar } = usePwaInstall()
+  const { podeInstalar, aoClicarInstalar, modalIosAberto, fecharModalIos } = usePwaInstall()
   const [nomeExibido, setNomeExibido] = useState('Cliente')
   const [menuAvatarAberto, setMenuAvatarAberto] = useState(false)
-  const [instrucaoIosAberta, setInstrucaoIosAberta] = useState(false)
 
   const [consumoContratos, setConsumoContratos] = useState<ConsumoPorContrato[]>([])
   const [cpePkSelecionado, setCpePkSelecionado] = useState<number | null>(null)
@@ -112,18 +108,9 @@ export default function Home() {
     }
   }
 
-  async function aoClicarInstalar() {
+  async function aoClicarInstalarMenu() {
     setMenuAvatarAberto(false)
-    if (podeInstalarNativo) {
-      const resultado = await instalar()
-      if (resultado === 'accepted') toast('App instalado!', 'sucesso')
-      return
-    }
-    // iOS Safari não tem prompt nativo de instalação — só o passo manual.
-    // Um toast (alguns segundos, some sozinho) é fácil de perder logo após
-    // fechar o menu do avatar; o passo a passo fica num modal que só some
-    // quando o cliente fechar, dando tempo de ler antes de ir até o Safari.
-    setInstrucaoIosAberta(true)
+    await aoClicarInstalar()
   }
 
   const corStatus = online === true ? CORES.sucessoVivo : online === false ? CORES.erro : CORES.textoFraco
@@ -154,8 +141,8 @@ export default function Home() {
             <>
               <div className="home-avatar-menu-fundo" onClick={() => setMenuAvatarAberto(false)} />
               <div className="home-avatar-menu">
-                {(podeInstalarNativo || podeInstalarIos) && (
-                  <button onClick={aoClicarInstalar}>
+                {podeInstalar && (
+                  <button onClick={aoClicarInstalarMenu}>
                     <MdGetApp size={18} /> Instalar app
                   </button>
                 )}
@@ -243,26 +230,7 @@ export default function Home() {
       </footer>
       </div>
 
-      {instrucaoIosAberta && (
-        <div className="home-modal-fundo" onClick={() => setInstrucaoIosAberta(false)}>
-          <div className="home-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Instalar o app</h2>
-            <ol className="home-instrucao-ios">
-              <li>
-                Toque no ícone de compartilhar <MdIosShare size={16} /> na barra do Safari
-              </li>
-              <li>
-                Escolha <strong>"Adicionar à Tela de Início"</strong> <MdAddBox size={16} />
-              </li>
-            </ol>
-            <p className="home-instrucao-ios-obs">
-              Só funciona pelo Safari — não abre pelo app do WhatsApp, Instagram ou outro navegador
-              (Chrome, Firefox etc).
-            </p>
-            <button onClick={() => setInstrucaoIosAberta(false)}>Entendi</button>
-          </div>
-        </div>
-      )}
+      <ModalInstalarIos aberto={modalIosAberto} onFechar={fecharModalIos} />
     </div>
   )
 }

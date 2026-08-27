@@ -169,18 +169,27 @@ com um app nativo do que um site comum:
   próprio app — nunca as chamadas `/api/*`, que são sempre dinâmicas.
   Ícones em `public/icons/` (gerados a partir do logotipo por
   `scripts/gerar-icones-pwa.mjs`, reexecutar se o logotipo mudar).
-  Chrome/Edge (Android e desktop) disparam `beforeinstallprompt`
-  sozinhos e o botão "Instalar app" (menu do avatar, `Home.tsx`) usa
-  o prompt nativo do navegador. **Safari no iOS nunca dispara esse
-  evento** (limitação da própria Apple, não tem prompt automático em
-  hipótese alguma) — lá o mesmo botão abre um modal em bottom-sheet
-  com o passo a passo manual (compartilhar → "Adicionar à Tela de
-  Início"), em vez de um toast: a instalação exige sair do app pra ir
-  até o Safari, então a instrução precisa ficar na tela até o cliente
-  fechar, não sumir sozinha em poucos segundos. O modal também avisa
-  que só funciona pelo Safari — abrir o link num navegador in-app
-  (WhatsApp, Instagram) ou no Chrome para iOS não oferece essa opção
-  no compartilhamento. Ver `src/hooks/usePwaInstall.ts`.
+  Lógica centralizada em `src/hooks/usePwaInstall.ts`, reaproveitada
+  tanto no menu do avatar (`Home.tsx`) quanto na tela de **Login**
+  (`Login.tsx`) — instalar não depende de já estar logado.
+  - **Chrome/Edge (Android e desktop)** disparam `beforeinstallprompt`
+    sozinhos; o botão "Instalar app" usa o prompt nativo do navegador.
+  - **Safari no iOS nunca dispara esse evento** (limitação da própria
+    Apple, não tem prompt automático em hipótese alguma — detecção por
+    `navigator.userAgent`/touch, cobre também iPad que se identifica
+    como Mac). Como não tem como saber sozinho quando o cliente já
+    olhou a tela de login antes, a tela de Login abre automaticamente
+    o passo a passo (`ModalInstalarIos.tsx`, compartilhar →
+    "Adicionar à Tela de Início") na primeira visita em iOS, antes
+    mesmo de logar — lembrado via `localStorage` pra não repetir a
+    cada acesso. Fora da primeira vez (ou se o cliente fechar o
+    modal), o mesmo botão "Instalar app" na tela de Login continua
+    disponível pra abrir de novo quando quiser. Modal em vez de toast
+    porque a instalação exige sair do app pra ir até o Safari, então a
+    instrução precisa ficar na tela até o cliente fechar, não sumir
+    sozinha em poucos segundos — e avisa que só funciona pelo Safari:
+    abrir o link num navegador in-app (WhatsApp, Instagram) ou no
+    Chrome para iOS não oferece essa opção no compartilhamento.
 - **Aviso de nova versão** — `registerType: 'autoUpdate'` (vite.config.ts)
   ativa o service worker novo sozinho em segundo plano, mas isso não
   troca os módulos JS já carregados numa aba que já estava aberta. O

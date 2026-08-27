@@ -1,11 +1,19 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MdAccountCircle, MdLock, MdSupportAgent, MdVisibility, MdVisibilityOff } from 'react-icons/md'
+import { MdAccountCircle, MdGetApp, MdLock, MdSupportAgent, MdVisibility, MdVisibilityOff } from 'react-icons/md'
 import { useSessao } from '../auth/SessionContext'
 import LoginBackground from '../components/LoginBackground'
+import ModalInstalarIos from '../components/ModalInstalarIos'
+import { usePwaInstall } from '../hooks/usePwaInstall'
 import logoHotnet from '../assets/logo-hotnet.png'
 import { abrirWhatsappLogin } from '../utils/whatsapp'
 import './Login.css'
+
+// Só pra não abrir o modal de instrução do iOS sozinho em toda visita à
+// tela de login — mostra automaticamente uma vez só; depois disso, o
+// botão "Instalar app" continua disponível pra quem quiser instalar
+// depois (ver JSX abaixo).
+const CHAVE_SUGESTAO_IOS_MOSTRADA = 'hotnet-pwa-ios-sugestao-mostrada'
 
 export default function Login() {
   const [usuario, setUsuario] = useState('')
@@ -14,6 +22,17 @@ export default function Login() {
   const [ajudaAberta, setAjudaAberta] = useState(false)
   const { entrar, carregando, erro } = useSessao()
   const navigate = useNavigate()
+  const { podeInstalar, podeInstalarIos, aoClicarInstalar, modalIosAberto, fecharModalIos } = usePwaInstall()
+
+  // Em iOS não existe prompt automático do navegador (ver usePwaInstall.ts)
+  // — esse é o jeito de aparecer "sozinho" logo na tela de login, já que é
+  // a primeira tela que o cliente vê antes mesmo de entrar.
+  useEffect(() => {
+    if (!podeInstalarIos) return
+    if (localStorage.getItem(CHAVE_SUGESTAO_IOS_MOSTRADA)) return
+    localStorage.setItem(CHAVE_SUGESTAO_IOS_MOSTRADA, '1')
+    aoClicarInstalar()
+  }, [podeInstalarIos, aoClicarInstalar])
 
   async function aoEnviar(evento: FormEvent) {
     evento.preventDefault()
@@ -74,6 +93,12 @@ export default function Login() {
         <button type="button" className="login-nao-consigo" onClick={() => setAjudaAberta(true)}>
           Não consigo entrar?
         </button>
+
+        {podeInstalar && (
+          <button type="button" className="login-btn-instalar" onClick={aoClicarInstalar}>
+            <MdGetApp size={18} /> Instalar app
+          </button>
+        )}
       </div>
 
       {ajudaAberta && (
@@ -101,6 +126,8 @@ export default function Login() {
           </div>
         </div>
       )}
+
+      <ModalInstalarIos aberto={modalIosAberto} onFechar={fecharModalIos} />
     </div>
   )
 }
