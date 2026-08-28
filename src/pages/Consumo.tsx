@@ -11,6 +11,7 @@ import {
 } from '../api/consumo'
 import { formatarBytes, formatarDuracao } from '../utils/formatacao'
 import CabecalhoTela from '../components/CabecalhoTela'
+import PullToRefresh from '../components/PullToRefresh'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
 import { CORES } from '../utils/cores'
@@ -120,6 +121,7 @@ export default function Consumo() {
   const hojeIso = new Date().toISOString().slice(0, 10)
 
   return (
+    <PullToRefresh aoAtualizar={carregar}>
     <div className="consumo-tela tela-entrada">
       <CabecalhoTela
         icone={MdDataUsage}
@@ -257,5 +259,6 @@ export default function Consumo() {
         </>
       )}
     </div>
+    </PullToRefresh>
   )
 }

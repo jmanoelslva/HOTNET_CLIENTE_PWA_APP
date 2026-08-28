@@ -4,6 +4,7 @@ import { useSessao } from '../auth/SessionContext'
 import { buscarDadosCliente, buscarEnderecos, formatarContatos, rotuloDocumento, tipoCadastro, type Endereco } from '../api/cadastro'
 import type { ClientDto } from '../api/client'
 import CabecalhoTela from '../components/CabecalhoTela'
+import PullToRefresh from '../components/PullToRefresh'
 import Skeleton from '../components/Skeleton'
 import { CORES } from '../utils/cores'
 import './Cadastro.css'
@@ -65,6 +66,7 @@ export default function Cadastro() {
   }
 
   return (
+    <PullToRefresh aoAtualizar={carregar}>
     <div className="cadastro-tela tela-entrada">
       <CabecalhoTela
         icone={MdBadge}
@@ -156,5 +158,6 @@ export default function Cadastro() {
         </>
       )}
     </div>
+    </PullToRefresh>
   )
 }

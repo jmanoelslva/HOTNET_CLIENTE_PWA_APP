@@ -4,6 +4,7 @@ import { MdDescription, MdFileDownload, MdPayments } from 'react-icons/md'
 import { urlImpressaoContrato } from '../api/client'
 import { buscarContratos, type Contrato } from '../api/contratos'
 import CabecalhoTela from '../components/CabecalhoTela'
+import PullToRefresh from '../components/PullToRefresh'
 import Skeleton from '../components/Skeleton'
 import { CORES, comAlpha } from '../utils/cores'
 import { abrirEImprimir } from '../utils/impressao'
@@ -70,6 +71,7 @@ export default function Contratos() {
   }
 
   return (
+    <PullToRefresh aoAtualizar={carregar}>
     <div className="contratos-tela tela-entrada">
       <CabecalhoTela
         icone={MdDescription}
@@ -173,5 +175,6 @@ export default function Contratos() {
         </ul>
       )}
     </div>
+    </PullToRefresh>
   )
 }
