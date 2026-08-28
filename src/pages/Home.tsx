@@ -12,6 +12,7 @@ import {
   MdLightMode,
   MdLogout,
   MdPayments,
+  MdSpeed,
   MdSupportAgent,
   MdWifi,
 } from 'react-icons/md'
@@ -233,6 +234,14 @@ export default function Home() {
               </p>
             </div>
           </div>
+          <a
+            className="home-teste-velocidade"
+            href="https://fast.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MdSpeed size={16} /> Testar velocidade da internet
+          </a>
           {consumoContratos.length > 1 && (
             <select
               className="home-seletor-contrato"

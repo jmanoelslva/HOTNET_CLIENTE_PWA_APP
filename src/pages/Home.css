@@ -163,6 +163,25 @@
   color: var(--cor-texto-terciario);
 }
 
+.home-teste-velocidade {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  /* 36px (não os 44px de alvo mínimo de uma ação principal) — é um link
+     secundário dentro do card de status, mesmo critério já usado em
+     "Ver mais boletos pagos" (Boletos.css): compensa com padding lateral
+     em vez de altura cheia. */
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1px solid var(--cor-borda);
+  color: var(--cor-texto-secundario);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .home-seletor-contrato {
   width: 100%;
   height: 40px;
