@@ -262,13 +262,15 @@ com um app nativo do que um site comum:
     instalação continuando disponível de verdade (bug confirmado e
     corrigido). `useSyncExternalStore` mantém todo componente que usa o
     hook sincronizado com esse estado compartilhado.
-- **Aviso de nova versão** — `registerType: 'autoUpdate'` (vite.config.ts)
-  ativa o service worker novo sozinho em segundo plano, mas isso não
-  troca os módulos JS já carregados numa aba que já estava aberta. O
-  registro é feito manualmente por `useRegisterSW` (`virtual:pwa-register/react`,
-  `injectRegister: false`) em vez do script mínimo auto-injetado, só pra
-  ter acesso ao callback `onNeedRefresh` — uma faixa fixa no topo
-  (`StatusBanners.tsx`) avisa e só recarrega quando o cliente confirmar.
+- **Aviso de nova versão** — o service worker novo troca sozinho em
+  segundo plano (`workbox.skipWaiting`/`workbox.clientsClaim`,
+  vite.config.ts — ver "service worker preso na versão antiga" abaixo),
+  mas isso não troca os módulos JS já carregados numa aba que já estava
+  aberta. O registro é feito manualmente por `useRegisterSW`
+  (`virtual:pwa-register/react`, `injectRegister: false`) em vez do
+  script mínimo auto-injetado, só pra ter acesso ao callback
+  `onNeedRefresh` — uma faixa fixa no topo (`StatusBanners.tsx`) avisa e
+  só recarrega quando o cliente confirmar.
   **Depende do servidor não cachear `sw.js`/`index.html`/
   `manifest.webmanifest`** (`Cache-Control: no-cache`, configurado nos
   exemplos de deploy — ver "Reverse proxy em produção" abaixo): sem
@@ -279,6 +281,22 @@ com um app nativo do que um site comum:
   service worker em si, que já era gerenciado certo, e sim sobre o
   cache HTTP comum do navegador escondendo o `sw.js` novo da própria
   checagem de atualização).
+- **Service worker preso na versão antiga** (`vite.config.ts`) — outro
+  bug real relatado em produção, causa diferente do de cima: mesmo com
+  o `Cache-Control: no-cache` certo, o cliente só via a versão nova
+  limpando os dados do app manualmente. Por padrão, o service worker
+  novo instalado fica "esperando" — só vira o ativo quando não sobra
+  NENHUMA aba/instância aberta controlada pelo antigo, ou quando o
+  cliente clica no aviso "Atualizar" acima. Como um app instalado
+  costuma ser minimizado (suspenso pelo sistema) em vez de fechado de
+  verdade, "nenhuma aba aberta" podia nunca acontecer de fato, deixando
+  o service worker preso indefinidamente — só limpar os dados (que
+  apaga o registro do service worker inteiro) resolvia. `workbox.
+  skipWaiting: true` faz o service worker novo ativar sozinho assim que
+  termina de instalar, sem esperar as abas antigas fecharem; `workbox.
+  clientsClaim: true` faz ele assumir o controle das abas JÁ abertas na
+  hora (a próxima requisição delas já passa pelo novo), em vez de só
+  nas próximas abas/navegações.
 - **Barra de navegação inferior** (`BottomNav`) fixa nas telas
   autenticadas, com atalho colorido pras 5 telas mais usadas.
 - **Confirmação antes de sair** (`ModalConfirmarLogout.tsx`) — os dois

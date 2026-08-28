@@ -11,14 +11,31 @@ export default defineConfig({
       // Registro manual via useRegisterSW (StatusBanners.tsx), não o
       // script mínimo auto-injetado — precisamos do callback onNeedRefresh
       // pra avisar o cliente e só recarregar quando ele confirmar, já que
-      // "autoUpdate" ativa a versão nova sozinho mas isso NÃO atualiza os
+      // mesmo com skipWaiting/clientsClaim (abaixo) isso NÃO troca os
       // módulos JS já carregados na aba aberta.
       injectRegister: false,
-      // Nunca cachear /api/* — são sempre dados dinâmicos e ligados à
-      // sessão (boletos, consumo, chamados...); o service worker só
-      // deve cuidar dos arquivos estáticos do próprio app.
       workbox: {
+        // Nunca cachear /api/* — são sempre dados dinâmicos e ligados à
+        // sessão (boletos, consumo, chamados...); o service worker só
+        // deve cuidar dos arquivos estáticos do próprio app.
         navigateFallbackDenylist: [/^\/api\//],
+        // Bug real relatado em produção: depois de um deploy, o cliente
+        // as vezes só via a versão nova limpando os dados do app (o que
+        // apaga o registro do service worker inteiro). Sem essas duas
+        // opções, o service worker novo instalado fica "esperando" —
+        // só vira o ativo quando não sobra NENHUMA aba/instância aberta
+        // controlada pelo antigo, ou quando o cliente clica no aviso
+        // "Atualizar" (StatusBanners.tsx). Como apps instalados costumam
+        // ser minimizados (suspensos pelo SO) em vez de fechados de
+        // verdade, "nenhuma aba aberta" podia nunca acontecer, deixando
+        // o service worker preso na versão antiga por tempo indefinido.
+        // skipWaiting: o service worker novo ativa sozinho assim que
+        // termina de instalar, sem esperar as abas antigas fecharem.
+        // clientsClaim: uma vez ativo, assume o controle das abas JÁ
+        // abertas na hora (a próxima requisição delas já passa pelo
+        // novo), em vez de só nas próximas abas/navegações.
+        skipWaiting: true,
+        clientsClaim: true,
       },
       manifest: {
         name: 'HOTNET — Portal do Cliente',
