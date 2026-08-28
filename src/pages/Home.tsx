@@ -159,7 +159,7 @@ export default function Home() {
 
         <div className="home-header-saudacao">
           <span className="home-saudacao">{saudacaoPorHorario(nomeExibido)}</span>
-          <p className="home-subtitulo">O que você precisa hoje?</p>
+          <p className="home-subtitulo">O que você deseja hoje?</p>
         </div>
 
         <div className="home-avatar-wrapper">
