@@ -17,7 +17,7 @@
   display: flex;
   align-items: stretch;
   justify-content: space-around;
-  max-width: 640px;
+  max-width: var(--largura-conteudo);
   margin: 0 auto;
 }
 

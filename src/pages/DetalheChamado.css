@@ -1,5 +1,5 @@
 .detalhe-tela {
-  max-width: 640px;
+  max-width: var(--largura-conteudo);
   margin: 0 auto;
   /* dvh acompanha a barra de endereço dinâmica do navegador do celular —
      com 100vh puro, em algumas telas/estados a barra de digitação fica

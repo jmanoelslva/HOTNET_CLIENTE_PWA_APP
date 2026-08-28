@@ -50,6 +50,29 @@
   /* Sombra dos cards — token à parte porque no escuro uma sombra preta
      não aparece contra um fundo já escuro (ver bloco dark abaixo). */
   --sombra-card: 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  /* Largura do conteúdo principal (container centralizado de cada tela,
+     inclusive a barra de navegação inferior) — um token só, em vez do
+     mesmo "max-width: 640px" repetido em cada arquivo de página, pra
+     mudar a largura em todo o app editando um lugar só. No celular
+     (largura default) a tela toda já é menor que isso, então o valor
+     não faz diferença; ele só passa a limitar de fato a partir do
+     tablet (ver media queries abaixo), evitando o app virar uma faixa
+     estreita flutuando no meio de uma tela grande sem aproveitar o
+     espaço disponível. */
+  --largura-conteudo: 640px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --largura-conteudo: 760px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --largura-conteudo: 900px;
+  }
 }
 
 /* Tema escuro — dirigido só pelo atributo data-theme no <html>, nunca
