@@ -302,12 +302,18 @@ com um app nativo do que um site comum:
   (`BottomNav.tsx`/`.css`). Desloca em múltiplos de 100% da própria
   largura (não da barra), então o passo por item é sempre exato, sem
   acumular erro de arredondamento.
-- **Puxar para atualizar** (`src/components/PullToRefresh.tsx`) nas
-  listas de Boletos e Suporte — puxar a tela pra baixo com a rolagem já
-  no topo dispara a mesma função de recarregar da tela. Feito na mão
-  (sem lib), com listener nativo (não JSX `onTouchMove`) porque precisa
-  de `preventDefault()` durante o arrasto — só funciona com
-  `passive:false`, que o React não oferece direto pra eventos de toque.
+- **Puxar para atualizar** (`src/components/PullToRefresh.tsx`) em
+  Home, Boletos, Contratos, Consumo, Suporte e Meus dados — puxar a
+  tela pra baixo com a rolagem já no topo dispara a mesma função de
+  recarregar da tela. Feito na mão (sem lib), com listener nativo (não
+  JSX `onTouchMove`) porque precisa de `preventDefault()` durante o
+  arrasto — só funciona com `passive:false`, que o React não oferece
+  direto pra eventos de toque. Em Home (`Home.tsx`), que não tem um
+  único `carregar()` como as demais telas, o gesto dispara `atualizar()`
+  — refaz nome e consumo do mês em paralelo (`Promise.all`),
+  reaproveitando as mesmas funções dos efeitos de carga inicial; a
+  checagem de sessão ao vivo roda em seguida sozinha, reagindo à troca
+  de contrato selecionado que esse refresh pode causar.
 - **Skeleton loaders** (`src/components/Skeleton.tsx`) no lugar de texto
   "Carregando…" nas listas — mantém a forma do card final, com efeito de
   brilho. Telas de carregamento de tela inteira (ex: checagem de sessão)

@@ -26,6 +26,7 @@ import { usePwaInstall } from '../hooks/usePwaInstall'
 import { useTema } from '../hooks/useTema'
 import ModalInstalarIos from '../components/ModalInstalarIos'
 import ModalConfirmarLogout from '../components/ModalConfirmarLogout'
+import PullToRefresh from '../components/PullToRefresh'
 import logoHotnet from '../assets/logo-hotnet.png'
 import './Home.css'
 
@@ -59,33 +60,57 @@ export default function Home() {
   const [online, setOnline] = useState<boolean | null | undefined>(undefined)
 
   useEffect(() => {
-    buscarDadosCliente(cpf)
-      .then((cliente) => {
-        const primeiroNome = cliente.client_complete_name?.trim().split(' ')[0]
-        if (primeiroNome) {
-          setNomeExibido(primeiroNome.charAt(0).toUpperCase() + primeiroNome.slice(1).toLowerCase())
-        }
-      })
-      .catch(() => {})
+    carregarNome()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cpf])
 
   useEffect(() => {
-    buscarConsumoDoMes(new Date().getFullYear(), new Date().getMonth() + 1)
-      .then((dados) => {
-        setConsumoContratos(dados)
-        if (dados.length > 0) {
-          setCpePkSelecionado(dados[0].cpePk)
-        } else {
-          // Sem consumo registrado ainda (ex: cliente novo) — cai pra lista
-          // de contratos só pro nome do plano, sem indicador de conexão
-          // (sem cpePk não dá pra checar a sessão).
-          buscarContratos()
-            .then((contratos) => setPlanoSemConsumo(contratos[0]?.plano ?? null))
-            .catch(() => {})
-        }
-      })
-      .catch(() => {})
+    carregarConsumo()
   }, [])
+
+  async function carregarNome() {
+    try {
+      const cliente = await buscarDadosCliente(cpf)
+      const primeiroNome = cliente.client_complete_name?.trim().split(' ')[0]
+      if (primeiroNome) {
+        setNomeExibido(primeiroNome.charAt(0).toUpperCase() + primeiroNome.slice(1).toLowerCase())
+      }
+    } catch {
+      // Falha silenciosa: saudação cai pro nome genérico ("Cliente") já no
+      // estado inicial, não é crítico o bastante pra bloquear a Home.
+    }
+  }
+
+  async function carregarConsumo() {
+    try {
+      const dados = await buscarConsumoDoMes(new Date().getFullYear(), new Date().getMonth() + 1)
+      setConsumoContratos(dados)
+      if (dados.length > 0) {
+        setCpePkSelecionado((atual) => (dados.some((c) => c.cpePk === atual) ? atual : dados[0].cpePk))
+      } else {
+        // Sem consumo registrado ainda (ex: cliente novo) — cai pra lista
+        // de contratos só pro nome do plano, sem indicador de conexão
+        // (sem cpePk não dá pra checar a sessão).
+        try {
+          const contratos = await buscarContratos()
+          setPlanoSemConsumo(contratos[0]?.plano ?? null)
+        } catch {
+          // Sem indicador nesse caso também — mesma lógica de falha
+          // silenciosa do restante da Home.
+        }
+      }
+    } catch {
+      // Falha silenciosa: sem card de status, mas o resto da Home
+      // (menu, WhatsApp) continua utilizável.
+    }
+  }
+
+  // Usado pelo pull-to-refresh — reaproveita as mesmas buscas dos efeitos
+  // de carga inicial. A checagem de sessão (efeito abaixo) roda sozinha em
+  // seguida, reagindo à troca de contratoSelecionado causada por aqui.
+  async function atualizar() {
+    await Promise.all([carregarNome(), carregarConsumo()])
+  }
 
   const contratoSelecionado = consumoContratos.find((c) => c.cpePk === cpePkSelecionado) ?? null
 
@@ -122,6 +147,7 @@ export default function Home() {
   const corStatus = online === true ? CORES.sucessoVivo : online === false ? CORES.erro : CORES.textoFraco
 
   return (
+    <PullToRefresh aoAtualizar={atualizar}>
     <div className="home-tela tela-entrada">
       <div className="home-conteudo">
       <header
@@ -256,5 +282,6 @@ export default function Home() {
         }}
       />
     </div>
+    </PullToRefresh>
   )
 }
