@@ -98,9 +98,17 @@ export default function Suporte() {
 
   useEffect(() => {
     carregar()
-    buscarCategorias().then(setCategorias).catch(() => {})
+    carregarCategorias()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  async function carregarCategorias() {
+    try {
+      setCategorias(await buscarCategorias())
+    } catch {
+      // abrirDialog() tenta de novo na próxima vez que o cliente tocar em "Novo chamado"
+    }
+  }
 
   async function carregar() {
     setCarregando(true)
@@ -130,10 +138,16 @@ export default function Suporte() {
   }
 
   const filtrados = chamados.filter((c) => (aba === 'resolvidos' ? chamadoResolvido(c) : !chamadoResolvido(c)))
+  // O backend não filtra por status (a paginação é sobre TODOS os chamados,
+  // ver buscarChamados) — a aba filtra só o que já foi carregado. Por isso,
+  // uma aba vazia não significa necessariamente "não existe": pode ser só
+  // que os chamados desse tipo ainda não foram trazidos do servidor.
+  const haMaisParaCarregar = chamados.length < totalNoServidor
 
   function abrirDialog() {
     if (categorias.length === 0) {
       toast('Categorias não carregadas ainda, tente novamente em instantes.')
+      carregarCategorias()
     }
     setCategoriaPk(categorias[0]?.category_pk ?? null)
     setCategoriaMenuAberto(false)
@@ -196,12 +210,21 @@ export default function Suporte() {
         </div>
       )}
 
-      {!carregando && !erro && filtrados.length === 0 && (
+      {!carregando && !erro && filtrados.length === 0 && !haMaisParaCarregar && (
         <EstadoVazio
           icone={MdSupportAgent}
           titulo={aba === 'resolvidos' ? 'Nenhum chamado resolvido ainda' : 'Nenhum chamado em aberto'}
           subtitulo={aba === 'resolvidos' ? undefined : 'Precisando de ajuda? Toque em "Novo chamado".'}
         />
+      )}
+
+      {!carregando && !erro && filtrados.length === 0 && haMaisParaCarregar && (
+        <div className="suporte-status">
+          <p>
+            Nenhum chamado {aba === 'resolvidos' ? 'resolvido' : 'em aberto'} entre os já carregados — toque em
+            "Carregar mais" abaixo pra continuar procurando.
+          </p>
+        </div>
       )}
 
       {!carregando && !erro && filtrados.length > 0 && (
@@ -244,7 +267,7 @@ export default function Suporte() {
         </ul>
       )}
 
-      {!carregando && !erro && chamados.length < totalNoServidor && (
+      {!carregando && !erro && haMaisParaCarregar && (
         <button className="suporte-carregar-mais" onClick={carregarMais} disabled={carregandoMais}>
           {carregandoMais ? 'Carregando…' : 'Carregar mais'}
         </button>

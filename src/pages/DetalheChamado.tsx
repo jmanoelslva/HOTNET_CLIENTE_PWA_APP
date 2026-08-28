@@ -95,8 +95,19 @@ export default function DetalheChamado() {
       setOperacoes(dados)
       // O servidor já confirmou essas mensagens — descarta as otimistas
       // correspondentes (por texto, já que a temporária não tem opPk real)
-      // pra não duplicar na tela.
-      setPendentes((atual) => atual.filter((p) => !dados.some((d) => d.doCliente && d.texto === p.texto)))
+      // pra não duplicar na tela. Casamento 1-pra-1 (cada operação
+      // confirmada "consome" no máximo uma pendente com o mesmo texto):
+      // se o cliente mandou o mesmo texto duas vezes seguidas, um simples
+      // "some()" removeria as DUAS pendentes ao ver só UMA confirmação.
+      setPendentes((atual) => {
+        const usados = new Set<number>()
+        for (const d of dados) {
+          if (!d.doCliente) continue
+          const indice = atual.findIndex((p, i) => !usados.has(i) && p.texto === d.texto)
+          if (indice !== -1) usados.add(indice)
+        }
+        return atual.filter((_, i) => !usados.has(i))
+      })
       setErro(null)
       // Só rola pro fim na carga inicial ou quando chega mensagem nova —
       // nas atualizações silenciosas de fundo (a cada 10s) sem novidade,
