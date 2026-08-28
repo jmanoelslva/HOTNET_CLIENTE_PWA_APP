@@ -54,25 +54,19 @@
   /* Largura do conteúdo principal (container centralizado de cada tela,
      inclusive a barra de navegação inferior) — um token só, em vez do
      mesmo "max-width: 640px" repetido em cada arquivo de página, pra
-     mudar a largura em todo o app editando um lugar só. No celular
-     (largura default) a tela toda já é menor que isso, então o valor
-     não faz diferença; ele só passa a limitar de fato a partir do
-     tablet (ver media queries abaixo), evitando o app virar uma faixa
-     estreita flutuando no meio de uma tela grande sem aproveitar o
-     espaço disponível. */
-  --largura-conteudo: 640px;
-}
-
-@media (min-width: 768px) {
-  :root {
-    --largura-conteudo: 760px;
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --largura-conteudo: 900px;
-  }
+     mudar a largura em todo o app editando um lugar só.
+     clamp(640px, 90vw, 900px): em vez de "pular" de valor em breakpoints
+     fixos (o que antes gerava um salto brusco em 768px/1024px), o meio
+     do clamp (90vw) lê a largura real da tela reportada pelo navegador
+     e escala com ela de forma contínua — qualquer tela, não só as que
+     bateram num breakpoint testado. Os 640px/900px são só piso e teto
+     (não item pra travar valor, e sim pra não deixar o conteúdo menor
+     que o próprio celular nem maior que uma medida confortável de
+     leitura num monitor ultrawide). O "min(100%, ...)" por fora garante
+     que em telas bem estreitas (celular) o resultado nunca passe da
+     largura real disponível — sem ele, o clamp sozinho poderia manter o
+     piso de 640px mesmo numa tela de 320px e estourar a largura. */
+  --largura-conteudo: min(100%, clamp(640px, 90vw, 900px));
 }
 
 /* Tema escuro — dirigido só pelo atributo data-theme no <html>, nunca
