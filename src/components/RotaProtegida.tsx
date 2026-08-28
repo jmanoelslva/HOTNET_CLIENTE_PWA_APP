@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
-import { useSessao } from '../auth/SessionContext'
+import { useSessao } from '../auth/useSessao'
 import Spinner from './Spinner'
 
 /** Redireciona pro login quem tentar acessar uma tela protegida sem sessão ativa. */

@@ -13,11 +13,11 @@ import {
   MdSwapHoriz,
   MdWarning,
 } from 'react-icons/md'
-import { useSessao } from '../auth/SessionContext'
+import { useSessao } from '../auth/useSessao'
 import { buscarCategorias, buscarChamados, chamadoResolvido, abrirChamado as apiAbrirChamado } from '../api/suporte'
 import type { CategoriaDto, TicketDto } from '../api/client'
 import CabecalhoTela from '../components/CabecalhoTela'
-import { useToast } from '../components/Toast/ToastContext'
+import { useToast } from '../components/Toast/useToast'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
 import PullToRefresh from '../components/PullToRefresh'

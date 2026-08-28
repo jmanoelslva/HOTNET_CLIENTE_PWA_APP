@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { MdBadge } from 'react-icons/md'
-import { useSessao } from '../auth/SessionContext'
+import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente, buscarEnderecos, formatarContatos, rotuloDocumento, tipoCadastro, type Endereco } from '../api/cadastro'
 import type { ClientDto } from '../api/client'
 import CabecalhoTela from '../components/CabecalhoTela'

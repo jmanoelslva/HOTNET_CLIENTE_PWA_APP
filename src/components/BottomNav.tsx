@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { MdDescription, MdHome, MdLogout, MdPayments, MdSupportAgent } from 'react-icons/md'
-import { useSessao } from '../auth/SessionContext'
+import { useSessao } from '../auth/useSessao'
 import { CORES, comAlpha } from '../utils/cores'
 import ModalConfirmarLogout from './ModalConfirmarLogout'
 import './BottomNav.css'

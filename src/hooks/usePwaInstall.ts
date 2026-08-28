@@ -1,5 +1,5 @@
 import { useCallback, useState, useSyncExternalStore } from 'react'
-import { useToast } from '../components/Toast/ToastContext'
+import { useToast } from '../components/Toast/useToast'
 
 /**
  * Evento `beforeinstallprompt` — o Chrome/Edge só disparam quando os

@@ -7,7 +7,7 @@ import CabecalhoTela from '../components/CabecalhoTela'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
 import PullToRefresh from '../components/PullToRefresh'
-import { useToast } from '../components/Toast/ToastContext'
+import { useToast } from '../components/Toast/useToast'
 import { CORES, comAlpha } from '../utils/cores'
 import { abrirEImprimir } from '../utils/impressao'
 import {

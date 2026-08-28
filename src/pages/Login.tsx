@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MdAccountCircle, MdGetApp, MdLock, MdSupportAgent, MdVisibility, MdVisibilityOff } from 'react-icons/md'
-import { useSessao } from '../auth/SessionContext'
+import { useSessao } from '../auth/useSessao'
 import LoginBackground from '../components/LoginBackground'
 import ModalInstalarIos from '../components/ModalInstalarIos'
 import { usePwaInstall } from '../hooks/usePwaInstall'

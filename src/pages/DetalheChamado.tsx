@@ -23,7 +23,7 @@ import {
   type OperacaoChamado,
 } from '../api/suporte'
 import type { TicketDto } from '../api/client'
-import { useToast } from '../components/Toast/ToastContext'
+import { useToast } from '../components/Toast/useToast'
 import Skeleton from '../components/Skeleton'
 import './DetalheChamado.css'
 

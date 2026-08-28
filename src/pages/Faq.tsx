@@ -11,7 +11,7 @@ import {
   MdWifi,
 } from 'react-icons/md'
 import { FaWhatsapp } from 'react-icons/fa'
-import { useSessao } from '../auth/SessionContext'
+import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente } from '../api/cadastro'
 import { abrirWhatsappAjuda } from '../utils/whatsapp'
 import CabecalhoTela from '../components/CabecalhoTela'

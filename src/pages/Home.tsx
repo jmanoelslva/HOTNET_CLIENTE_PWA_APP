@@ -16,7 +16,7 @@ import {
   MdWifi,
 } from 'react-icons/md'
 import { FaWhatsapp } from 'react-icons/fa'
-import { useSessao } from '../auth/SessionContext'
+import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente } from '../api/cadastro'
 import { buscarContratos } from '../api/contratos'
 import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, type ConsumoPorContrato } from '../api/consumo'

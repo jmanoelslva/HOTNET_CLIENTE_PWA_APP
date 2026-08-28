@@ -7,7 +7,7 @@ import { ToastProvider } from '../components/Toast/ToastContext'
 import * as apiSuporte from '../api/suporte'
 import type { CategoriaDto, TicketDto } from '../api/client'
 
-vi.mock('../auth/SessionContext', () => ({
+vi.mock('../auth/useSessao', () => ({
   useSessao: () => ({ cpf: '12345678900' }),
 }))
 

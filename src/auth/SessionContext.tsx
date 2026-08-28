@@ -1,25 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { aoExpirarSessao, buscarCadastroInfo, login as apiLogin, logout as apiLogout } from '../api/client'
-import { useToast } from '../components/Toast/ToastContext'
-
-interface SessionState {
-  logado: boolean
-  // true só durante a checagem inicial de sessão (ver useEffect abaixo) —
-  // enquanto isso as rotas protegidas esperam em vez de já mandar pro
-  // login (ver RotaProtegida.tsx).
-  verificando: boolean
-  carregando: boolean
-  erro: string | null
-  // CPF/CNPJ (só dígitos) usado no login — guardado em memória (nunca em
-  // localStorage/sessionStorage) só pra resolver o client_pk ao abrir um
-  // chamado de suporte, igual ao SessionManager.getSavedUsername() do
-  // app Android.
-  cpf: string | null
-  entrar: (usuario: string, senha: string) => Promise<boolean>
-  sair: () => Promise<void>
-}
-
-const SessionContext = createContext<SessionState | null>(null)
+import { useToast } from '../components/Toast/useToast'
+import { SessionContext } from './session-context'
 
 /**
  * Estado de sessão simples, só em memória (igual ao SessaoAppState do app
@@ -117,10 +99,4 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       {children}
     </SessionContext.Provider>
   )
-}
-
-export function useSessao(): SessionState {
-  const contexto = useContext(SessionContext)
-  if (!contexto) throw new Error('useSessao precisa estar dentro de <SessionProvider>')
-  return contexto
 }
