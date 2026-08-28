@@ -8,8 +8,8 @@ renovação automática) — pergunta o domínio e se é Apache ou Nginx, e não
 mexe em nenhum vhost já existente no servidor:
 
 ```bash
-git clone https://github.com/jmanoelslva/web-app-hotnet.git
-sudo bash web-app-hotnet/deploy/install.sh
+git clone https://github.com/jmanoelslva/HOTNET_WEB_APP.git
+sudo bash HOTNET_WEB_APP/deploy/install.sh
 ```
 
 Rodar de novo (mesmo servidor, mesmo domínio) atualiza o portal: puxa o
