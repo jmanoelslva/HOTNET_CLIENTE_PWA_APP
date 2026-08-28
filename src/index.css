@@ -53,20 +53,17 @@
 
   /* Largura do conteúdo principal (container centralizado de cada tela,
      inclusive a barra de navegação inferior) — um token só, em vez do
-     mesmo "max-width: 640px" repetido em cada arquivo de página, pra
-     mudar a largura em todo o app editando um lugar só.
-     clamp(640px, 90vw, 900px): em vez de "pular" de valor em breakpoints
-     fixos (o que antes gerava um salto brusco em 768px/1024px), o meio
-     do clamp (90vw) lê a largura real da tela reportada pelo navegador
-     e escala com ela de forma contínua — qualquer tela, não só as que
-     bateram num breakpoint testado. Os 640px/900px são só piso e teto
-     (não item pra travar valor, e sim pra não deixar o conteúdo menor
-     que o próprio celular nem maior que uma medida confortável de
-     leitura num monitor ultrawide). O "min(100%, ...)" por fora garante
-     que em telas bem estreitas (celular) o resultado nunca passe da
-     largura real disponível — sem ele, o clamp sozinho poderia manter o
-     piso de 640px mesmo numa tela de 320px e estourar a largura. */
-  --largura-conteudo: min(100%, clamp(640px, 90vw, 900px));
+     mesmo "max-width" repetido em cada arquivo de página, pra mudar a
+     largura em todo o app editando um lugar só.
+     100% de propósito: a barra de navegação inferior e o cabeçalho de
+     cada tela precisam preencher a tela de ponta a ponta em QUALQUER
+     tamanho/orientação (retrato, paisagem, tablet, navegador largo) —
+     um valor menor que 100% (ex: um teto fixo tipo 900px) deixa sobra
+     vazia nas bordas em telas largas, que é exatamente o que não pode
+     acontecer aqui. O espaçamento lateral em telas grandes continua
+     vindo só do padding de cada "-tela" (20-24px), igual em qualquer
+     tamanho de tela — não deste token. */
+  --largura-conteudo: 100%;
 }
 
 /* Tema escuro — dirigido só pelo atributo data-theme no <html>, nunca
