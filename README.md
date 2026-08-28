@@ -367,6 +367,18 @@ com um app nativo do que um site comum:
   `React.lazy` em `App.tsx`, dentro de um único `<Suspense>` (fallback:
   `Spinner tela`). Em vez de um bundle JS inicial só, o cliente baixa
   apenas o código da tela que está acessando.
+- **Home sem altura travada** (`src/pages/Home.css`) — bug real: a tela
+  chegou a ter `height: 100dvh` (descontando a barra inferior) com
+  `overflow: hidden`, numa tentativa de evitar uma sobra cosmética de
+  scroll quando o conteúdo já cabia na tela. Em retrato o conteúdo cabia
+  e o corte passava despercebido, mas em **paisagem** (celular deitado) a
+  altura disponível cai bastante e a grade de 6 itens do menu passava a
+  ficar cortada, sem nenhum jeito de rolar até o resto — a barra de
+  navegação inferior continuava normal por ser `position: fixed`, fora
+  dessa caixa, o que mascarava o problema. Corrigido removendo a altura
+  fixa e o `overflow: hidden`: a Home agora flui e rola pelo `body`, igual
+  a todas as outras telas (Boletos, Contratos etc.), que nunca tiveram
+  esse problema.
 
 ## Testes e CI
 

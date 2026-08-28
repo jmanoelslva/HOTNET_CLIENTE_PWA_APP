@@ -1,11 +1,12 @@
 .home-tela {
-  /* Trava a altura no espaço realmente visível (descontando os 64px que o
-     body reserva pra barra de navegação fixa, ver index.css) — sem isso
-     a página fica 64px mais alta que a viewport e sempre sobra rolagem,
-     mesmo com o conteúdo cabendo à vontade. */
-  height: calc(100vh - 64px);
-  height: calc(100dvh - 64px);
-  overflow: hidden;
+  /* Sem altura fixa nem "overflow: hidden" aqui — mesmo padrão das demais
+     telas (Boletos, Contratos, etc.), que deixam o body rolar sozinho.
+     Uma altura travada em 100dvh cortava o menu sem dar nenhum jeito de
+     rolar até o resto quando o conteúdo não cabia na altura disponível
+     (bug real: celular deitado/paisagem tem bem menos altura que em pé,
+     e a grade de 6 itens do menu passava a ficar cortada e inacessível,
+     embora a barra de navegação inferior — fixa, fora desta tela —
+     continuasse funcionando normalmente). */
   background: var(--cor-fundo);
 }
 
