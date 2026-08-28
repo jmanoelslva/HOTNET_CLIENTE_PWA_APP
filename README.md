@@ -309,7 +309,12 @@ com um app nativo do que um site comum:
   toda vez que o app volta a primeiro plano (`visibilitychange`, mesmo
   padrão já usado pra retomar o polling do chat em
   `DetalheChamado.tsx`) — checa por versão nova toda vez que o cliente
-  volta a usar o app, não só uma vez por dia.
+  volta a usar o app, não só uma vez por dia. O puxar-pra-atualizar
+  (`PullToRefresh.tsx`) também dispara essa mesma checagem em paralelo à
+  atualização de dados da própria tela — silenciosa (quem avisa achou
+  versão nova é a faixa de "Nova versão disponível" de qualquer forma),
+  mas dá ao cliente um jeito manual e explícito de pedir a checagem na
+  hora, em vez de só esperar o app voltar a primeiro plano sozinho.
 - **Barra de navegação inferior** (`BottomNav`) fixa nas telas
   autenticadas, com atalho colorido pras 5 telas mais usadas.
 - **Confirmação antes de sair** (`ModalConfirmarLogout.tsx`) — os dois

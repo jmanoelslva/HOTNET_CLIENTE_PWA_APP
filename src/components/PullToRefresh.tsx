@@ -70,6 +70,20 @@ export default function PullToRefresh({ aoAtualizar, children }: Props) {
         if (atual < LIMITE_ACIONAR_PX) return 0
         atualizandoRef.current = true
         setAtualizando(true)
+        // Aproveita o gesto de puxar-pra-atualizar (presente em quase
+        // toda tela autenticada) pra também checar se existe uma versão
+        // nova do app — complementa a checagem automática ao voltar a
+        // primeiro plano (StatusBanners.tsx, ver README "Critério de
+        // checagem por versão nova"): aqui é o cliente pedindo uma
+        // atualização explicitamente, então vale ignorar o mesmo limite
+        // de ~24h do navegador. Roda em paralelo, sem bloquear nem
+        // depender do resultado da atualização de dados da própria tela
+        // — "silenciosa": se achar versão nova, quem avisa é a faixa de
+        // "Nova versão disponível" (StatusBanners), não este componente.
+        navigator.serviceWorker
+          ?.getRegistration()
+          .then((registration) => registration?.update())
+          .catch(() => {})
         aoAtualizarRef.current().finally(() => {
           atualizandoRef.current = false
           setAtualizando(false)
