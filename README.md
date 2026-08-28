@@ -188,6 +188,27 @@ Todas as telas principais implementadas e validadas contra o backend real:
   do servidor — ver `pendentes` em `DetalheChamado.tsx`), anexos
   (foto/câmera, galeria ou arquivo, com miniatura pra imagem/PDF) e
   compartilhamento de localização.
+  - A paginação de chamados (`buscarChamados`) não filtra por status no
+    backend — trás todos, e a aba Abertos/Resolvidos só filtra o que já
+    foi carregado. Por isso o aviso de "nenhum chamado" só é definitivo
+    quando não há mais páginas a buscar (`haMaisParaCarregar` em
+    `Suporte.tsx`); enquanto houver, mostra um aviso provisório ao lado
+    do botão "Carregar mais" em vez de afirmar que não existe nenhum
+    (bug real: uma aba podia aparecer vazia só porque os chamados
+    daquele tipo ainda não tinham sido trazidos do servidor).
+  - `buscarCategorias()` falhando no carregamento inicial não trava mais
+    a abertura de chamados pro resto da sessão — `abrirDialog()` tenta
+    de novo (e seleciona a primeira categoria assim que a lista chegar)
+    toda vez que o cliente toca em "Novo chamado" com a lista ainda
+    vazia.
+  - O polling do chat (10s, `DetalheChamado.tsx`) pausa com a aba/app em
+    segundo plano (`document.visibilityState`) e busca na hora — não só
+    no próximo tick — ao voltar ao primeiro plano, pra não gastar dados
+    e bateria à toa minimizado (público de um portal de cliente de
+    internet costuma estar numa conexão instável).
+  - A lista de mensagens tem `role="log"`/`aria-live="polite"` — leitor
+    de tela anuncia mensagens novas chegando via polling sem o cliente
+    precisar navegar até lá pra descobrir que a equipe respondeu.
 - **Avisos** — gate obrigatório em tela cheia quando há avisos não
   confirmados (mesmo comportamento do `AvisoActivity` do app Android).
 - **Meus dados** — informações pessoais, contato e endereços.
@@ -359,8 +380,14 @@ Testes em `*.test.ts(x)` ao lado do arquivo testado (`vitest` +
 `@testing-library/react`, config em `vitest.config.ts`). Cobertura
 propositalmente focada no que é mais arriscado quebrar em silêncio, não
 exaustiva: a lógica de sessão expirada em `src/api/client.ts` (o quirk do
-401/"Login Failure", ver acima), `ErrorBoundary`, `StatusBanners` e
-`useOnline`.
+401/"Login Failure", ver acima), `ErrorBoundary`, `StatusBanners`,
+`useOnline` e — na tela de Suporte, ver detalhes acima — o retry de
+categorias, o estado vazio condicionado a `haMaisParaCarregar` e o
+casamento 1-pra-1 de mensagens otimistas (`descartarPendentesConfirmadas`
+em `src/api/suporte.ts`, testado isolado e também via `DetalheChamado.tsx`
+com timers falsos pra simular o polling em segundo plano).
 
-`.github/workflows/ci.yml` roda lint + testes + build a cada push/PR pra
-`master`.
+`.github/workflows/ci.yml` roda `npm audit --audit-level=high` + lint +
+testes + build a cada push/PR pra `master` — falha o build em
+vulnerabilidade alta/crítica nova numa dependência (moderadas/baixas não
+quebram o CI, pra não gerar ruído em achados sem correção disponível).

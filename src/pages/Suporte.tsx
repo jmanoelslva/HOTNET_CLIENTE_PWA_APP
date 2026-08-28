@@ -102,6 +102,17 @@ export default function Suporte() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Se o diálogo já estiver aberto quando o retry de categorias (ver
+  // abrirDialog) terminar de carregar, seleciona a primeira automaticamente
+  // — sem isso, a lista aparece no dropdown mas nada fica pré-selecionado,
+  // e "categoriaPk" continua null (bloqueando o envio) até o cliente abrir
+  // o dropdown manualmente.
+  useEffect(() => {
+    if (dialogAberto && categoriaPk == null && categorias.length > 0) {
+      setCategoriaPk(categorias[0].category_pk)
+    }
+  }, [categorias, dialogAberto, categoriaPk])
+
   async function carregarCategorias() {
     try {
       setCategorias(await buscarCategorias())

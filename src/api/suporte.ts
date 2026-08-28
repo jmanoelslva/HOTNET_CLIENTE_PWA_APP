@@ -119,6 +119,29 @@ export async function buscarOperacoes(ticketPk: number): Promise<OperacaoChamado
   return operacoes.sort((a, b) => (a.dataCriacao ?? '').localeCompare(b.dataCriacao ?? ''))
 }
 
+/**
+ * Remove de "pendentes" (mensagens otimistas, ver DetalheChamado.tsx) as
+ * que já foram confirmadas em "dados" — casamento 1-pra-1 por texto (a
+ * pendente não tem opPk real, só o texto pra comparar). Cada operação
+ * confirmada do cliente "consome" no máximo uma pendente com o mesmo
+ * texto: um "some()" simples removeria TODAS as pendentes com aquele
+ * texto de uma vez, mesmo com só uma confirmação — bug real quando o
+ * mesmo texto é enviado mais de uma vez antes do servidor confirmar a
+ * primeira.
+ */
+export function descartarPendentesConfirmadas(
+  pendentes: OperacaoChamado[],
+  dados: OperacaoChamado[],
+): OperacaoChamado[] {
+  const usados = new Set<number>()
+  for (const d of dados) {
+    if (!d.doCliente) continue
+    const indice = pendentes.findIndex((p, i) => !usados.has(i) && p.texto === d.texto)
+    if (indice !== -1) usados.add(indice)
+  }
+  return pendentes.filter((_, i) => !usados.has(i))
+}
+
 export async function enviarMensagem(ticketPk: number, texto: string): Promise<void> {
   const resposta = await criarOperacaoChamado(ticketPk, texto)
   if (resposta.success === false) {

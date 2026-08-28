@@ -14,6 +14,7 @@ import EstadoVazio from '../components/EstadoVazio'
 import {
   buscarOperacoes,
   chamadoResolvido,
+  descartarPendentesConfirmadas,
   ehArquivoDeImagem,
   ehArquivoDeVideo,
   ehArquivoPdf,
@@ -78,11 +79,35 @@ export default function DetalheChamado() {
   // desatualizado, já que o efeito só reagenda quando "pk" muda).
   const qtdMensagensRef = useRef(0)
 
+  // Pausa o polling com a aba/app em segundo plano (document.hidden) —
+  // sem isso, o app continua gastando dados/bateria a cada 10s mesmo
+  // minimizado, o que pesa mais pra quem já está numa conexão ruim
+  // (justamente o público de um portal de cliente de internet). Ao voltar
+  // pro primeiro plano, busca na hora (não espera o próximo tick) e
+  // retoma o intervalo.
   useEffect(() => {
     if (!Number.isFinite(pk)) return
     carregar(true)
-    const intervalo = setInterval(() => carregar(false), INTERVALO_ATUALIZACAO_MS)
-    return () => clearInterval(intervalo)
+    let intervalo: ReturnType<typeof setInterval> | null =
+      document.visibilityState === 'visible' ? setInterval(() => carregar(false), INTERVALO_ATUALIZACAO_MS) : null
+
+    function aoMudarVisibilidade() {
+      if (document.visibilityState === 'visible') {
+        if (intervalo == null) {
+          carregar(false)
+          intervalo = setInterval(() => carregar(false), INTERVALO_ATUALIZACAO_MS)
+        }
+      } else if (intervalo != null) {
+        clearInterval(intervalo)
+        intervalo = null
+      }
+    }
+
+    document.addEventListener('visibilitychange', aoMudarVisibilidade)
+    return () => {
+      if (intervalo != null) clearInterval(intervalo)
+      document.removeEventListener('visibilitychange', aoMudarVisibilidade)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pk])
 
@@ -93,21 +118,7 @@ export default function DetalheChamado() {
       const chegouMensagemNova = dados.length > qtdMensagensRef.current
       qtdMensagensRef.current = dados.length
       setOperacoes(dados)
-      // O servidor já confirmou essas mensagens — descarta as otimistas
-      // correspondentes (por texto, já que a temporária não tem opPk real)
-      // pra não duplicar na tela. Casamento 1-pra-1 (cada operação
-      // confirmada "consome" no máximo uma pendente com o mesmo texto):
-      // se o cliente mandou o mesmo texto duas vezes seguidas, um simples
-      // "some()" removeria as DUAS pendentes ao ver só UMA confirmação.
-      setPendentes((atual) => {
-        const usados = new Set<number>()
-        for (const d of dados) {
-          if (!d.doCliente) continue
-          const indice = atual.findIndex((p, i) => !usados.has(i) && p.texto === d.texto)
-          if (indice !== -1) usados.add(indice)
-        }
-        return atual.filter((_, i) => !usados.has(i))
-      })
+      setPendentes((atual) => descartarPendentesConfirmadas(atual, dados))
       setErro(null)
       // Só rola pro fim na carga inicial ou quando chega mensagem nova —
       // nas atualizações silenciosas de fundo (a cada 10s) sem novidade,
@@ -222,7 +233,10 @@ export default function DetalheChamado() {
         )}
       </header>
 
-      <div className="detalhe-chat">
+      {/* role="log" + aria-live: leitor de tela anuncia mensagens novas
+          chegando via polling, sem precisar o cliente ficar navegando pra
+          "descobrir" que a equipe respondeu. */}
+      <div className="detalhe-chat" role="log" aria-live="polite" aria-relevant="additions">
         {carregando &&
           [0, 1, 2].map((indice) => (
             <div key={indice} className={`balao-linha ${indice === 1 ? 'linha-equipe' : 'linha-cliente'}`}>
