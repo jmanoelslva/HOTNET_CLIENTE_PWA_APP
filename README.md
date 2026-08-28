@@ -379,6 +379,29 @@ com um app nativo do que um site comum:
   fixa e o `overflow: hidden`: a Home agora flui e rola pelo `body`, igual
   a todas as outras telas (Boletos, Contratos etc.), que nunca tiveram
   esse problema.
+- **Barra de navegação e conteúdo de ponta a ponta em qualquer tela**
+  (`--largura-conteudo` em `src/index.css`) — a largura do container
+  centralizado de cada tela (e da barra de navegação inferior) vem de um
+  token só, referenciado via `max-width: var(--largura-conteudo)` em vez
+  de repetir o valor em cada arquivo de página. Hoje é `100%`: bug real,
+  em duas rodadas — a largura ficava travada em `640px` fixo, então em
+  qualquer tela mais larga que isso (tablet, celular deitado, navegador)
+  sobrava vazio nas bordas da barra de navegação e do cabeçalho em vez de
+  preencher a tela inteira; só o retrato do celular (mais estreito que o
+  limite) não mostrava o problema. Uma primeira correção trocou o valor
+  fixo por um teto maior (depois por um `clamp()` baseado em `vw`, pra
+  escalar contínuo com a tela em vez de saltar em breakpoints) — mas
+  qualquer teto, por maior que fosse, ainda deixava sobra em telas bem
+  largas. A versão final abandona qualquer teto: `100%`, sem breakpoint
+  nenhum, com o espaçamento lateral vindo só do padding fixo (20-24px) de
+  cada `-tela`, igual em qualquer tamanho/orientação de tela.
+- **Título de seção fora do card em "Meus dados"** (`src/pages/Cadastro.tsx`)
+  — a seção de Endereço tinha um título solto ("Endereço") por fora de
+  qualquer card, diferente de "Informações pessoais" e "Contato" (título
+  dentro do card branco) — destoava do resto da tela. Removido: cada
+  card de endereço já tem seu próprio título explícito (identificação do
+  endereço, ou "Endereço padrão"/"Endereço N"), então o título de seção
+  por fora era só redundante.
 
 ## Testes e CI
 
