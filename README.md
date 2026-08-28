@@ -297,6 +297,19 @@ com um app nativo do que um site comum:
   clientsClaim: true` faz ele assumir o controle das abas JÁ abertas na
   hora (a próxima requisição delas já passa pelo novo), em vez de só
   nas próximas abas/navegações.
+- **Critério de checagem por versão nova** — o navegador sozinho só
+  checa o `sw.js` de novo a cada navegação, e mesmo assim no máximo 1x a
+  cada ~24h (limite do próprio spec de Service Worker, não configurável
+  por código nenhum). Um cliente que abre o app, o sistema suspende em
+  segundo plano, e volta a primeiro plano horas depois — sem uma
+  navegação nova de verdade — podia nunca disparar essa checagem, mesmo
+  dentro da mesma janela de 24h de um deploy novo. `StatusBanners.tsx`
+  chama `registration.update()` manualmente (ignora o limite de 24h) no
+  callback `onRegisteredSW` do `useRegisterSW`, ao registrar e de novo
+  toda vez que o app volta a primeiro plano (`visibilitychange`, mesmo
+  padrão já usado pra retomar o polling do chat em
+  `DetalheChamado.tsx`) — checa por versão nova toda vez que o cliente
+  volta a usar o app, não só uma vez por dia.
 - **Barra de navegação inferior** (`BottomNav`) fixa nas telas
   autenticadas, com atalho colorido pras 5 telas mais usadas.
 - **Confirmação antes de sair** (`ModalConfirmarLogout.tsx`) — os dois

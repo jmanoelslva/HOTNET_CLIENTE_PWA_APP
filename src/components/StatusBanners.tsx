@@ -12,7 +12,30 @@ import './StatusBanners.css'
  */
 export default function StatusBanners() {
   const online = useOnline()
-  const { needRefresh: [precisaAtualizar], updateServiceWorker } = useRegisterSW()
+  const {
+    needRefresh: [precisaAtualizar],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegisteredSW(_url, registration) {
+      if (!registration) return
+      // Por padrão, o navegador só checa o sw.js sozinho a cada
+      // navegação — e mesmo assim, no máximo 1x a cada ~24h (limite do
+      // próprio spec de Service Worker, não configurável). Um cliente
+      // que abre o app, o SO suspende em segundo plano, e volta a
+      // primeiro plano horas depois (sem uma navegação nova de verdade)
+      // podia nunca disparar essa checagem, mesmo dentro da mesma janela
+      // de 24h de um deploy novo. registration.update() ignora esse
+      // limite de 24h — chamado aqui ao registrar e de novo toda vez que
+      // o app volta a primeiro plano (mesmo padrão de retomar em
+      // primeiro plano já usado no polling do chat, ver
+      // DetalheChamado.tsx), o app checa por uma versão nova sempre que
+      // o cliente efetivamente volta a usá-lo, não só uma vez por dia.
+      registration.update()
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') registration.update()
+      })
+    },
+  })
 
   if (!online) {
     return (
