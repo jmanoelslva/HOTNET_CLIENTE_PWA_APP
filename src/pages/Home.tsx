@@ -240,7 +240,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <MdSpeed size={16} /> Testar velocidade da internet
+            <MdSpeed size={16} /> Teste de Velocidade
           </a>
           {consumoContratos.length > 1 && (
             <select

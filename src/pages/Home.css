@@ -175,8 +175,11 @@
   height: 36px;
   padding: 0 14px;
   border-radius: 18px;
-  border: 1px solid var(--cor-borda);
-  color: var(--cor-texto-secundario);
+  /* Sem fundo (background transparente, herdado por padrão) — só a
+     borda e o texto/ícone (via currentColor) na cor do Consumo, mesma
+     linguagem visual do ícone de Consumo no menu da Home. */
+  border: 1.5px solid var(--cor-consumo);
+  color: var(--cor-consumo);
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;
