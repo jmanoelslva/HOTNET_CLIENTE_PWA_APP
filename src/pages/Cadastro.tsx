@@ -117,44 +117,41 @@ export default function Cadastro() {
             ]}
           />
 
-          <div className="cadastro-secao-endereco">
-            <span className="cadastro-secao-titulo">Endereço</span>
-            {enderecos.length === 0 ? (
-              <p className="cadastro-endereco-indisponivel">Endereço indisponível no momento.</p>
-            ) : (
-              enderecos.map((endereco, indice) => {
-                const titulo = endereco.identificacao?.trim()
-                  ? endereco.identificacao
-                  : endereco.padrao
-                    ? 'Endereço padrão'
-                    : `Endereço ${indice + 1}`
-                const logradouro = [endereco.logradouro, endereco.numero ? `nº ${endereco.numero}` : null]
-                  .filter(Boolean)
-                  .join(', ')
-                const cidadeUf = [endereco.cidade, endereco.estado].filter(Boolean).join(' - ')
+          {enderecos.length === 0 ? (
+            <p className="cadastro-endereco-indisponivel">Endereço indisponível no momento.</p>
+          ) : (
+            enderecos.map((endereco, indice) => {
+              const titulo = endereco.identificacao?.trim()
+                ? endereco.identificacao
+                : endereco.padrao
+                  ? 'Endereço padrão'
+                  : `Endereço ${indice + 1}`
+              const logradouro = [endereco.logradouro, endereco.numero ? `nº ${endereco.numero}` : null]
+                .filter(Boolean)
+                .join(', ')
+              const cidadeUf = [endereco.cidade, endereco.estado].filter(Boolean).join(' - ')
 
-                return (
-                  <div className="cadastro-card" key={endereco.addressPk || indice}>
-                    <span className="cadastro-card-titulo cadastro-endereco-titulo">{titulo}</span>
-                    {[
-                      { label: 'Logradouro', value: logradouro || null },
-                      { label: 'Bairro', value: endereco.bairro },
-                      { label: 'CEP', value: endereco.cep },
-                      { label: 'Cidade / UF', value: cidadeUf || null },
-                      { label: 'Complemento', value: endereco.complemento },
-                    ]
-                      .filter((linha) => linha.value?.trim())
-                      .map((linha, i) => (
-                        <div className="cadastro-linha" key={i}>
-                          <span>{linha.label}</span>
-                          <strong>{linha.value}</strong>
-                        </div>
-                      ))}
-                  </div>
-                )
-              })
-            )}
-          </div>
+              return (
+                <div className="cadastro-card" key={endereco.addressPk || indice}>
+                  <span className="cadastro-card-titulo cadastro-endereco-titulo">{titulo}</span>
+                  {[
+                    { label: 'Logradouro', value: logradouro || null },
+                    { label: 'Bairro', value: endereco.bairro },
+                    { label: 'CEP', value: endereco.cep },
+                    { label: 'Cidade / UF', value: cidadeUf || null },
+                    { label: 'Complemento', value: endereco.complemento },
+                  ]
+                    .filter((linha) => linha.value?.trim())
+                    .map((linha, i) => (
+                      <div className="cadastro-linha" key={i}>
+                        <span>{linha.label}</span>
+                        <strong>{linha.value}</strong>
+                      </div>
+                    ))}
+                </div>
+              )
+            })
+          )}
         </>
       )}
     </div>

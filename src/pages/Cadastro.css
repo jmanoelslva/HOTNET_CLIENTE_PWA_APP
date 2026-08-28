@@ -68,14 +68,6 @@
   text-align: right;
 }
 
-.cadastro-secao-titulo {
-  display: block;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--cor-texto);
-  margin: 8px 0 12px;
-}
-
 .cadastro-endereco-indisponivel {
   color: var(--cor-texto-terciario);
   font-size: 13px;
