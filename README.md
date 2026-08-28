@@ -2,7 +2,7 @@
 
 Portal do cliente HOTNET em formato web, para hospedagem em servidor
 próprio da empresa sob o domínio `cliente.hotnet.net.br`. Reaproveita o
-mesmo backend Controllr/BRbyte (`hotnet.net.br`) já usado pelo app Android,
+mesmo backend Controllr/BRbyte (`controllr.hotnet.net.br`) já usado pelo app Android,
 mas é um projeto novo e independente — nenhum código do app Android é
 compartilhado.
 
@@ -49,7 +49,7 @@ o cookie manualmente em `localStorage`/`sessionStorage`.
 
 O navegador só fala com o próprio servidor do Vite (`localhost:5173` ou o
 IP da rede local, ver "Rodando localmente" acima). O `vite.config.ts`
-repassa `/api/*` para `https://hotnet.net.br` por baixo (`server.proxy`),
+repassa `/api/*` para `https://controllr.hotnet.net.br` por baixo (`server.proxy`),
 reescrevendo o domínio do cookie de sessão pra bater com o host que o
 navegador *realmente* usou pra acessar o Vite (`req.headers.host`, sem
 porta) — não um valor fixo. Isso é o que permite abrir o portal tanto por
@@ -81,25 +81,25 @@ caso. Mantém tudo na mesma origem do ponto de vista do navegador, sem CORS.
 
 ### Reverse proxy em produção (obrigatório)
 
-Em produção, `cliente.hotnet.net.br` e `hotnet.net.br` são domínios
+Em produção, `cliente.hotnet.net.br` e `controllr.hotnet.net.br` são domínios
 diferentes — o navegador não vai aceitar nem enviar o cookie de sessão
 entre eles sem ajuda. O servidor web real (Apache/Nginx) que hospedar este
 build **precisa** fazer o mesmo reverse proxy do Vite:
 
-- Repassar tudo em `/api/*` para `https://hotnet.net.br/*` (removendo o
+- Repassar tudo em `/api/*` para `https://controllr.hotnet.net.br/*` (removendo o
   prefixo `/api`).
-- Reescrever o domínio do cookie de sessão (`Set-Cookie`) de `hotnet.net.br`
+- Reescrever o domínio do cookie de sessão (`Set-Cookie`) de `controllr.hotnet.net.br`
   para `cliente.hotnet.net.br`, equivalente ao `cookieDomainRewrite` do
-  Vite (no Nginx isso é `proxy_cookie_domain hotnet.net.br
+  Vite (no Nginx isso é `proxy_cookie_domain controllr.hotnet.net.br
   cliente.hotnet.net.br;`).
 - Preservar `Content-Type: application/x-www-form-urlencoded` e cookies de
   requisição (`proxy_set_header Cookie $http_cookie;`).
-- Repassar também `/public/*` e `/common/*` pra `https://hotnet.net.br`
+- Repassar também `/public/*` e `/common/*` pra `https://controllr.hotnet.net.br`
   (sem cortar o prefixo, ao contrário de `/api`) — páginas geradas pelo
   próprio backend, como o layout de impressão do boleto
   (`invoice_ctl/invoice/print_layout`), referenciam logo/ícones com
   caminho absoluto (ex: `/public/assets/uploaddir/logo/office/1/logo.png`)
-  esperando estar em `hotnet.net.br`. Sem isso, essas imagens quebram.
+  esperando estar em `controllr.hotnet.net.br`. Sem isso, essas imagens quebram.
 - Repassar `/assets/*` também — mas só como **fallback**: a tela de
   impressão do CONTRATO usa esse mesmo caminho pro logo (sem o prefixo
   `/public` que o boleto usa), só que `/assets/` é também onde o

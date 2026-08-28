@@ -1,7 +1,7 @@
 # Exemplo de VirtualHost Apache para cliente.hotnet.net.br
 #
 # Serve o build estático do Vite (npm run build -> dist/) e faz o reverse
-# proxy de /api/* para o backend real (hotnet.net.br), reescrevendo o
+# proxy de /api/* para o backend real (controllr.hotnet.net.br), reescrevendo o
 # domínio do cookie de sessão (ver README.md, seção "Reverse proxy em
 # produção"). Requer os módulos: proxy, proxy_http, headers, rewrite,
 # ssl (a2enmod proxy proxy_http headers rewrite ssl).
@@ -81,7 +81,7 @@
         # seus arquivos (JS/CSS com hash). Serve o arquivo local se ele
         # existir; só repassa pro backend (via proxy) quando não existir.
         RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
-        RewriteRule ^assets/(.*)$ https://hotnet.net.br/assets/$1 [P,L]
+        RewriteRule ^assets/(.*)$ https://controllr.hotnet.net.br/assets/$1 [P,L]
 
         # SPA: qualquer rota que não bata em um arquivo real cai no
         # index.html (o roteamento de fato acontece no react-router-dom).
@@ -124,29 +124,29 @@
     # cabeçalho vindo do IP deste servidor (não é algo deste repositório).
     RequestHeader set X-Real-IP "%{REMOTE_ADDR}e"
 
-    ProxyPass        /api/ https://hotnet.net.br/
-    ProxyPassReverse /api/ https://hotnet.net.br/
+    ProxyPass        /api/ https://controllr.hotnet.net.br/
+    ProxyPassReverse /api/ https://controllr.hotnet.net.br/
 
     # Páginas geradas pelo próprio backend (ex: o layout de impressão do
     # boleto, invoice_ctl/invoice/print_layout, servido via /api acima)
     # referenciam logo/ícones com caminho absoluto (ex:
     # "/public/assets/uploaddir/logo/office/1/logo.png"), esperando estar
-    # em hotnet.net.br — sem repassar essas duas rotas também, essas
+    # em controllr.hotnet.net.br — sem repassar essas duas rotas também, essas
     # imagens quebram (o navegador tenta buscar no nosso próprio domínio).
     # Mesmo prefixo dos dois lados: preserva o path (sem cortar nada).
-    ProxyPass        /public/ https://hotnet.net.br/public/
-    ProxyPassReverse /public/ https://hotnet.net.br/public/
-    ProxyPass        /common/ https://hotnet.net.br/common/
-    ProxyPassReverse /common/ https://hotnet.net.br/common/
+    ProxyPass        /public/ https://controllr.hotnet.net.br/public/
+    ProxyPassReverse /public/ https://controllr.hotnet.net.br/public/
+    ProxyPass        /common/ https://controllr.hotnet.net.br/common/
+    ProxyPassReverse /common/ https://controllr.hotnet.net.br/common/
 
     # Reversão pro proxy via mod_rewrite [P] de /assets/ (ver o
     # RewriteRule dentro do <Directory> acima).
-    ProxyPassReverse /assets/ https://hotnet.net.br/assets/
+    ProxyPassReverse /assets/ https://controllr.hotnet.net.br/assets/
 
-    # OBRIGATÓRIO: reescreve o domínio do Set-Cookie de hotnet.net.br pra
+    # OBRIGATÓRIO: reescreve o domínio do Set-Cookie de controllr.hotnet.net.br pra
     # cliente.hotnet.net.br, senão o navegador descarta o cookie de sessão
     # (BRBOSCookie) por não bater com o domínio da página. "edit*" (em vez
     # de "edit") é necessário porque pode haver mais de um Set-Cookie por
     # resposta.
-    Header edit* Set-Cookie "domain=hotnet\.net\.br" "domain=cliente.hotnet.net.br"
+    Header edit* Set-Cookie "domain=controllr\.hotnet\.net\.br" "domain=cliente.hotnet.net.br"
 </VirtualHost>

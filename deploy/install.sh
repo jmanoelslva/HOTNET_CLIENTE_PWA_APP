@@ -11,7 +11,7 @@
 # Reaproveita a mesma lógica de proxy/cookie documentada no README.md
 # ("Reverse proxy em produção") e os vhosts de exemplo desta pasta
 # (nginx.conf.example / apache-vhost.conf.example) como template — só o
-# domínio do cliente é perguntado; o backend real (hotnet.net.br) fica fixo.
+# domínio do cliente é perguntado; o backend real (controllr.hotnet.net.br) fica fixo.
 
 set -euo pipefail
 
@@ -19,7 +19,7 @@ set -euo pipefail
 # Configuração fixa
 # --------------------------------------------------------------------------
 REPO_URL="https://github.com/jmanoelslva/web-app-hotnet.git"
-BACKEND_DOMAIN="hotnet.net.br"
+BACKEND_DOMAIN="controllr.hotnet.net.br"
 INSTALL_DIR="/opt/hotnet-web"
 ACME_WEBROOT="/var/www/certbot-acme"
 # jsdom (devDependency, só usado por "npm test" — nunca em produção) exige
@@ -52,7 +52,7 @@ cat <<'BANNER'
    1. Instalar dependências (Node.js, git, rsync, Apache ou Nginx, certbot)
    2. Clonar/atualizar o projeto e gerar o build de produção
    3. Publicar o build e configurar o servidor web com reverse proxy pro
-      backend Controllr/BRbyte (hotnet.net.br)
+      backend Controllr/BRbyte (controllr.hotnet.net.br)
    4. Emitir um certificado Let's Encrypt pro domínio informado e ativar
       a renovação automática
 

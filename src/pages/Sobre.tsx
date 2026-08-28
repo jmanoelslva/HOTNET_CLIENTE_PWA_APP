@@ -24,7 +24,7 @@ export default function Sobre() {
           <FaWhatsapp size={18} /> Falar com a gente
         </button>
 
-        <a className="sobre-link" href="https://hotnet.net.br/policies/privacy" target="_blank" rel="noreferrer">
+        <a className="sobre-link" href="https://controllr.hotnet.net.br/policies/privacy" target="_blank" rel="noreferrer">
           Política de Privacidade
         </a>
       </div>

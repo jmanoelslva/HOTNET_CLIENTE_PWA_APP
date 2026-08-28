@@ -1,10 +1,10 @@
 /**
- * Cliente HTTP pro backend Controllr/BRbyte (hotnet.net.br), reaproveitando
+ * Cliente HTTP pro backend Controllr/BRbyte (controllr.hotnet.net.br), reaproveitando
  * as mesmas particularidades já confirmadas e documentadas no app Android
  * (ver README do projeto Android, seção "Backend (Controllr/BRbyte)").
  *
  * Todas as chamadas passam por "/api/..." — em desenvolvimento, o proxy do
- * Vite (vite.config.ts) repassa pra hotnet.net.br; em produção, é o
+ * Vite (vite.config.ts) repassa pra controllr.hotnet.net.br; em produção, é o
  * servidor web (Apache/Nginx) que precisa fazer esse mesmo reverse proxy,
  * pra manter tudo na mesma origem do navegador e evitar problema de CORS
  * (ver README.md, seção "Deploy em produção").

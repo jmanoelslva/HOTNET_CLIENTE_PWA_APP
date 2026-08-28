@@ -45,12 +45,12 @@ export default defineConfig({
     host: true,
     proxy: {
       // Em desenvolvimento, o navegador só fala com o próprio servidor
-      // do Vite — ele repassa pra hotnet.net.br por baixo, então o
+      // do Vite — ele repassa pra controllr.hotnet.net.br por baixo, então o
       // cookie de sessão (BRBOSCookie) e a origem ficam consistentes,
       // sem problema de CORS. Em produção, isso precisa ser feito pelo
       // servidor real (Apache/Nginx) — ver README.md.
       '/api': {
-        target: 'https://hotnet.net.br',
+        target: 'https://controllr.hotnet.net.br',
         changeOrigin: true,
         secure: true,
         // Repassa o IP de origem do cliente pro backend (X-Forwarded-For/
@@ -81,17 +81,17 @@ export default defineConfig({
       // do boleto, invoice_ctl/invoice/print_layout, servido via /api)
       // referenciam logo/ícones com caminho absoluto (ex:
       // "/public/assets/uploaddir/logo/office/1/logo.png"), esperando
-      // estar em hotnet.net.br — sem repassar essas duas rotas também,
+      // estar em controllr.hotnet.net.br — sem repassar essas duas rotas também,
       // o navegador tenta buscar essas imagens no nosso próprio domínio
       // e elas quebram. Sem rewrite: mantém o path igual dos dois lados.
       '/public': {
-        target: 'https://hotnet.net.br',
+        target: 'https://controllr.hotnet.net.br',
         changeOrigin: true,
         secure: true,
         xfwd: true,
       },
       '/common': {
-        target: 'https://hotnet.net.br',
+        target: 'https://controllr.hotnet.net.br',
         changeOrigin: true,
         secure: true,
         xfwd: true,
@@ -106,7 +106,7 @@ export default defineConfig({
       // próprio enquanto roda em modo desenvolvimento (só na build final),
       // então repassar direto é seguro aqui.
       '/assets': {
-        target: 'https://hotnet.net.br',
+        target: 'https://controllr.hotnet.net.br',
         changeOrigin: true,
         secure: true,
         xfwd: true,

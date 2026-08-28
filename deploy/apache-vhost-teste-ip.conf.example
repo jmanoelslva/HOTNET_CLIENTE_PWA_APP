@@ -44,11 +44,11 @@
     # de desenvolvimento do Vite (vite.config.ts).
     SSLProxyEngine on
     ProxyPreserveHost off
-    ProxyPass        /api/ https://hotnet.net.br/
-    ProxyPassReverse /api/ https://hotnet.net.br/
+    ProxyPass        /api/ https://controllr.hotnet.net.br/
+    ProxyPassReverse /api/ https://controllr.hotnet.net.br/
 
-    # Reescreve o domínio do cookie de hotnet.net.br pro IP:porta atual.
-    Header edit* Set-Cookie "domain=hotnet\.net\.br" "domain=45.237.95.186"
+    # Reescreve o domínio do cookie de controllr.hotnet.net.br pro IP:porta atual.
+    Header edit* Set-Cookie "domain=controllr\.hotnet\.net\.br" "domain=45.237.95.186"
 
     # OBRIGATÓRIO nesse teste sem HTTPS: remove a flag "Secure" do
     # cookie — o navegador descarta cookies Secure recebidos numa

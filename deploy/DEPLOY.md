@@ -51,8 +51,8 @@ Ambos fazem as mesmas duas coisas, que são obrigatórias:
    react-router-dom funcionar em URLs como `/boletos`, `/contratos`, etc.
    — sem isso, recarregar a página numa rota interna dá 404).
 2. Fazem reverse proxy de `/api/*` pro backend real
-   (`https://hotnet.net.br`), reescrevendo o domínio do cookie de sessão
-   de `hotnet.net.br` pra `cliente.hotnet.net.br`. **Esse passo é o mais
+   (`https://controllr.hotnet.net.br`), reescrevendo o domínio do cookie de sessão
+   de `controllr.hotnet.net.br` pra `cliente.hotnet.net.br`. **Esse passo é o mais
    fácil de esquecer** — sem ele, o login até funciona (a primeira
    resposta chega normal), mas a sessão não se mantém entre requisições,
    porque o navegador descarta o cookie por domínio incompatível.
@@ -78,7 +78,7 @@ caminho padrão do Certbot. Sem HTTPS, o cookie de sessão do Controllr
       aceito com o domínio reescrito).
 - [ ] Abrir o DevTools → Application → Cookies e confirmar que o cookie
       de sessão aparece com o domínio `cliente.hotnet.net.br`, não
-      `hotnet.net.br`.
+      `controllr.hotnet.net.br`.
 - [ ] Testar "Ver boletos em PDF" e "Ver contrato completo" (abrem
       `/api/...` em nova aba) — confirma que o proxy também funciona
       fora das chamadas fetch/XHR.

@@ -240,7 +240,7 @@ export default function Home() {
       </button>
 
       <footer className="home-rodape">
-        <a href="https://hotnet.net.br/policies/privacy" target="_blank" rel="noreferrer">
+        <a href="https://controllr.hotnet.net.br/policies/privacy" target="_blank" rel="noreferrer">
           Política de Privacidade
         </a>
       </footer>
