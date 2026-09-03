@@ -25,7 +25,16 @@ import './Boletos.css'
 const CNPJ_FALLBACK = '17.659.900/0001-48'
 const LIMITE_PAGOS_PADRAO = 3
 
-type FiltroStatus = 'aberto' | 'pagos'
+type FiltroStatus = 'aberto' | 'atrasados' | 'pagos'
+
+function estaVencida(fatura: FaturaDto): boolean {
+  const dias = Number.parseInt(fatura.days_late ?? '', 10) || 0
+  return !fatura.invoice_date_credit && dias > 0
+}
+
+function formatarContagem(qtd: number): string {
+  return qtd > 99 ? '99+' : String(qtd)
+}
 
 function formatarValor(valorBruto: string | number | null | undefined): string {
   const valor = typeof valorBruto === 'number' ? valorBruto : Number.parseFloat(String(valorBruto ?? '0').replace(',', '.'))
@@ -127,12 +136,31 @@ export default function Boletos() {
     return [...mapa.entries()].sort((a, b) => a[1] - b[1])
   }, [faturas])
 
+  const porContrato = useMemo(
+    () => (filtroContrato != null ? faturas.filter((f) => f.contract_pk === filtroContrato) : faturas),
+    [faturas, filtroContrato],
+  )
+
+  // Contagens pras abas — respeitam o filtro de contrato, não o de status.
+  const contagens = useMemo(
+    () => ({
+      aberto: porContrato.filter((f) => !f.invoice_date_credit && !estaVencida(f)).length,
+      atrasados: porContrato.filter(estaVencida).length,
+      pagos: porContrato.filter((f) => !!f.invoice_date_credit).length,
+    }),
+    [porContrato],
+  )
+
   const faturasFiltradas = useMemo(() => {
-    const porContrato = filtroContrato != null ? faturas.filter((f) => f.contract_pk === filtroContrato) : faturas
-    return filtroStatus === 'aberto'
-      ? porContrato.filter((f) => !f.invoice_date_credit)
-      : porContrato.filter((f) => !!f.invoice_date_credit)
-  }, [faturas, filtroContrato, filtroStatus])
+    switch (filtroStatus) {
+      case 'aberto':
+        return porContrato.filter((f) => !f.invoice_date_credit && !estaVencida(f))
+      case 'atrasados':
+        return porContrato.filter(estaVencida)
+      case 'pagos':
+        return porContrato.filter((f) => !!f.invoice_date_credit)
+    }
+  }, [porContrato, filtroStatus])
 
   const faturasExibidas =
     filtroStatus === 'aberto' || mostrarTodosPagos ? faturasFiltradas : faturasFiltradas.slice(0, LIMITE_PAGOS_PADRAO)
@@ -193,13 +221,24 @@ export default function Boletos() {
           className={`aba-chip aba-aberto ${filtroStatus === 'aberto' ? 'ativa' : ''}`}
           onClick={() => trocarStatus('aberto')}
         >
-          Em aberto
+          <span className="aba-chip-texto">Em aberto</span>
+          {contagens.aberto > 0 && <span className="aba-chip-contagem">{formatarContagem(contagens.aberto)}</span>}
+        </button>
+        <button
+          className={`aba-chip aba-atrasados ${filtroStatus === 'atrasados' ? 'ativa' : ''}`}
+          onClick={() => trocarStatus('atrasados')}
+        >
+          <span className="aba-chip-texto">Atrasado</span>
+          {contagens.atrasados > 0 && (
+            <span className="aba-chip-contagem">{formatarContagem(contagens.atrasados)}</span>
+          )}
         </button>
         <button
           className={`aba-chip aba-pagos ${filtroStatus === 'pagos' ? 'ativa' : ''}`}
           onClick={() => trocarStatus('pagos')}
         >
-          Pagos
+          <span className="aba-chip-texto">Pago</span>
+          {contagens.pagos > 0 && <span className="aba-chip-contagem">{formatarContagem(contagens.pagos)}</span>}
         </button>
       </div>
 
@@ -241,8 +280,14 @@ export default function Boletos() {
       {!carregando && !erro && faturasFiltradas.length === 0 && (
         <EstadoVazio
           icone={MdPayments}
-          titulo={filtroStatus === 'aberto' ? 'Nenhum boleto em aberto' : 'Nenhum boleto pago'}
-          subtitulo={filtroStatus === 'aberto' ? 'Você está em dia por aqui.' : undefined}
+          titulo={
+            filtroStatus === 'aberto'
+              ? 'Nenhum boleto em aberto'
+              : filtroStatus === 'atrasados'
+                ? 'Nenhum boleto atrasado'
+                : 'Nenhum boleto pago'
+          }
+          subtitulo={filtroStatus !== 'pagos' ? 'Você está em dia por aqui.' : undefined}
         />
       )}
 
@@ -251,7 +296,7 @@ export default function Boletos() {
           {faturasExibidas.map((fatura) => {
             const paga = !!fatura.invoice_date_credit
             const dias = Number.parseInt(fatura.days_late ?? '', 10) || 0
-            const vencida = !paga && dias > 0
+            const vencida = estaVencida(fatura)
             const valorAtualizado = vencida ? calcularValorComEncargos(fatura) : null
             const jaInformado = informados.has(fatura.invoice_pk) || fatura.obs_pk != null
 

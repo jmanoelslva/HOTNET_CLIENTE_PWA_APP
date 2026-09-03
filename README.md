@@ -174,7 +174,7 @@ Todas as telas principais implementadas e validadas contra o backend real:
 - **Login/sessão** — autenticação, sessão em memória.
 - **Home** — saudação, botão de WhatsApp, menu de navegação para as
   demais telas.
-- **Boletos** — abas Em aberto/Pagos, filtro por contrato, cálculo de
+- **Boletos** — abas Em aberto/Atrasado/Pago com contagem por aba, filtro por contrato, cálculo de
   multa/juros para vencidos, copiar código de barras/PIX, QR Code,
   boleto em PDF, informar pagamento.
 - **Contratos** — descoberta via faturas (contract/list sem filtro pode
