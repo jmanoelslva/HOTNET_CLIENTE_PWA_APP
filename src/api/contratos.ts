@@ -10,6 +10,8 @@ export interface ItemServico {
   nome: string
   valor: string | null
   ehEquipamento: boolean
+  /** Conexão (cpe_pk) do item quando é o plano; ver vincularContratos em consumo.ts. */
+  cpePk: number | null
 }
 
 export interface Contrato {
@@ -21,6 +23,10 @@ export interface Contrato {
   valor: string | null
   plano: string | null
   itens: ItemServico[]
+  /** Dados na tela Contratos: some só com contract_client_show=false explícito. */
+  podeVerDados: boolean
+  /** "Ver contrato completo": some só com contract_client_print=false explícito. */
+  podeVerDocumento: boolean
 }
 
 async function detalhesSeguro(contractPk: number): Promise<ContratoDto | null> {
@@ -48,6 +54,7 @@ async function itensSeguro(contractPk: number): Promise<ItemServico[]> {
         nome,
         valor: dto.item_amount ?? null,
         ehEquipamento: dto.item_rent === true || dto.item_type === 5,
+        cpePk: dto.cpe_pk && dto.cpe_pk > 0 ? dto.cpe_pk : null,
       })
     }
     return itens
@@ -93,6 +100,8 @@ export async function buscarContratos(): Promise<Contrato[]> {
         valor: detalhes.contract_amount ?? detalhes.contract_value ?? null,
         plano,
         itens,
+        podeVerDados: detalhes.contract_client_show !== false,
+        podeVerDocumento: detalhes.contract_client_print !== false,
       }
     }),
   )

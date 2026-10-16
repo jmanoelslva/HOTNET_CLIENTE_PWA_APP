@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import type { IconType } from 'react-icons'
 import {
   MdAdd,
   MdCampaign,
   MdClose,
   MdConstruction,
-  MdExpandMore,
   MdPayments,
   MdSell,
   MdSupportAgent,
@@ -14,7 +13,19 @@ import {
   MdWarning,
 } from 'react-icons/md'
 import { useSessao } from '../auth/useSessao'
-import { buscarCategorias, buscarChamados, chamadoResolvido, abrirChamado as apiAbrirChamado } from '../api/suporte'
+import {
+  buscarCategorias,
+  buscarChamados,
+  chamadoResolvido,
+  abrirChamado as apiAbrirChamado,
+  type ChamadoCriado,
+} from '../api/suporte'
+import { buscarContratos } from '../api/contratos'
+import { buscarDadosCliente } from '../api/cadastro'
+import { contarBoletosAtrasados, situacaoDosContratos } from '../api/situacao'
+import ChecklistConexao from '../components/ChecklistConexao'
+import NovoChamado from '../components/NovoChamado'
+import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import type { CategoriaDto, TicketDto } from '../api/client'
 import CabecalhoTela from '../components/CabecalhoTela'
 import { useToast } from '../components/Toast/useToast'
@@ -89,29 +100,28 @@ export default function Suporte() {
 
   const [categorias, setCategorias] = useState<CategoriaDto[]>([])
   const [checklistAberto, setChecklistAberto] = useState(false)
-  const [dialogAberto, setDialogAberto] = useState(false)
-  const [categoriaPk, setCategoriaPk] = useState<number | null>(null)
-  const [categoriaMenuAberto, setCategoriaMenuAberto] = useState(false)
-  const [assunto, setAssunto] = useState('')
-  const [descricao, setDescricao] = useState('')
-  const [enviando, setEnviando] = useState(false)
+  const [novoChamadoAberto, setNovoChamadoAberto] = useState(false)
+  // Passos marcados no checklist de conexão: vão junto no texto do chamado.
+  const [passosFeitos, setPassosFeitos] = useState<string[]>([])
+  const [contratoStatus, setContratoStatus] = useState<number | null>(null)
+  const [boletosAtrasados, setBoletosAtrasados] = useState<number | null>(null)
+  const location = useLocation()
 
   useEffect(() => {
     carregar()
     carregarCategorias()
+    // Todos os contratos cancelados: atendimento só pelo WhatsApp (checklist e novo chamado).
+    buscarContratos()
+      .then((contratos) => setContratoStatus(situacaoDosContratos(contratos)))
+      .catch(() => setContratoStatus(null))
+    // "Diagnóstico" da Início → "abrir chamado": já chega no formulário, com os passos feitos.
+    const vindoDaInicio = location.state as { abrirNovoChamado?: boolean; passos?: string[] } | null
+    if (vindoDaInicio?.abrirNovoChamado) {
+      abrirNovoChamado(vindoDaInicio.passos ?? [])
+      navigate(location.pathname, { replace: true, state: null })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  // Se o diálogo já estiver aberto quando o retry de categorias (ver
-  // abrirDialog) terminar de carregar, seleciona a primeira automaticamente
-  // — sem isso, a lista aparece no dropdown mas nada fica pré-selecionado,
-  // e "categoriaPk" continua null (bloqueando o envio) até o cliente abrir
-  // o dropdown manualmente.
-  useEffect(() => {
-    if (dialogAberto && categoriaPk == null && categorias.length > 0) {
-      setCategoriaPk(categorias[0].category_pk)
-    }
-  }, [categorias, dialogAberto, categoriaPk])
 
   async function carregarCategorias() {
     try {
@@ -155,33 +165,35 @@ export default function Suporte() {
   // que os chamados desse tipo ainda não foram trazidos do servidor.
   const haMaisParaCarregar = chamados.length < totalNoServidor
 
-  function abrirDialog() {
-    if (categorias.length === 0) {
-      toast('Categorias não carregadas ainda, tente novamente em instantes.')
-      carregarCategorias()
-    }
-    setCategoriaPk(categorias[0]?.category_pk ?? null)
-    setCategoriaMenuAberto(false)
-    setAssunto('')
-    setDescricao('')
-    setDialogAberto(true)
+  function abrirChecklist() {
+    setBoletosAtrasados(null)
+    setChecklistAberto(true)
+    contarBoletosAtrasados().then(setBoletosAtrasados)
   }
 
-  async function enviarChamado() {
-    if (categoriaPk == null || !assunto.trim() || !descricao.trim()) {
-      toast('Preencha categoria, assunto e descrição.')
-      return
-    }
-    setEnviando(true)
+  function abrirNovoChamado(passos: string[]) {
+    if (categorias.length === 0) carregarCategorias()
+    setPassosFeitos(passos)
+    setNovoChamadoAberto(true)
+  }
+
+  async function enviarChamado(categoriaPk: number, assunto: string, descricao: string): Promise<ChamadoCriado | null> {
     try {
-      const mensagem = await apiAbrirChamado(cpf, categoriaPk, assunto.trim(), descricao.trim())
-      toast(mensagem, 'sucesso')
-      setDialogAberto(false)
+      const criado = await apiAbrirChamado(cpf, categoriaPk, assunto, descricao)
       carregar()
+      return criado
     } catch (excecao) {
       toast(excecao instanceof Error ? excecao.message : 'Não foi possível abrir o chamado.')
-    } finally {
-      setEnviando(false)
+      return null
+    }
+  }
+
+  async function falarNoWhatsapp() {
+    try {
+      const cliente = await buscarDadosCliente(cpf)
+      abrirWhatsappSuporte(cliente.client_complete_name ?? null, cpf)
+    } catch {
+      abrirWhatsappSuporte(null, cpf)
     }
   }
 
@@ -284,137 +296,55 @@ export default function Suporte() {
         </button>
       )}
 
-      <button className="suporte-fab" onClick={() => setChecklistAberto(true)} aria-label="Novo chamado">
+      <button className="suporte-fab" onClick={abrirChecklist} aria-label="Novo chamado">
         <MdAdd size={28} />
       </button>
 
       {checklistAberto && (
-        <div className="suporte-modal-fundo" onClick={() => setChecklistAberto(false)}>
-          <div className="suporte-checklist" onClick={(evento) => evento.stopPropagation()}>
-            <MdSupportAgent size={48} color={CORES.primaria} className="suporte-checklist-icone" />
-            <h2>Antes de abrir o chamado</h2>
-            <p>Esses passos resolvem boa parte dos problemas rapidinho</p>
-
-            <div className="suporte-checklist-itens">
-              <div className="suporte-checklist-item">
-                <span>🔌</span>
-                <div>
-                  <strong>Já reiniciou o roteador?</strong>
-                  <p>Desligue por 10 segundos e ligue de novo</p>
-                </div>
-              </div>
-              <div className="suporte-checklist-item">
-                <span>🔗</span>
-                <div>
-                  <strong>Os cabos estão bem conectados?</strong>
-                  <p>Confira se nenhum fio está solto</p>
-                </div>
-              </div>
-              <div className="suporte-checklist-item">
-                <span>📱</span>
-                <div>
-                  <strong>Testou em outro aparelho?</strong>
-                  <p>Ajuda a saber se é só um aparelho ou a rede toda</p>
-                </div>
-              </div>
-            </div>
-
-            <button
-              className="suporte-btn-primario suporte-checklist-continua"
-              onClick={() => {
-                setChecklistAberto(false)
-                abrirDialog()
-              }}
-            >
-              Continua sem funcionar
-            </button>
-            <button className="suporte-checklist-resolvido" onClick={() => setChecklistAberto(false)}>
-              Resolvido, obrigado
-            </button>
-          </div>
-        </div>
+        <ChecklistConexao
+          boletosAtrasados={boletosAtrasados}
+          contratoStatus={contratoStatus}
+          onVerBoletos={() => navigate('/boletos', { viewTransition: true })}
+          onFechar={() => setChecklistAberto(false)}
+          onContinuar={(passos) => {
+            setChecklistAberto(false)
+            abrirNovoChamado(passos)
+          }}
+          onWhatsapp={() => {
+            setChecklistAberto(false)
+            falarNoWhatsapp()
+          }}
+        />
       )}
 
-      {dialogAberto && (
-        <div className="suporte-modal-fundo" onClick={() => setDialogAberto(false)}>
-          <div className="suporte-modal" onClick={(evento) => evento.stopPropagation()}>
-            <h2>Novo chamado</h2>
-
-            <label>Categoria</label>
-            {(() => {
-              const categoriaSelecionada = categorias.find((c) => c.category_pk === categoriaPk) ?? null
-              const IconeSelecionado = iconeParaCategoria(categoriaSelecionada?.category_name ?? '')
-              return (
-                <div className="suporte-dropdown-wrapper">
-                  <button
-                    type="button"
-                    className="suporte-dropdown-btn"
-                    onClick={() => setCategoriaMenuAberto((v) => !v)}
-                  >
-                    <span className="suporte-dropdown-btn-conteudo">
-                      <IconeSelecionado
-                        className="suporte-dropdown-icone"
-                        style={{ color: corParaCategoria(categoriaSelecionada?.category_name ?? '') }}
-                      />
-                      {categoriaSelecionada?.category_name ?? 'Selecione uma categoria'}
-                    </span>
-                    <MdExpandMore />
-                  </button>
-                  {categoriaMenuAberto && (
-                    <>
-                      <div className="suporte-dropdown-fundo" onClick={() => setCategoriaMenuAberto(false)} />
-                      <div className="suporte-dropdown-lista">
-                        {categorias.map((categoria) => {
-                          const Icone = iconeParaCategoria(categoria.category_name ?? '')
-                          return (
-                            <button
-                              type="button"
-                              key={categoria.category_pk}
-                              className="suporte-dropdown-item"
-                              onClick={() => {
-                                setCategoriaPk(categoria.category_pk)
-                                setCategoriaMenuAberto(false)
-                              }}
-                            >
-                              <Icone
-                                className="suporte-dropdown-icone"
-                                style={{ color: corParaCategoria(categoria.category_name ?? '') }}
-                              />
-                              {categoria.category_name ?? `Categoria ${categoria.category_pk}`}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </>
-                  )}
-                </div>
-              )
-            })()}
-
-            <label>Assunto</label>
-            <input
-              value={assunto}
-              onChange={(evento) => setAssunto(evento.target.value)}
-              placeholder="Resuma o problema em poucas palavras"
-              maxLength={120}
-            />
-
-            <label>Descrição</label>
-            <textarea
-              value={descricao}
-              onChange={(evento) => setDescricao(evento.target.value)}
-              placeholder="Descreva o problema com detalhes"
-              rows={4}
-            />
-
-            <div className="suporte-modal-acoes">
-              <button onClick={() => setDialogAberto(false)}>Cancelar</button>
-              <button className="suporte-btn-primario" disabled={enviando} onClick={enviarChamado}>
-                {enviando ? 'Enviando…' : 'Enviar chamado'}
-              </button>
-            </div>
-          </div>
-        </div>
+      {novoChamadoAberto && (
+        <NovoChamado
+          categorias={categorias}
+          contratoStatus={contratoStatus}
+          passosFeitos={passosFeitos}
+          iconeDaCategoria={iconeParaCategoria}
+          corDaCategoria={corParaCategoria}
+          onEnviar={enviarChamado}
+          onVerConversa={(criado, assunto, categoria) =>
+            navigate(`/suporte/${criado.ticketPk}`, {
+              state: {
+                chamado: {
+                  ticket_pk: criado.ticketPk ?? undefined,
+                  ticket_title: assunto,
+                  ticket_protocol: criado.protocolo ?? undefined,
+                  category_name: categoria ?? undefined,
+                },
+              },
+              viewTransition: true,
+            })
+          }
+          onVerBoletos={() => navigate('/boletos', { viewTransition: true })}
+          onWhatsapp={() => {
+            setNovoChamadoAberto(false)
+            falarNoWhatsapp()
+          }}
+          onFechar={() => setNovoChamadoAberto(false)}
+        />
       )}
     </div>
     </PullToRefresh>

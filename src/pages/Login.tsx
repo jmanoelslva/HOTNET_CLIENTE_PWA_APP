@@ -114,7 +114,7 @@ export default function Login() {
                 className="login-modal-whatsapp"
                 onClick={() => {
                   setAjudaAberta(false)
-                  abrirWhatsappLogin()
+                  abrirWhatsappLogin(usuario)
                 }}
               >
                 Falar com a gente

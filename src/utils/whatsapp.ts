@@ -19,7 +19,11 @@ export function abrirWhatsappAjuda(nomeCompleto: string | null, cpf: string | nu
   )
 }
 
-/** Mensagem fixa usada pelo "Não consigo entrar?" da tela de login (sem nome/CPF — o cliente ainda não está logado). */
-export function abrirWhatsappLogin() {
-  abrir('Olá, preciso de ajuda para entrar no aplicativo.')
+/**
+ * "Não consigo entrar?" da tela de login: sem sessão não há nome, mas vai o CPF/CNPJ digitado
+ * (ou "Não informado"), como no app Android — o atendimento identifica o cliente sem perguntar.
+ */
+export function abrirWhatsappLogin(cpfDigitado: string | null) {
+  const cpf = cpfDigitado?.replace(/\D/g, '') || null
+  abrir(`Olá!\nSou *Não informado*\nCPF: *${cpf ?? 'Não informado'}*\n\nPreciso de ajuda para entrar no aplicativo.`)
 }

@@ -21,6 +21,12 @@ vi.mock('../api/suporte', async () => {
   }
 })
 
+vi.mock('../api/contratos', () => ({ buscarContratos: vi.fn().mockResolvedValue([]) }))
+vi.mock('../api/situacao', async () => {
+  const real = await vi.importActual<typeof import('../api/situacao')>('../api/situacao')
+  return { ...real, contarBoletosAtrasados: vi.fn().mockResolvedValue(0) }
+})
+
 function chamado(parcial: Partial<TicketDto>): TicketDto {
   return { ticket_pk: 1, ticket_title: 'Chamado', ...parcial }
 }
@@ -58,7 +64,7 @@ describe('Suporte — retry de categorias', () => {
 
     const usuario = userEvent.setup()
     await usuario.click(screen.getByRole('button', { name: 'Novo chamado' }))
-    await usuario.click(screen.getByRole('button', { name: 'Continua sem funcionar' }))
+    await usuario.click(screen.getByRole('button', { name: 'Pular e abrir chamado' }))
 
     await waitFor(() => expect(apiSuporte.buscarCategorias).toHaveBeenCalledTimes(2))
     await waitFor(() => expect(screen.getByText('Financeiro e pagamentos')).toBeInTheDocument())

@@ -81,3 +81,29 @@ describe('post — ouvinte global de sessão expirada (aoExpirarSessao)', () => 
     expect(ouvinte).not.toHaveBeenCalled()
   })
 })
+
+describe('post — respostas que não são JSON e falha de rede', () => {
+  it('página HTML de erro (proxy fora) vira mensagem amigável, não SyntaxError', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        status: 502,
+        ok: false,
+        json: async () => {
+          throw new SyntaxError('Unexpected token <')
+        },
+      }),
+    )
+    await expect(post('invoice_ctl/invoice/list', {})).rejects.toThrow('Nosso sistema está com instabilidade')
+  })
+
+  it('falha de rede vira aviso de sem conexão', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+    await expect(post('invoice_ctl/invoice/list', {})).rejects.toThrow('Sem conexão com a internet')
+  })
+
+  it('"Authentication failed" fora do login também é sessão expirada', async () => {
+    mockFetchUmaVez({ status: 200, ok: true, json: { success: false, message: 'Authentication failed for user [x]' } })
+    await expect(post('invoice_ctl/invoice/list', {})).rejects.toBeInstanceOf(SessaoExpiradaError)
+  })
+})

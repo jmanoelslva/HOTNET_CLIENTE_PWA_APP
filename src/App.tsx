@@ -9,6 +9,7 @@ import { useSessao } from './auth/useSessao'
 
 // Uma página por chunk — carregada só quando o cliente navega até ela, em
 // vez de tudo num bundle inicial só (a lista de rotas só cresce).
+const AlterarSenha = lazy(() => import('./pages/AlterarSenha'))
 const Boletos = lazy(() => import('./pages/Boletos'))
 const Cadastro = lazy(() => import('./pages/Cadastro'))
 const Consumo = lazy(() => import('./pages/Consumo'))
@@ -108,6 +109,14 @@ function App() {
             element={
               <RotaProtegida>
                 <Sobre />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/alterar-senha"
+            element={
+              <RotaProtegida>
+                <AlterarSenha />
               </RotaProtegida>
             }
           />

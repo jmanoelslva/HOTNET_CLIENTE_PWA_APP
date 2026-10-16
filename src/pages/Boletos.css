@@ -413,3 +413,9 @@
   background: var(--cor-fundo);
   color: var(--cor-texto);
 }
+
+.boletos-qr-indisponivel {
+  margin: 8px 0 16px;
+  color: var(--cor-erro);
+  text-align: center;
+}

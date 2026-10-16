@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { MdCheckCircle, MdDescription, MdFileDownload, MdPayments, MdQrCodeScanner } from 'react-icons/md'
+import { MdCheckCircle, MdDescription, MdFileDownload, MdPayments, MdQrCodeScanner, MdReceiptLong } from 'react-icons/md'
 import { FaBarcode } from 'react-icons/fa'
 import { SiPix } from 'react-icons/si'
 import CabecalhoTela from '../components/CabecalhoTela'
@@ -8,8 +8,11 @@ import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
 import PullToRefresh from '../components/PullToRefresh'
 import { useToast } from '../components/Toast/useToast'
+import ReciboModal from '../components/ReciboModal'
+import { useSessao } from '../auth/useSessao'
 import { CORES, comAlpha } from '../utils/cores'
 import { abrirEImprimir } from '../utils/impressao'
+import { estaVencida } from '../utils/faturas'
 import {
   ApiError,
   SessaoExpiradaError,
@@ -26,11 +29,6 @@ const CNPJ_FALLBACK = '17.659.900/0001-48'
 const LIMITE_PAGOS_PADRAO = 3
 
 type FiltroStatus = 'aberto' | 'atrasados' | 'pagos'
-
-function estaVencida(fatura: FaturaDto): boolean {
-  const dias = Number.parseInt(fatura.days_late ?? '', 10) || 0
-  return !fatura.invoice_date_credit && dias > 0
-}
 
 function formatarContagem(qtd: number): string {
   return qtd > 99 ? '99+' : String(qtd)
@@ -70,6 +68,17 @@ function calcularValorComEncargos(fatura: FaturaDto): number | null {
   return valorOriginal + multa + juros
 }
 
+/**
+ * invoice_qrcode_image pode vir com ou sem o prefixo "data:image/...;base64,". Só aceita
+ * imagem em base64: qualquer outra coisa vira uma imagem inválida e cai no aviso de
+ * "QR Code indisponível" (antes aparecia o ícone de imagem quebrada).
+ */
+function srcQrCode(valor: string): string {
+  const texto = valor.trim()
+  if (/^data:image\/[a-z+]+;base64,/i.test(texto)) return texto
+  return `data:image/png;base64,${texto}`
+}
+
 async function copiarTexto(texto: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(texto)
@@ -83,19 +92,25 @@ export default function Boletos() {
   const location = useLocation()
   const navigate = useNavigate()
   const { toast } = useToast()
-  const contratoPreSelecionado = (location.state as { contratoPk?: number } | null)?.contratoPk ?? null
+  const { cpf } = useSessao()
+  const estadoNavegacao = location.state as { contratoPk?: number; filtro?: FiltroStatus } | null
+  const contratoPreSelecionado = estadoNavegacao?.contratoPk ?? null
 
   const [faturas, setFaturas] = useState<FaturaDto[]>([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
 
-  const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>('aberto')
+  // "Ver boletos em atraso" (cartão de conexão bloqueada na Início) abre direto na aba Atrasado.
+  const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>(estadoNavegacao?.filtro ?? 'aberto')
   const [filtroContrato, setFiltroContrato] = useState<number | null>(contratoPreSelecionado)
   const [mostrarTodosPagos, setMostrarTodosPagos] = useState(false)
 
   const [copiado, setCopiado] = useState<string | null>(null)
   const [qrCodeAberto, setQrCodeAberto] = useState<string | null>(null)
+  // Imagem do QR não carregou (base64 inválido): mostra o aviso em vez da imagem quebrada.
+  const [qrIndisponivel, setQrIndisponivel] = useState(false)
   const [confirmando, setConfirmando] = useState<FaturaDto | null>(null)
+  const [reciboAberto, setReciboAberto] = useState<FaturaDto | null>(null)
   const [informando, setInformando] = useState<number | null>(null)
   const [informados, setInformados] = useState<Set<number>>(new Set())
 
@@ -168,6 +183,11 @@ export default function Boletos() {
   function trocarStatus(status: FiltroStatus) {
     setFiltroStatus(status)
     setMostrarTodosPagos(false)
+  }
+
+  function fecharQrCode() {
+    setQrCodeAberto(null)
+    setQrIndisponivel(false)
   }
 
   async function aoCopiar(chave: string, valor: string | null | undefined) {
@@ -356,6 +376,18 @@ export default function Boletos() {
                   </div>
                 )}
 
+                {paga && (
+                  <div className="boleto-acoes">
+                    <button
+                      className="boleto-acao-principal"
+                      style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primariaEscura }}
+                      onClick={() => setReciboAberto(fatura)}
+                    >
+                      <MdReceiptLong /> Recibo
+                    </button>
+                  </div>
+                )}
+
                 {!paga && (
                   <div className="boleto-acoes">
                     {/* Ação principal, linha inteira no topo. */}
@@ -388,7 +420,11 @@ export default function Boletos() {
                     {/* Utilitário + confirmação pós-pagamento, em par. */}
                     <button
                       style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
-                      onClick={() => abrirEImprimir(urlImpressaoBoleto(fatura.invoice_pk))}
+                      onClick={() =>
+                        abrirEImprimir(urlImpressaoBoleto(fatura.invoice_pk), () =>
+                          toast('Não foi possível abrir o boleto agora. Tente novamente.'),
+                        )
+                      }
                     >
                       <MdFileDownload /> Imprimir / Salvar PDF
                     </button>
@@ -416,11 +452,17 @@ export default function Boletos() {
         </button>
       )}
 
+      {reciboAberto && <ReciboModal fatura={reciboAberto} cpf={cpf} onFechar={() => setReciboAberto(null)} />}
+
       {qrCodeAberto && (
-        <div className="boletos-modal-fundo" onClick={() => setQrCodeAberto(null)}>
+        <div className="boletos-modal-fundo" onClick={() => fecharQrCode()}>
           <div className="boletos-modal" onClick={(evento) => evento.stopPropagation()}>
-            <img src={qrCodeAberto} alt="QR Code do PIX" />
-            <button onClick={() => setQrCodeAberto(null)}>Fechar</button>
+            {qrIndisponivel ? (
+              <p className="boletos-qr-indisponivel">QR Code indisponível no momento. Use o Pix copia e cola.</p>
+            ) : (
+              <img src={srcQrCode(qrCodeAberto)} alt="QR Code do PIX" onError={() => setQrIndisponivel(true)} />
+            )}
+            <button onClick={() => fecharQrCode()}>Fechar</button>
           </div>
         </div>
       )}

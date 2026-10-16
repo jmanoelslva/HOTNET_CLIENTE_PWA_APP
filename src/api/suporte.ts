@@ -68,12 +68,18 @@ async function buscarClientePk(cpf: string | null): Promise<number | null> {
   return null
 }
 
+export interface ChamadoCriado {
+  ticketPk: number | null
+  /** O Controllr às vezes só gera o número depois; null = ainda não veio. */
+  protocolo: string | null
+}
+
 export async function abrirChamado(
   cpf: string | null,
   categoryPk: number,
   titulo: string,
   descricao: string,
-): Promise<string> {
+): Promise<ChamadoCriado> {
   const clientPk = await buscarClientePk(cpf)
   if (clientPk == null) {
     throw new ApiError('Não foi possível identificar seu cadastro para abrir o chamado.')
@@ -84,8 +90,8 @@ export async function abrirChamado(
     throw new ApiError(resposta.message ?? 'Não foi possível abrir o chamado.')
   }
 
-  const protocolo = resposta.results?.[0]?.ticket_protocol
-  return protocolo ? `Chamado aberto com sucesso! Protocolo: ${protocolo}` : 'Chamado aberto com sucesso!'
+  const criado = resposta.results?.[0]
+  return { ticketPk: criado?.ticket_pk ?? null, protocolo: criado?.ticket_protocol?.trim() || null }
 }
 
 export interface OperacaoChamado {

@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   MdAccountCircle,
+  MdBlock,
+  MdBuild,
+  MdCheckCircle,
+  MdLock,
   MdBadge,
   MdDarkMode,
   MdDataUsage,
@@ -9,6 +13,7 @@ import {
   MdGetApp,
   MdHelp,
   MdInfoOutline,
+  MdKey,
   MdLightMode,
   MdLogout,
   MdPayments,
@@ -19,8 +24,11 @@ import {
 import { FaWhatsapp } from 'react-icons/fa'
 import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente } from '../api/cadastro'
-import { buscarContratos } from '../api/contratos'
-import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, type ConsumoPorContrato } from '../api/consumo'
+import { buscarContratos, type Contrato } from '../api/contratos'
+import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, totalBytes, vincularContratos, type ConsumoPorContrato } from '../api/consumo'
+import { contarBoletosAtrasados, situacaoDosContratos } from '../api/situacao'
+import ChecklistConexao from '../components/ChecklistConexao'
+import { formatarBytes } from '../utils/formatacao'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import { CORES, comAlpha } from '../utils/cores'
 import { usePwaInstall } from '../hooks/usePwaInstall'
@@ -59,6 +67,10 @@ export default function Home() {
   const [cpePkSelecionado, setCpePkSelecionado] = useState<number | null>(null)
   const [planoSemConsumo, setPlanoSemConsumo] = useState<string | null>(null)
   const [online, setOnline] = useState<boolean | null | undefined>(undefined)
+  // Contratos (status e número): situação da conta no cartão de conexão.
+  const [contratos, setContratos] = useState<Contrato[]>([])
+  const [checklistAberto, setChecklistAberto] = useState(false)
+  const [boletosAtrasados, setBoletosAtrasados] = useState<number | null>(null)
 
   useEffect(() => {
     carregarNome()
@@ -84,21 +96,21 @@ export default function Home() {
 
   async function carregarConsumo() {
     try {
-      const dados = await buscarConsumoDoMes(new Date().getFullYear(), new Date().getMonth() + 1)
+      // Contratos em paralelo: dão o status (bloqueado/cancelado) e o número de cada conexão.
+      // Falha neles não esconde o cartão, só tira a situação da conta.
+      const [consumo, listaContratos] = await Promise.all([
+        buscarConsumoDoMes(new Date().getFullYear(), new Date().getMonth() + 1),
+        buscarContratos().catch(() => [] as Contrato[]),
+      ])
+      const dados = vincularContratos(consumo, listaContratos)
+      setContratos(listaContratos)
       setConsumoContratos(dados)
       if (dados.length > 0) {
         setCpePkSelecionado((atual) => (dados.some((c) => c.cpePk === atual) ? atual : dados[0].cpePk))
       } else {
-        // Sem consumo registrado ainda (ex: cliente novo) — cai pra lista
-        // de contratos só pro nome do plano, sem indicador de conexão
-        // (sem cpePk não dá pra checar a sessão).
-        try {
-          const contratos = await buscarContratos()
-          setPlanoSemConsumo(contratos[0]?.plano ?? null)
-        } catch {
-          // Sem indicador nesse caso também — mesma lógica de falha
-          // silenciosa do restante da Home.
-        }
+        // Sem consumo registrado ainda (ex: cliente novo, bloqueado ou cancelado) — o plano e a
+        // situação vêm só dos contratos, sem indicador de conexão (sem cpePk não dá pra checar).
+        setPlanoSemConsumo(listaContratos.find((c) => c.podeVerDados)?.plano ?? listaContratos[0]?.plano ?? null)
       }
     } catch {
       // Falha silenciosa: sem card de status, mas o resto da Home
@@ -114,6 +126,15 @@ export default function Home() {
   }
 
   const contratoSelecionado = consumoContratos.find((c) => c.cpePk === cpePkSelecionado) ?? null
+
+  // contract_status da conexão mostrada: pelo contrato vinculado; sem vínculo, a situação única
+  // dos contratos (mesma regra do Suporte). 4 = bloqueado, 5 = cancelado.
+  const statusContrato =
+    (contratoSelecionado?.contractPk != null
+      ? contratos.find((c) => c.id === contratoSelecionado.contractPk)?.status
+      : undefined) ?? situacaoDosContratos(contratos)
+  const bloqueada = statusContrato === 4
+  const cancelada = statusContrato === 5
 
   useEffect(() => {
     if (!contratoSelecionado) return
@@ -145,7 +166,52 @@ export default function Home() {
     await aoClicarInstalar()
   }
 
-  const corStatus = online === true ? CORES.sucessoVivo : online === false ? CORES.erro : CORES.textoFraco
+  function abrirDiagnostico() {
+    setBoletosAtrasados(null)
+    setChecklistAberto(true)
+    contarBoletosAtrasados().then(setBoletosAtrasados)
+  }
+
+  const cartao = (() => {
+    if (bloqueada) {
+      return {
+        selo: { texto: 'Bloqueada', Icone: MdLock, cor: CORES.erro },
+        titulo: 'Conexão bloqueada',
+        descricao: 'Identificamos um boleto em aberto neste contrato. Após a confirmação do pagamento, a conexão é liberada.',
+        IconeConexao: MdLock,
+        corIcone: CORES.erro,
+      }
+    }
+    if (cancelada) {
+      return {
+        selo: { texto: 'Cancelada', Icone: MdBlock, cor: CORES.textoFraco },
+        titulo: 'Contrato cancelado',
+        descricao: 'Seu contrato foi cancelado. Fale com a gente se tiver alguma dúvida.',
+        IconeConexao: MdBlock,
+        corIcone: CORES.textoFraco,
+      }
+    }
+    const selo = statusContrato != null ? { texto: 'Conta ativa', Icone: MdCheckCircle, cor: CORES.sucessoVivo } : null
+    if (online === true) {
+      return { selo, titulo: 'Conectado agora', descricao: 'Sua internet está funcionando normalmente.', IconeConexao: MdWifi, corIcone: CORES.sucessoVivo }
+    }
+    if (online === false) {
+      return { selo, titulo: 'Sem conexão agora', descricao: 'Não detectamos conexão ativa. Confira se o roteador está ligado.', IconeConexao: MdWifi, corIcone: CORES.textoFraco }
+    }
+    if (online === undefined && contratoSelecionado) {
+      return { selo, titulo: 'Verificando conexão…', descricao: 'Consultando o status da sua conexão.', IconeConexao: MdWifi, corIcone: CORES.textoFraco }
+    }
+    return {
+      selo: null,
+      titulo: 'Não foi possível verificar',
+      descricao: 'Não conseguimos consultar sua conexão agora. Confira a internet do aparelho e puxe para atualizar.',
+      IconeConexao: MdWifi,
+      corIcone: CORES.textoFraco,
+    }
+  })()
+  const mostrarTesteVelocidade = online === true && !bloqueada && !cancelada
+  const usoDoMes = contratoSelecionado ? totalBytes(contratoSelecionado) : 0
+  const nomeMes = new Date().toLocaleDateString('pt-BR', { month: 'long' })
 
   return (
     <PullToRefresh aoAtualizar={atualizar}>
@@ -186,6 +252,14 @@ export default function Home() {
                 <button
                   onClick={() => {
                     setMenuAvatarAberto(false)
+                    navigate('/alterar-senha', { viewTransition: true })
+                  }}
+                >
+                  <MdKey size={18} /> Alterar senha
+                </button>
+                <button
+                  onClick={() => {
+                    setMenuAvatarAberto(false)
                     navigate('/sobre', { viewTransition: true })
                   }}
                 >
@@ -206,57 +280,77 @@ export default function Home() {
         </div>
       </header>
 
-      {(contratoSelecionado || planoSemConsumo) && (
-        <div className="home-card-status">
-          <div className="home-card-status-topo">
-            <span className="home-indicador" style={{ background: corStatus }}>
-              <MdWifi size={22} color={CORES.branco} />
-            </span>
-            <div className="home-card-status-textos">
-              <span className="home-plano-nome">
-                {contratoSelecionado?.planoNome ?? planoSemConsumo ?? 'Plano não informado'}
-              </span>
-              <p className="home-status-texto" style={{ color: corStatus }}>
-                {online === true
-                  ? 'Sua conexão está normal!'
-                  : online === false
-                    ? 'Sua conexão está fora do ar!'
-                    : contratoSelecionado
-                      ? 'Verificando conexão…'
-                      : 'Status indisponível'}
-              </p>
-              <p className="home-status-resumo">
-                {online === true
-                  ? 'Tudo funcionando como deve!'
-                  : online === false
-                    ? 'Verifique seu roteador ou modem.'
-                    : 'Não foi possível verificar sua conexão agora.'}
-              </p>
-            </div>
-          </div>
-          <a
-            className="home-teste-velocidade"
-            href="https://fast.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <MdSpeed size={16} /> Teste de Velocidade
-          </a>
+      {(contratoSelecionado || planoSemConsumo || contratos.length > 0) && (
+        <section className={`home-conexao ${bloqueada ? 'home-conexao-alerta' : ''}`} aria-label="Sua conexão">
           {consumoContratos.length > 1 && (
             <select
-              className="home-seletor-contrato"
+              className="home-conexao-seletor"
+              aria-label="Contrato mostrado"
               value={cpePkSelecionado ?? ''}
               onChange={(evento) => setCpePkSelecionado(Number(evento.target.value))}
             >
               {consumoContratos.map((c) => (
                 <option key={c.cpePk} value={c.cpePk}>
-                  {c.planoNome ?? 'Plano não informado'}
-                  {c.contractNumber != null ? ` (Contrato ${c.contractNumber})` : ''}
+                  {c.contractNumber != null ? `Contrato ${c.contractNumber}` : `Conexão ${c.cpePk}`}
+                  {c.planoNome ? ` · ${c.planoNome}` : ''}
                 </option>
               ))}
             </select>
           )}
-        </div>
+          <div className="home-conexao-topo">
+            <span className="home-conexao-rotulo">Sua conexão</span>
+            {cartao.selo && (
+              <span className="home-conexao-selo">
+                <cartao.selo.Icone size={14} color={cartao.selo.cor} aria-hidden="true" />
+                {cartao.selo.texto}
+              </span>
+            )}
+          </div>
+          <div className="home-conexao-estado" aria-live="polite">
+            <span className="home-conexao-icone">
+              <cartao.IconeConexao size={26} color={cartao.corIcone} aria-hidden="true" />
+            </span>
+            <div className="home-conexao-textos">
+              <p className="home-conexao-titulo">{cartao.titulo}</p>
+              <p className="home-conexao-descricao">{cartao.descricao}</p>
+            </div>
+          </div>
+          <div className="home-conexao-blocos">
+            <div className="home-conexao-bloco">
+              <span>Plano</span>
+              <strong>{contratoSelecionado?.planoNome ?? planoSemConsumo ?? '—'}</strong>
+            </div>
+            <div className="home-conexao-bloco">
+              <span>Uso em {nomeMes}</span>
+              <strong>{usoDoMes > 0 ? formatarBytes(usoDoMes) : '—'}</strong>
+            </div>
+          </div>
+          {bloqueada && (
+            <button
+              className="home-conexao-acao"
+              onClick={() => navigate('/boletos', { state: { filtro: 'atrasados' }, viewTransition: true })}
+            >
+              <MdPayments size={18} aria-hidden="true" /> Ver boletos em atraso
+            </button>
+          )}
+          {cancelada && (
+            <button className="home-conexao-acao home-conexao-acao-whatsapp" onClick={aoClicarWhatsapp}>
+              <FaWhatsapp size={18} aria-hidden="true" /> Falar no WhatsApp
+            </button>
+          )}
+          <div className="home-conexao-secundarias">
+            {mostrarTesteVelocidade && (
+              <a className="home-conexao-secundaria" href="https://fast.com" target="_blank" rel="noopener noreferrer">
+                <MdSpeed size={18} aria-hidden="true" /> Teste de velocidade
+              </a>
+            )}
+            {!cancelada && (
+              <button className="home-conexao-secundaria" onClick={abrirDiagnostico}>
+                <MdBuild size={18} aria-hidden="true" /> Diagnóstico
+              </button>
+            )}
+          </div>
+        </section>
       )}
 
       <div className="home-menu">
@@ -280,6 +374,20 @@ export default function Home() {
         </a>
       </footer>
       </div>
+
+      {checklistAberto && (
+        <ChecklistConexao
+          boletosAtrasados={boletosAtrasados}
+          contratoStatus={statusContrato}
+          onVerBoletos={() => navigate('/boletos', { viewTransition: true })}
+          onFechar={() => setChecklistAberto(false)}
+          onContinuar={(passos) => navigate('/suporte', { state: { abrirNovoChamado: true, passos }, viewTransition: true })}
+          onWhatsapp={() => {
+            setChecklistAberto(false)
+            aoClicarWhatsapp()
+          }}
+        />
+      )}
 
       <ModalInstalarIos aberto={modalIosAberto} onFechar={fecharModalIos} />
       <ModalConfirmarLogout

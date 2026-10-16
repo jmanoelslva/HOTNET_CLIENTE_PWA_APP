@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { MdDataUsage } from 'react-icons/md'
 import {
   buscarConsumoDoMes,
+  comNumeroDoContrato,
   buscarSessaoAtualPorCpe,
   totalBytes,
   totalRxBytes,
@@ -9,6 +10,7 @@ import {
   type ConsumoPorContrato,
   type SessaoAtual,
 } from '../api/consumo'
+import { buscarContratos } from '../api/contratos'
 import { formatarBytes, formatarDuracao } from '../utils/formatacao'
 import CabecalhoTela from '../components/CabecalhoTela'
 import PullToRefresh from '../components/PullToRefresh'
@@ -44,6 +46,8 @@ export default function Consumo() {
   const [erro, setErro] = useState<string | null>(null)
 
   const [sessaoAtual, setSessaoAtual] = useState<SessaoAtual | null | undefined>(undefined)
+  // Consulta da sessão falhou (rede, servidor): não é o mesmo que "Offline".
+  const [falhaSessao, setFalhaSessao] = useState(false)
   const [detalhesAbertos, setDetalhesAbertos] = useState(false)
 
   useEffect(() => {
@@ -55,7 +59,7 @@ export default function Consumo() {
     setCarregando(true)
     setErro(null)
     try {
-      const dados = await buscarConsumoDoMes(ano, mes)
+      const dados = await comNumeroDoContrato(await buscarConsumoDoMes(ano, mes), buscarContratos)
       setConsumoPorContrato(dados)
       if (dados.length > 0) {
         setCpePkSelecionado((atual) => (dados.some((c) => c.cpePk === atual) ? atual : dados[0].cpePk))
@@ -76,6 +80,7 @@ export default function Consumo() {
 
   useEffect(() => {
     setSessaoAtual(undefined)
+    setFalhaSessao(false)
     setDetalhesAbertos(false)
     if (consumoSelecionado == null) return
     let cancelado = false
@@ -84,7 +89,9 @@ export default function Consumo() {
         if (!cancelado) setSessaoAtual(sessao)
       })
       .catch(() => {
-        if (!cancelado) setSessaoAtual(null)
+        if (cancelado) return
+        setSessaoAtual(null)
+        setFalhaSessao(true)
       })
     return () => {
       cancelado = true
@@ -144,7 +151,7 @@ export default function Consumo() {
         >
           {consumoPorContrato.map((c) => (
             <option key={c.cpePk} value={c.cpePk}>
-              Contrato {c.contractNumber ?? c.cpePk}
+              {c.contractNumber != null ? `Contrato ${c.contractNumber}` : `Conexão ${c.cpePk}`}
             </option>
           ))}
         </select>
@@ -197,7 +204,13 @@ export default function Consumo() {
                 style={{ background: sessaoAtual ? CORES.sucesso : CORES.textoFraco }}
               />
               <span>
-                {sessaoAtual === undefined ? 'Verificando conexão…' : sessaoAtual ? 'Online Agora' : 'Offline'}
+                {sessaoAtual === undefined
+                  ? 'Verificando conexão…'
+                  : sessaoAtual
+                    ? 'Online Agora'
+                    : falhaSessao
+                      ? 'Não foi possível verificar'
+                      : 'Offline'}
               </span>
             </div>
 

@@ -12,6 +12,21 @@
 
 const API_BASE = '/api'
 
+export const MENSAGEM_SEM_CONEXAO = 'Sem conexão com a internet. Verifique seu Wi-Fi ou dados móveis e tente novamente.'
+
+/** Mesmas mensagens de "não autenticado" que o app Android reconhece (SessionExpiredInterceptor). */
+export function ehMensagemDeLoginRecusado(mensagem: string | undefined): boolean {
+  return /login failure|unauthorized|authentication failed/i.test(mensagem ?? '')
+}
+
+/** Texto pro cliente a partir do status HTTP, como MensagemErro.deCodigoHttp no app Android. */
+export function mensagemDeStatus(status: number): string {
+  if (status === 401 || status === 403) return 'Sua sessão expirou. Faça login novamente.'
+  if (status === 404) return 'Não encontramos essa informação no momento.'
+  if (status >= 500) return 'Nosso sistema está com instabilidade no momento. Tente novamente em alguns minutos.'
+  return 'Não foi possível completar essa ação. Tente novamente.'
+}
+
 export class SessaoExpiradaError extends Error {
   constructor() {
     super('Sessão expirada.')
@@ -53,12 +68,19 @@ async function post<T>(path: string, campos: Record<string, string | number | un
     if (valor !== undefined) corpo.append(chave, String(valor))
   }
 
-  const response = await fetch(`${API_BASE}/${path}`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: corpo.toString(),
-  })
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE}/${path}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: corpo.toString(),
+    })
+  } catch {
+    // fetch só lança em falha de rede (sem internet, DNS, proxy fora): antes a tela mostrava
+    // o texto cru do navegador ("Failed to fetch").
+    throw new ApiError(MENSAGEM_SEM_CONEXAO)
+  }
 
   // IMPORTANTE (mesmo quirk do app Android, ver SessionExpiredInterceptor.kt):
   // a própria chamada de /login NÃO deve ser tratada como "sessão expirada"
@@ -72,15 +94,22 @@ async function post<T>(path: string, campos: Record<string, string | number | un
   // entraria num loop (expirou → desloga → logout 401 → "expirou" de novo).
   const ehLogout = path === 'session/logout'
 
-  const json = (await response.json()) as { success?: boolean; message?: string }
+  // Proxy fora ou erro do servidor pode devolver uma página HTML em vez de JSON: antes o
+  // response.json() lançava SyntaxError e a tela mostrava a mensagem técnica.
+  let json: { success?: boolean; message?: string }
+  try {
+    json = (await response.json()) as { success?: boolean; message?: string }
+  } catch {
+    json = {}
+  }
 
   if (!ehLogin) {
-    if (response.status === 401 || (json.success === false && /login failure|unauthorized/i.test(json.message ?? ''))) {
+    if (response.status === 401 || (json.success === false && ehMensagemDeLoginRecusado(json.message))) {
       if (!ehLogout) ouvinteSessaoExpirada?.()
       throw new SessaoExpiradaError()
     }
     if (!response.ok) {
-      throw new ApiError(json.message ?? `Erro ${response.status} ao chamar ${path}`)
+      throw new ApiError(json.message || mensagemDeStatus(response.status))
     }
   }
 
@@ -116,6 +145,8 @@ export interface FaturaDto {
   invoice_qrcode?: string
   invoice_qrcode_image?: string
   invoice_date_credit?: string
+  // Valor efetivamente pago (com multa/juros ou desconto) — usado no recibo.
+  invoice_amount_paid?: string
   obs_pk?: number
   add_observation?: boolean
   // Taxas percentuais (não valor em R$) usadas pra calcular o valor com
@@ -160,6 +191,10 @@ export interface ContratoDto {
   contract_date_cad?: string
   contract_amount?: string
   contract_value?: string
+  // Opções do contrato no Controllr: show = dados na tela Contratos; print = "Ver contrato
+  // completo". Ausente permite; só false esconde (mesma regra do app Android).
+  contract_client_show?: boolean
+  contract_client_print?: boolean
 }
 
 /**
@@ -187,6 +222,8 @@ export interface ItemServicoDto {
   item_rent?: boolean
   plan_name?: string
   plan_pk?: number
+  // Conexão (CPE) do item: liga o consumo e a sessão, que só trazem cpe_pk, ao contrato.
+  cpe_pk?: number
 }
 
 export interface ContractSvcListResponse {
@@ -205,6 +242,33 @@ export function listarItensContrato(contractPk: number): Promise<ContractSvcList
     sort: 'contract_pk',
     dir: 'ASC',
   })
+}
+
+export interface DetalheFaturaDto {
+  invoice_details_name?: string
+  invoice_details_amount?: string
+  invoice_details_discount?: string
+  invoice_details_others?: string
+}
+
+/**
+ * Itens da cobrança (plano, juros por atraso, desconto…) — invoice_ctl/invoice/list_details,
+ * os mesmos do painel do cliente; usado no recibo.
+ */
+export function listarDetalhesFatura(
+  invoicePk: number,
+): Promise<{ success?: boolean; message?: string; results?: DetalheFaturaDto[] }> {
+  return post('invoice_ctl/invoice/list_details', {
+    where: whereJson([{ field: 'invoice_pk', oper: 5, value: String(invoicePk) }]),
+  })
+}
+
+/**
+ * Troca a senha do cliente logado — session/setpassword, a mesma chamada do "Alterar senha" da
+ * área do cliente na web. O servidor NÃO pede a senha atual: quem chama confirma antes.
+ */
+export function alterarSenha(nova: string): Promise<{ success?: boolean; message?: string }> {
+  return post('session/setpassword', { user_password: nova, user_password_repeat: nova })
 }
 
 export interface InformarPagamentoResponse {
@@ -228,8 +292,9 @@ export function informarPagamento(invoicePk: number, contractPk: number): Promis
  * pelo mesmo proxy de "/api" (ver vite.config.ts / README, seção de
  * produção), então os cookies de sessão já rewriteados valem aqui também.
  */
-export function urlImpressaoBoleto(invoicePk: number): string {
-  return `${API_BASE}/invoice_ctl/invoice/print_layout?invoice_pk=${invoicePk}`
+export function urlImpressaoBoleto(invoicePk: number, recibo = false): string {
+  // layout_type=2: recibo do sistema (o mesmo do painel do cliente), só pra fatura paga.
+  return `${API_BASE}/invoice_ctl/invoice/print_layout?invoice_pk=${invoicePk}${recibo ? '&layout_type=2' : ''}`
 }
 
 /**
@@ -517,7 +582,8 @@ export function criarOperacaoChamado(
  * de proxy das outras URLs de impressão (ver urlImpressaoBoleto).
  */
 export function urlAnexoChamado(ticketPk: number, arquivo: string): string {
-  return `${API_BASE}/support_ctl/annex/view/${ticketPk}/${arquivo}`
+  // Nome vem do servidor: codificado, um "../" no nome não aponta pra outro endereço da API.
+  return `${API_BASE}/support_ctl/annex/view/${ticketPk}/${encodeURIComponent(arquivo)}`
 }
 
 /**
@@ -532,20 +598,30 @@ export async function enviarAnexoChamado(ticketPk: number, arquivo: File): Promi
   corpo.append('file', arquivo)
   corpo.append('ticket_pk', String(ticketPk))
 
-  const response = await fetch(`${API_BASE}/support_ctl/annex/upload`, {
-    method: 'POST',
-    credentials: 'include',
-    body: corpo,
-  })
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE}/support_ctl/annex/upload`, {
+      method: 'POST',
+      credentials: 'include',
+      body: corpo,
+    })
+  } catch {
+    throw new ApiError(MENSAGEM_SEM_CONEXAO)
+  }
 
   if (response.status === 401) {
     ouvinteSessaoExpirada?.()
     throw new SessaoExpiradaError()
   }
 
-  const json = (await response.json()) as { success?: boolean; message?: string }
+  let json: { success?: boolean; message?: string }
+  try {
+    json = (await response.json()) as { success?: boolean; message?: string }
+  } catch {
+    json = {}
+  }
   if (!response.ok || json.success === false) {
-    throw new ApiError(json.message ?? 'Não foi possível enviar o anexo.')
+    throw new ApiError(json.message || 'Não foi possível enviar o anexo.')
   }
   return json
 }

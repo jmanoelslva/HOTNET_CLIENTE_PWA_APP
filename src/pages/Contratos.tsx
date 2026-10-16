@@ -8,6 +8,7 @@ import PullToRefresh from '../components/PullToRefresh'
 import Skeleton from '../components/Skeleton'
 import { CORES, comAlpha } from '../utils/cores'
 import { abrirEImprimir } from '../utils/impressao'
+import { useToast } from '../components/Toast/useToast'
 import './Contratos.css'
 
 // Valores confirmados na documentação oficial do contract_status.
@@ -35,6 +36,7 @@ function formatarData(data: string | null): string {
 }
 
 export default function Contratos() {
+  const { toast } = useToast()
   const [contratos, setContratos] = useState<Contrato[]>([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
@@ -58,7 +60,8 @@ export default function Contratos() {
     setCarregando(true)
     setErro(null)
     try {
-      const resultado = await buscarContratos()
+      // contract_client_show=false: o contrato sai da lista (o status dele ainda vale na Início).
+      const resultado = (await buscarContratos()).filter((contrato) => contrato.podeVerDados)
       if (resultado.length === 0) {
         setErro('Nenhum contrato disponível para exibição no momento.')
       }
@@ -162,12 +165,19 @@ export default function Contratos() {
                   >
                     <MdPayments /> Meus boletos
                   </button>
-                  <button
-                    style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
-                    onClick={() => abrirEImprimir(urlImpressaoContrato(contrato.id))}
-                  >
-                    <MdFileDownload /> Ver contrato completo
-                  </button>
+                  {/* contract_client_print=false: sem o documento completo (nem imprimir/salvar PDF). */}
+                  {contrato.podeVerDocumento && (
+                    <button
+                      style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
+                      onClick={() =>
+                        abrirEImprimir(urlImpressaoContrato(contrato.id), () =>
+                          toast('Não foi possível abrir o contrato agora. Tente novamente.'),
+                        )
+                      }
+                    >
+                      <MdFileDownload /> Ver contrato completo
+                    </button>
+                  )}
                 </div>
               </li>
             )

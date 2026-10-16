@@ -1,0 +1,316 @@
+.chamado-fundo {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+}
+
+.chamado-modal {
+  position: relative;
+  background: var(--cor-superficie);
+  border-radius: 20px 20px 0 0;
+  padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  width: 100%;
+  max-width: 460px;
+  max-height: 92dvh;
+  overflow-y: auto;
+  color: var(--cor-texto);
+}
+
+.chamado-fechar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chamado-etapa {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chamado-etapa h2 {
+  margin: 0;
+  padding-right: 40px;
+  font-size: 20px;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.chamado-texto {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cor-texto-secundario);
+}
+
+.chamado-etapas {
+  display: flex;
+  gap: 6px;
+  width: calc(100% - 48px);
+}
+
+.chamado-etapas span {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--cor-borda);
+}
+
+.chamado-etapas span.on {
+  background: var(--cor-suporte);
+}
+
+.chamado-categorias {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chamado-categorias button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1.5px solid var(--cor-borda-suave);
+  border-radius: 14px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  text-align: left;
+  cursor: pointer;
+  min-height: 56px;
+}
+
+.chamado-categorias button:hover {
+  border-color: var(--cor-suporte);
+}
+
+.chamado-categoria-icone {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chamado-categoria-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chamado-categoria-texto strong {
+  font-size: 15px;
+}
+
+.chamado-categoria-texto small {
+  font-size: 13px;
+  color: var(--cor-texto-secundario);
+}
+
+.chamado-voltar {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-superficie);
+  color: var(--cor-suporte);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chamado-dica {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cor-primaria) 12%, transparent);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.chamado-dica button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-weight: 800;
+  color: var(--cor-primaria-escura);
+  cursor: pointer;
+}
+
+.chamado-etapa label {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.chamado-sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chamado-sugestoes button {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--cor-suporte) 12%, transparent);
+  color: var(--cor-suporte);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chamado-sugestoes button.ativa {
+  border-color: var(--cor-suporte);
+}
+
+.chamado-etapa input,
+.chamado-etapa textarea {
+  width: 100%;
+  border: 1px solid var(--cor-borda);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--cor-texto);
+  background: var(--cor-superficie);
+}
+
+.chamado-etapa input {
+  height: 48px;
+}
+
+.chamado-etapa textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.chamado-etapa input:focus-visible,
+.chamado-etapa textarea:focus-visible,
+.chamado-modal button:focus-visible {
+  outline: 2px solid var(--cor-suporte);
+  outline-offset: 2px;
+}
+
+.chamado-passos {
+  font-size: 13px;
+  color: var(--cor-texto-secundario);
+  background: var(--cor-fundo);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.chamado-passos ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
+.chamado-btn-primario,
+.chamado-btn-secundario,
+.chamado-btn-whatsapp {
+  min-height: 48px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.chamado-btn-primario {
+  margin-top: 6px;
+  border: none;
+  color: var(--cor-branco-fixo);
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+}
+
+.chamado-btn-primario:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.chamado-btn-whatsapp {
+  border: none;
+  color: var(--cor-branco-fixo);
+  background: linear-gradient(135deg, var(--cor-whatsapp), var(--cor-whatsapp-escura));
+}
+
+.chamado-btn-secundario {
+  border: 1.5px solid var(--cor-borda);
+  background: transparent;
+  color: var(--cor-texto);
+}
+
+.chamado-sucesso {
+  align-items: center;
+  text-align: center;
+}
+
+.chamado-sucesso h2 {
+  padding-right: 0;
+}
+
+.chamado-sucesso .chamado-btn-primario,
+.chamado-sucesso .chamado-btn-secundario {
+  width: 100%;
+}
+
+.chamado-sucesso-icone {
+  color: var(--cor-sucesso-vivo);
+}
+
+.chamado-protocolo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 16px;
+  border-radius: 12px;
+  background: var(--cor-fundo);
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.chamado-protocolo button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-superficie);
+  color: var(--cor-suporte);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}

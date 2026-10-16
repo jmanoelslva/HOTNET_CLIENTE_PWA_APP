@@ -1,4 +1,5 @@
 import { ApiError, buscarConsumoDiario, buscarSessaoAtual } from './client'
+import type { Contrato } from './contratos'
 
 export interface ConsumoDiario {
   data: string // yyyy-MM-dd
@@ -88,6 +89,40 @@ export async function buscarConsumoDoMes(ano: number, mes: number): Promise<Cons
   return [...porCpe.values()].sort((a, b) => (a.contractNumber ?? a.cpePk) - (b.contractNumber ?? b.cpePk))
 }
 
+/**
+ * Completa contractPk/contractNumber de cada conexão do consumo pelo cpe_pk dos itens dos
+ * contratos (contract/svclist) — usage/list_day só traz o cpe_pk. Sem item correspondente,
+ * a conexão fica como veio. Mesma regra do app Android (vincularContratos).
+ */
+export function vincularContratos(consumo: ConsumoPorContrato[], contratos: Contrato[]): ConsumoPorContrato[] {
+  const contratoDaConexao = new Map<number, Contrato>()
+  for (const contrato of contratos) {
+    for (const item of contrato.itens) {
+      if (item.cpePk != null) contratoDaConexao.set(item.cpePk, contrato)
+    }
+  }
+  return consumo
+    .map((c) => {
+      const contrato = contratoDaConexao.get(c.cpePk)
+      if (!contrato) return c
+      return { ...c, contractPk: c.contractPk ?? contrato.id, contractNumber: c.contractNumber ?? contrato.numero }
+    })
+    .sort((a, b) => (a.contractNumber ?? a.cpePk) - (b.contractNumber ?? b.cpePk))
+}
+
+/** Com 2+ conexões, busca os contratos pra mostrar o número de cada uma; falha mantém o ID. */
+export async function comNumeroDoContrato(
+  consumo: ConsumoPorContrato[],
+  buscarContratos: () => Promise<Contrato[]>,
+): Promise<ConsumoPorContrato[]> {
+  if (consumo.length < 2) return consumo
+  try {
+    return vincularContratos(consumo, await buscarContratos())
+  } catch {
+    return consumo
+  }
+}
+
 export interface SessaoAtual {
   ip: string | null
   ipv6Prefixo: string | null
@@ -108,7 +143,9 @@ export interface SessaoAtual {
 export async function buscarSessaoAtualPorCpe(cpePk: number): Promise<SessaoAtual | null> {
   const where = JSON.stringify([{ field: 'aaa_cpe.cpe_pk', oper: 5, value: String(cpePk) }])
   const resposta = await buscarSessaoAtual(where)
-  if (resposta.success === false) return null
+  // Falha da consulta não é "desconectado": quem chama mostra "não foi possível verificar"
+  // em vez de "fora do ar, verifique o roteador".
+  if (resposta.success === false) throw new ApiError(resposta.message ?? 'Não foi possível verificar a conexão.')
 
   const primeiro = resposta.results?.[0]
   if (!primeiro) return null

@@ -115,86 +115,182 @@
   padding: 24px 20px 48px;
 }
 
-.home-card-status {
-  background: var(--cor-superficie);
+/* Cartão de conexão: grafite nos dois temas (texto branco fixo), como no app Android. Brilho
+   vermelho só com a conta bloqueada. */
+.home-conexao {
+  background: linear-gradient(140deg, var(--cor-cartao-conexao), var(--cor-cartao-conexao-fim));
+  color: var(--cor-branco-fixo);
   border-radius: 20px;
   padding: 18px;
   box-shadow: var(--sombra-card);
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.home-card-status-topo {
+.home-conexao-alerta {
+  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--cor-erro) 30%, transparent), transparent 60%),
+    linear-gradient(140deg, var(--cor-cartao-conexao), var(--cor-cartao-conexao-fim));
+}
+
+.home-conexao-seletor {
+  width: 100%;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cor-branco-fixo);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.home-conexao-seletor option {
+  color: var(--cor-texto);
+  background: var(--cor-superficie);
+}
+
+.home-conexao-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-conexao-rotulo {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.home-conexao-selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.home-conexao-estado {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.home-indicador {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
+.home-conexao-icone {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
   border-radius: 14px;
-  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.home-card-status-textos {
-  flex: 1;
+.home-conexao-textos {
   min-width: 0;
 }
 
-.home-plano-nome {
-  font-weight: 400;
-  color: var(--cor-texto-terciario);
-  font-size: 12px;
+.home-conexao-titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  text-wrap: balance;
 }
 
-.home-status-texto {
+.home-conexao-descricao {
   margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.home-conexao-blocos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.home-conexao-bloco {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.home-conexao-bloco span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.home-conexao-bloco strong {
   font-size: 15px;
-  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
-.home-status-resumo {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: var(--cor-texto-terciario);
-}
-
-.home-teste-velocidade {
-  display: inline-flex;
+.home-conexao-acao {
+  min-height: 48px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 12px;
-  /* 36px (não os 44px de alvo mínimo de uma ação principal) — é um link
-     secundário dentro do card de status, mesmo critério já usado em
-     "Ver mais boletos pagos" (Boletos.css): compensa com padding lateral
-     em vez de altura cheia. */
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 18px;
-  /* Sem fundo (background transparente, herdado por padrão) — só a
-     borda e o texto/ícone (via currentColor) na cor do Consumo, mesma
-     linguagem visual do ícone de Consumo no menu da Home. */
-  border: 1.5px solid var(--cor-consumo);
-  color: var(--cor-consumo);
-  font-size: 12px;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  /* Laranja vivo da marca com texto escuro: contraste alto sobre o grafite. */
+  background: var(--cor-primaria);
+  color: var(--cor-texto-sobre-laranja);
+}
+
+.home-conexao-acao-whatsapp {
+  background: linear-gradient(135deg, var(--cor-whatsapp), var(--cor-whatsapp-escura));
+  color: var(--cor-branco-fixo);
+}
+
+.home-conexao-secundarias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.home-conexao-secundaria {
+  min-height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--cor-branco-fixo);
+  font: inherit;
+  font-size: 14px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
   text-decoration: none;
 }
 
-.home-seletor-contrato {
-  width: 100%;
-  height: 40px;
-  margin-top: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--cor-borda);
-  padding: 0 12px;
-  font-size: 13px;
-  color: var(--cor-texto);
-  background: var(--cor-superficie);
+.home-conexao button:focus-visible,
+.home-conexao a:focus-visible,
+.home-conexao select:focus-visible {
+  outline: 2px solid var(--cor-branco-fixo);
+  outline-offset: 2px;
 }
 
 .home-whatsapp {
