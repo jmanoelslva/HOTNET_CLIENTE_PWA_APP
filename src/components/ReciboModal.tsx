@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { MdClose, MdPrint, MdShare } from 'react-icons/md'
 import { listarDetalhesFatura, listarItensContrato, urlImpressaoBoleto, type FaturaDto } from '../api/client'
 import { buscarDadosCliente } from '../api/cadastro'
@@ -56,48 +57,82 @@ async function planoDoContrato(contractPk: number | undefined): Promise<string |
   }
 }
 
-function escaparHtml(texto: string): string {
-  return texto.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
-}
-
-/** Página do recibo pra impressão/"Salvar como PDF" do navegador (texto real, não imagem). */
-function htmlParaImpressao(d: DadosRecibo): string {
-  const e = escaparHtml
-  // A aba nova é about:blank: o logo precisa do endereço completo do portal.
-  const logo = new URL(logoHotnet, window.location.href).href
-  const doc = d.documentoMascarado ? `, ${rotuloDocumento(d.documentoMascarado)} ${e(d.documentoMascarado)}` : ''
-  const linhas = linhasDemonstrativo(d)
-    .map((l) => `<tr><td>${e(descricaoLinha(l))}</td><td class="v">${e(formatarCentavosComSinal(l.centavos))}</td></tr>`)
-    .join('')
-  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Recibo ${numeroRecibo(d)}</title>
-<style>
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#222;margin:32px;max-width:640px}
-*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.faixa{height:8px;border-radius:4px;background:linear-gradient(90deg,#d94a38,#f28f3b);margin-bottom:16px}
-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:2px solid #d94a38;padding-bottom:12px}
-.marca{display:flex;gap:12px;align-items:center}.marca img{width:56px;height:56px;object-fit:contain}
-h1{font-size:18px;margin:0}small{color:#666;display:block;font-size:11px}
-.titulo{text-align:right}.titulo b{color:#d94a38;text-transform:uppercase;display:block}
-p{line-height:1.6;font-size:14px}table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
-td{padding:6px 0;border-bottom:1px solid #eee}.v{text-align:right;font-variant-numeric:tabular-nums}
-.total td{font-weight:800;font-size:15px;border-bottom:0}.total .v{color:#d94a38}
-.info{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;font-size:12px}
-.info div{border:1px solid #eee;border-radius:8px;padding:6px 8px}.info span{color:#777;display:block;font-size:10px;text-transform:uppercase}
-</style></head><body>
-<div class="faixa"></div>
-<header><div class="marca"><img id="logo" src="${e(logo)}" alt="HOTNET"><div><h1>${e(EMPRESA_RECIBO.nome)}</h1><small>${e(EMPRESA_RECIBO.responsavel)} · CNPJ ${e(EMPRESA_RECIBO.cnpj)}</small>
-<small>${e(EMPRESA_RECIBO.endereco)} · ${e(EMPRESA_RECIBO.cidade)}</small></div></div>
-<div class="titulo"><b>Recibo de pagamento</b>Nº ${numeroRecibo(d)}<small>Via do cliente</small></div></header>
-<p>Recebemos de <b>${e(d.clienteNome?.toUpperCase() ?? 'TITULAR DO CONTRATO')}</b>${doc}, a importância de
-<b>${e(formatarReais(d.pagoCentavos))} (${e(valorPorExtenso(d.pagoCentavos))})</b>, referente à mensalidade${
-    d.contratoNumero != null ? ` do contrato nº ${d.contratoNumero}` : ''
-  } com vencimento em ${e(d.vencimento)}, dando plena quitação deste valor.</p>
-<div class="info"><div><span>Cobrança</span>${numeroRecibo(d)}</div><div><span>Vencimento</span>${e(d.vencimento)}</div>
-<div><span>Data de crédito</span>${e(d.dataCredito)}</div><div><span>Contrato</span>${d.contratoNumero != null ? `Nº ${d.contratoNumero}` : '—'}</div></div>
-<table>${linhas}<tr><td>Valor do título</td><td class="v">${e(formatarReais(d.tituloCentavos))}</td></tr>
-<tr class="total"><td>Valor pago</td><td class="v">${e(formatarReais(d.pagoCentavos))}</td></tr></table>
-<p><small>Emitido pelo portal HOTNET em ${new Date().toLocaleDateString('pt-BR')}.</small></p>
-</body></html>`
+/**
+ * Recibo em folha (impressão/"Salvar como PDF" do navegador, texto real). Fica no próprio
+ * documento, escondido na tela e mostrado só na impressão (ReciboModal.css): imprimir uma aba
+ * nova escrita por script falhava no Chrome do Android (logo no tamanho original, sem estilo).
+ */
+function ReciboImpressao({ d }: { d: DadosRecibo }) {
+  return (
+    <div className="recibo-impressao" aria-hidden="true">
+      <div className="ri-faixa" />
+      <header className="ri-topo">
+        <div className="ri-marca">
+          <img src={logoHotnet} alt="" width={56} height={56} />
+          <div>
+            <h1>{EMPRESA_RECIBO.nome}</h1>
+            <small>
+              {EMPRESA_RECIBO.responsavel} · CNPJ {EMPRESA_RECIBO.cnpj}
+            </small>
+            <small>
+              {EMPRESA_RECIBO.endereco} · {EMPRESA_RECIBO.cidade}
+            </small>
+          </div>
+        </div>
+        <div className="ri-titulo">
+          <b>Recibo de pagamento</b>
+          Nº {numeroRecibo(d)}
+          <small>Via do cliente</small>
+        </div>
+      </header>
+      <p className="ri-corpo">
+        Recebemos de <b>{d.clienteNome?.toUpperCase() ?? 'TITULAR DO CONTRATO'}</b>
+        {d.documentoMascarado ? `, ${rotuloDocumento(d.documentoMascarado)} ${d.documentoMascarado}` : ''}, a importância de{' '}
+        <b>
+          {formatarReais(d.pagoCentavos)} ({valorPorExtenso(d.pagoCentavos)})
+        </b>
+        , referente à mensalidade{d.contratoNumero != null ? ` do contrato nº ${d.contratoNumero}` : ''} com vencimento em{' '}
+        {d.vencimento}, dando plena quitação deste valor.
+      </p>
+      <div className="ri-info">
+        <div>
+          <span>Cobrança</span>
+          {numeroRecibo(d)}
+        </div>
+        <div>
+          <span>Vencimento</span>
+          {d.vencimento}
+        </div>
+        <div>
+          <span>Data de crédito</span>
+          {d.dataCredito}
+        </div>
+        <div>
+          <span>Contrato</span>
+          {d.contratoNumero != null ? `Nº ${d.contratoNumero}` : '—'}
+        </div>
+      </div>
+      <table className="ri-tabela">
+        <tbody>
+          {linhasDemonstrativo(d).map((l, i) => (
+            <tr key={i}>
+              <td>{descricaoLinha(l)}</td>
+              <td className="ri-valor">{formatarCentavosComSinal(l.centavos)}</td>
+            </tr>
+          ))}
+          <tr>
+            <td>Valor do título</td>
+            <td className="ri-valor">{formatarReais(d.tituloCentavos)}</td>
+          </tr>
+          <tr className="ri-total">
+            <td>Valor pago</td>
+            <td className="ri-valor">{formatarReais(d.pagoCentavos)}</td>
+          </tr>
+        </tbody>
+      </table>
+      <small className="ri-rodape">Emitido pelo portal HOTNET em {new Date().toLocaleDateString('pt-BR')}.</small>
+    </div>
+  )
 }
 
 interface Props {
@@ -149,34 +184,15 @@ export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
     }
   }
 
-  function imprimir(d: DadosRecibo) {
-    const janela = window.open('', '_blank')
-    if (!janela) {
-      toast('O navegador bloqueou a nova aba. Libere pop-ups para este site e tente de novo.')
-      return
+  function imprimir() {
+    // Na impressão, ReciboModal.css esconde o portal inteiro e mostra só .recibo-impressao.
+    const limpar = () => {
+      document.body.classList.remove('imprimindo-recibo')
+      window.removeEventListener('afterprint', limpar)
     }
-    janela.document.open()
-    // Todo texto vindo do servidor passa por escaparHtml em htmlParaImpressao; o resto são
-    // números e textos fixos do próprio portal.
-    janela.document.write(htmlParaImpressao(d))
-    janela.document.close()
-    janela.focus()
-    // Só imprime depois do logo carregar: antes, a impressão abria e o PDF saía sem ele.
-    const imagem = janela.document.getElementById('logo') as HTMLImageElement | null
-    let impresso = false
-    const imprimirUmaVez = () => {
-      if (impresso) return
-      impresso = true
-      janela.print()
-    }
-    if (!imagem || imagem.complete) {
-      imprimirUmaVez()
-    } else {
-      imagem.addEventListener('load', imprimirUmaVez, { once: true })
-      imagem.addEventListener('error', imprimirUmaVez, { once: true })
-      // Rede lenta: não deixa a pessoa esperando para sempre.
-      window.setTimeout(imprimirUmaVez, 3000)
-    }
+    document.body.classList.add('imprimindo-recibo')
+    window.addEventListener('afterprint', limpar)
+    window.print()
   }
 
   return (
@@ -253,7 +269,7 @@ export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
               <button className="recibo-btn-primario" onClick={() => compartilhar(dados)}>
                 <MdShare size={18} /> Compartilhar
               </button>
-              <button className="recibo-btn-borda" onClick={() => imprimir(dados)}>
+              <button className="recibo-btn-borda" onClick={imprimir}>
                 <MdPrint size={18} /> Imprimir / PDF
               </button>
             </div>
@@ -271,6 +287,8 @@ export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
           </>
         )}
       </div>
+      {/* Filho direto do body: a regra de impressão esconde todo o resto da página. */}
+      {dados && createPortal(<ReciboImpressao d={dados} />, document.body)}
     </div>
   )
 }

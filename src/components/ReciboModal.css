@@ -182,3 +182,141 @@
   font-size: 14px;
   padding: 24px 0;
 }
+
+/* Recibo em folha: escondido na tela, só aparece na impressão (ver ReciboImpressao). Cores
+   fixas de papel: a folha é sempre clara, em qualquer tema. */
+.recibo-impressao {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  body.imprimindo-recibo {
+    background: #ffffff !important;
+    padding: 0 !important;
+  }
+
+  body.imprimindo-recibo > :not(.recibo-impressao) {
+    display: none !important;
+  }
+
+  body.imprimindo-recibo .recibo-impressao {
+    display: block;
+    color: #222222;
+    font-size: 13px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+.ri-faixa {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #d94a38, #f28f3b);
+  margin-bottom: 16px;
+}
+
+.ri-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 2px solid #d94a38;
+  padding-bottom: 12px;
+}
+
+.ri-marca {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Tamanho travado: sem isso o logo saía no tamanho original e ocupava a folha inteira. */
+.ri-marca img {
+  width: 56px;
+  height: 56px;
+  max-width: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.recibo-impressao h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.recibo-impressao small {
+  display: block;
+  color: #666666;
+  font-size: 11px;
+}
+
+.ri-titulo {
+  text-align: right;
+}
+
+.ri-titulo b {
+  display: block;
+  color: #d94a38;
+  text-transform: uppercase;
+}
+
+.ri-corpo {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 16px 0;
+}
+
+.ri-info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  font-size: 12px;
+}
+
+.ri-info div {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.ri-info span {
+  display: block;
+  color: #777777;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.ri-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.ri-tabela td {
+  padding: 6px 0;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.ri-valor {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ri-total td {
+  font-weight: 800;
+  font-size: 15px;
+  border-bottom: 0;
+}
+
+.ri-total .ri-valor {
+  color: #d94a38;
+}
+
+.ri-rodape {
+  margin-top: 16px;
+}
