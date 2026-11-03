@@ -18,7 +18,7 @@ set -euo pipefail
 # --------------------------------------------------------------------------
 # Configuração fixa
 # --------------------------------------------------------------------------
-REPO_URL="https://github.com/jmanoelslva/HOTNET_WEB_APP.git"
+REPO_URL="https://github.com/jmanoelslva/HOTNET_CLIENTE_PWA_APP.git"
 BACKEND_DOMAIN="controllr.hotnet.net.br"
 INSTALL_DIR="/opt/hotnet-web"
 ACME_WEBROOT="/var/www/certbot-acme"
