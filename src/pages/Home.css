@@ -1,176 +1,277 @@
 .home-tela {
-  /* Sem altura fixa nem "overflow: hidden" aqui — mesmo padrão das demais
-     telas (Boletos, Contratos, etc.), que deixam o body rolar sozinho.
-     Uma altura travada em 100dvh cortava o menu sem dar nenhum jeito de
-     rolar até o resto quando o conteúdo não cabia na altura disponível
-     (bug real: celular deitado/paisagem tem bem menos altura que em pé,
-     e a grade de 6 itens do menu passava a ficar cortada e inacessível,
-     embora a barra de navegação inferior — fixa, fora desta tela —
-     continuasse funcionando normalmente). */
-  background: var(--cor-fundo);
+  max-width: var(--largura-conteudo);
+  margin: 0 auto;
+  padding: 0 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
+/* Cabeçalho (MainHeader): inicial no círculo laranja-claro com anel laranja,
+   saudação em titleLarge ExtraBold e a pergunta em cinza. */
 .home-cabecalho {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 18px 20px;
-  margin-bottom: 20px;
-  border-radius: 20px;
-  border: 1px solid transparent;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 0 2px;
 }
 
-.home-header-logo {
-  height: 44px;
-  width: 44px;
+.home-avatar {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
   border-radius: 50%;
-  background: var(--cor-superficie);
-  box-shadow: var(--sombra-card);
-  padding: 4px;
-  flex-shrink: 0;
+  border: 2px solid var(--cor-primaria);
+  background: var(--cor-primaria-container);
+  color: var(--cor-sobre-primaria-container);
+  font: inherit;
+  font-size: 22px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
-.home-header-saudacao {
-  flex: 1;
+.home-cabecalho-textos {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
 .home-saudacao {
-  display: block;
-  font-size: 18px;
+  font-size: 22px;
+  line-height: 28px;
   font-weight: 800;
-  color: var(--cor-texto);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .home-subtitulo {
-  margin: 2px 0 0;
-  color: var(--cor-texto-terciario);
   font-size: 12px;
+  line-height: 16px;
+  color: var(--cor-texto-secundario);
 }
 
-.home-avatar-wrapper {
-  position: relative;
+/* Seletor de contrato: trilho de pílulas, como AbasPilula. */
+.home-seletor {
+  display: flex;
+  gap: 0;
+  padding: 3px;
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie-alta);
+  overflow-x: auto;
+}
+
+.home-seletor-item {
+  flex: 1;
+  min-height: 40px;
+  border: none;
+  border-radius: var(--raio-sm);
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.home-seletor-item.ativo {
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-weight: 800;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* Faixa da conexão (normal): branca, cantos de 24, abre os detalhes. */
+.home-faixa {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-xl);
+  overflow: hidden;
+}
+
+.home-faixa-topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.home-faixa-ponto {
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  border-radius: 50%;
+  background: var(--cor-texto-desabilitado);
+}
+
+.home-faixa-ponto.online {
+  background: #20b957;
+}
+
+.home-faixa-ponto.verificando {
+  animation: home-pulso 1.2s ease-in-out infinite;
+}
+
+@keyframes home-pulso {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.home-faixa-textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-faixa-textos strong {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 800;
+}
+
+.home-faixa-textos span {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--cor-texto-secundario);
+}
+
+.home-faixa-seta {
+  color: var(--cor-texto-secundario);
+  transition: rotate 0.2s ease;
+}
+
+.home-faixa-seta.aberta {
+  rotate: 180deg;
+}
+
+.home-faixa-detalhes {
+  padding: 0 16px 12px;
+}
+
+.home-blocos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.home-bloco {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie-alta);
+}
+
+.home-bloco span {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--cor-texto-secundario);
+}
+
+.home-bloco strong {
+  font-size: 14px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.home-faixa-botoes {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.home-faixa-botoes > * {
+  flex: 1;
+}
+
+/* Faixa da conexão com problema: errorContainer (cancelado: cinza). */
+.home-faixa-problema {
+  padding: 16px;
+  border-radius: var(--raio-xl);
+  background: #ffd9e2;
+  color: #3f0018;
+}
+
+.home-faixa-problema.neutra {
+  background: var(--cor-superficie-alta);
+  color: var(--cor-texto);
+}
+
+:root[data-theme='dark'] .home-faixa-problema:not(.neutra) {
+  background: #8e0e42;
+  color: #ffd9e2;
+}
+
+.home-faixa-problema-topo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.home-faixa-problema-topo svg {
+  margin-top: 2px;
   flex-shrink: 0;
 }
 
-.home-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background: var(--cor-superficie);
-  color: var(--cor-primaria);
-  box-shadow: var(--sombra-card);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+.home-faixa-problema-topo strong {
+  display: block;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 800;
 }
 
-.home-avatar-menu-fundo {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
+.home-faixa-problema-topo p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
 }
 
-.home-avatar-menu {
-  position: absolute;
-  top: 52px;
-  right: 0;
-  z-index: 11;
-  background: var(--cor-superficie);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  min-width: 120px;
-}
-
-.home-avatar-menu button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.home-faixa-problema .botao-primario {
   width: 100%;
-  border: none;
-  background: transparent;
-  text-align: left;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--cor-texto);
-  cursor: pointer;
-  white-space: nowrap;
 }
 
-.home-avatar-menu button:hover {
-  background: var(--cor-fundo);
-}
-
-.home-avatar-menu-sair {
-  color: var(--cor-primaria-escura) !important;
-}
-
-.home-conteudo {
-  max-width: var(--largura-conteudo);
-  margin: 0 auto;
-  padding: 24px 20px 48px;
-}
-
-/* Cartão de conexão: grafite nos dois temas (texto branco fixo), como no app Android. Brilho
-   vermelho só com a conta bloqueada. */
-.home-conexao {
-  background: linear-gradient(140deg, var(--cor-cartao-conexao), var(--cor-cartao-conexao-fim));
-  color: var(--cor-branco-fixo);
-  border-radius: 20px;
-  padding: 18px;
-  box-shadow: var(--sombra-card);
-  margin-bottom: 20px;
+/* Cartão grafite do próximo boleto (BoletoDestaqueInicio + CartaoDestaque). */
+.home-boleto {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-.home-conexao-alerta {
-  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--cor-erro) 30%, transparent), transparent 60%),
-    linear-gradient(140deg, var(--cor-cartao-conexao), var(--cor-cartao-conexao-fim));
-}
-
-.home-conexao-seletor {
-  width: 100%;
-  height: 40px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 0 12px;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
+  padding: 16px;
+  border-radius: var(--raio-xl);
+  background: var(--cor-cartao-conexao);
   color: var(--cor-branco-fixo);
-  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
-.home-conexao-seletor option {
-  color: var(--cor-texto);
-  background: var(--cor-superficie);
-}
-
-.home-conexao-topo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-
-.home-conexao-rotulo {
+.home-boleto-rotulo {
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.75);
 }
 
-.home-conexao-selo {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.home-boleto-valor {
+  margin-top: 4px;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 800;
+}
+
+.home-boleto-prazo {
+  align-self: flex-start;
+  margin-top: 6px;
   padding: 4px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.14);
@@ -178,180 +279,223 @@
   font-weight: 800;
 }
 
-.home-conexao-estado {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+.home-boleto-prazo.atrasado {
+  background: #ff8a8a;
+  color: #4a0008;
 }
 
-.home-conexao-icone {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.12);
+.home-boleto-pix {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.home-conexao-textos {
-  min-width: 0;
-}
-
-.home-conexao-titulo {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 800;
-  text-wrap: balance;
-}
-
-.home-conexao-descricao {
-  margin: 2px 0 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.home-conexao-blocos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 8px;
-}
-
-.home-conexao-bloco {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.home-conexao-bloco span {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.home-conexao-bloco strong {
-  font-size: 15px;
-  overflow-wrap: anywhere;
-}
-
-.home-conexao-acao {
   min-height: 48px;
+  margin-top: 12px;
   border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  /* Laranja vivo do logotipo com texto escuro (7:1), como no app Android. */
+  border-radius: var(--raio-md);
   background: var(--cor-laranja-vivo);
   color: var(--cor-texto-sobre-laranja);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
-.home-conexao-acao-whatsapp {
-  background: linear-gradient(135deg, var(--cor-whatsapp), var(--cor-whatsapp-escura));
-  color: var(--cor-branco-fixo);
+.home-boleto-pix.copiado {
+  background: #c8f2d4;
+  color: #0b4a22;
 }
 
-.home-conexao-secundarias {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+.home-boleto-secundario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-}
-
-.home-conexao-secundaria {
-  min-height: 48px;
+  min-height: 44px;
+  margin-top: 8px;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--raio-md);
   background: rgba(255, 255, 255, 0.12);
   color: var(--cor-branco-fixo);
   font: inherit;
   font-size: 14px;
   font-weight: 700;
+  cursor: pointer;
+}
+
+/* "Tudo em dia" (TudoEmDiaCard). */
+.home-em-dia {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.home-conexao button:focus-visible,
-.home-conexao a:focus-visible,
-.home-conexao select:focus-visible {
-  outline: 2px solid var(--cor-branco-fixo);
-  outline-offset: 2px;
-}
-
-.home-whatsapp {
-  width: 100%;
-  height: 52px;
-  border: none;
-  border-radius: 14px;
-  color: var(--cor-branco-fixo);
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-whatsapp), var(--cor-whatsapp-escura));
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.home-menu {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  margin-bottom: 32px;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-.home-menu-item {
+.home-em-dia-icone {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--cor-sucesso) 16%, transparent);
+  color: var(--cor-sucesso);
+}
+
+.home-em-dia-textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-em-dia-textos strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.home-em-dia-textos span {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}
+
+.home-em-dia-acao {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--cor-primaria);
+  white-space: nowrap;
+}
+
+/* Acesso rápido: bloco branco com 5 círculos alternando laranja e vermelho. */
+.home-atalhos {
+  margin-top: 4px;
+  padding: 12px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-xl);
   background: var(--cor-superficie);
-  border-radius: 16px;
-  padding: 20px 8px;
-  box-shadow: var(--sombra-card);
+}
+
+.home-atalhos h2 {
+  margin: 2px 0 10px 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--cor-texto-secundario);
+}
+
+.home-atalhos-grade {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+}
+
+.home-atalho {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: inherit;
+  gap: 6px;
+  padding: 6px 0;
+  border: none;
+  border-radius: var(--raio-md);
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  cursor: pointer;
 }
 
-.home-menu-icone {
+.home-atalho-icone {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.home-menu-label {
+.home-atalho-icone.primaria {
+  background: var(--cor-primaria-container);
+  color: var(--cor-primaria);
+}
+
+.home-atalho-icone.terciaria {
+  background: var(--cor-terciaria-container);
+  color: var(--cor-terciaria);
+}
+
+:root[data-theme='dark'] .home-atalho-icone.primaria {
+  color: var(--cor-primaria-clara);
+}
+
+.home-atalho-titulo {
   font-size: 12px;
-  font-weight: 600;
+  line-height: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* WhatsApp (WhatsappButton): verde só no símbolo, "Chamar" em laranja. */
+.home-whatsapp {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
   color: var(--cor-texto);
-  text-align: center;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-.home-rodape {
-  text-align: center;
-  margin-top: 24px;
+.home-whatsapp-icone {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-whatsapp);
+  color: #ffffff;
 }
 
-.home-rodape a {
+.home-whatsapp-textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-whatsapp-textos strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.home-whatsapp-textos span {
   font-size: 12px;
-  color: var(--cor-texto-terciario);
+  color: var(--cor-texto-secundario);
+}
+
+.home-whatsapp-chamar {
+  padding: 6px 10px;
+  border-radius: var(--raio-md);
+  background: var(--cor-primaria);
+  color: var(--cor-branco-fixo);
+  font-size: 12px;
+  font-weight: 700;
 }

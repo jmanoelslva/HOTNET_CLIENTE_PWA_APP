@@ -1,11 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LuCircleUser, LuArrowDownToLine, LuLock, LuHeadset, LuEye, LuEyeOff } from 'react-icons/lu'
+import { LuArrowDownToLine, LuChevronRight, LuHeadset, LuEye, LuEyeOff } from 'react-icons/lu'
+import { FaWhatsapp } from 'react-icons/fa'
 import { useSessao } from '../auth/useSessao'
-import LoginBackground from '../components/LoginBackground'
 import ModalInstalarIos from '../components/ModalInstalarIos'
 import { usePwaInstall } from '../hooks/usePwaInstall'
-import logoHotnet from '../assets/logo-hotnet.png'
+import logoApp from '../assets/logo-app.png'
 import { abrirWhatsappLogin } from '../utils/whatsapp'
 import './Login.css'
 
@@ -39,15 +39,21 @@ export default function Login() {
 
   return (
     <div className="login-tela tela-entrada">
-      <LoginBackground />
+      {/* Topo da identidade "H" do app Android (gradienteTopoMarca): laranja
+          sólido atrás do texto branco, depois degradê até o fundo. */}
+      <header className="login-topo">
+        <span className="login-logo-circulo">
+          <img src={logoApp} alt="" className="login-logo" />
+        </span>
+        <span className="login-marca">HOTNET</span>
+        <h1>Entre na sua conta</h1>
+        <p>Conexão, boletos e suporte num só lugar.</p>
+      </header>
 
+      <div className="login-conteudo">
       <div className="login-card">
-        <img src={logoHotnet} alt="HOTNET" className="login-logo" />
-
         <form onSubmit={aoEnviar}>
-          <label htmlFor="usuario">
-            <LuCircleUser className="login-label-icone" /> CPF ou CNPJ
-          </label>
+          <label htmlFor="usuario">CPF ou CNPJ</label>
           <input
             id="usuario"
             type="text"
@@ -58,9 +64,7 @@ export default function Login() {
             required
           />
 
-          <label htmlFor="senha">
-            <LuLock className="login-label-icone" /> Senha
-          </label>
+          <label htmlFor="senha">Senha</label>
           <div className="login-campo-senha">
             <input
               id="senha"
@@ -91,11 +95,26 @@ export default function Login() {
           Não consigo entrar?
         </button>
 
-        {podeInstalar && (
-          <button type="button" className="login-btn-instalar" onClick={aoClicarInstalar}>
-            <LuArrowDownToLine size={18} /> Instalar app
-          </button>
-        )}
+      </div>
+
+      <button type="button" className="login-ajuda" onClick={() => abrirWhatsappLogin(usuario)}>
+        <span className="login-ajuda-icone" aria-hidden="true">
+          <FaWhatsapp size={20} />
+        </span>
+        <span className="login-ajuda-textos">
+          <strong>Precisa de ajuda?</strong>
+          <span>Fale com a gente no WhatsApp</span>
+        </span>
+        <LuChevronRight size={22} aria-hidden="true" />
+      </button>
+
+      {podeInstalar && (
+        <button type="button" className="login-btn-instalar" onClick={aoClicarInstalar}>
+          <LuArrowDownToLine size={18} /> Instalar o app
+        </button>
+      )}
+
+      {__APP_VERSION__ && <p className="login-versao">Versão {__APP_VERSION__}</p>}
       </div>
 
       {ajudaAberta && (
