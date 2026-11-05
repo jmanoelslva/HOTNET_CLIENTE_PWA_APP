@@ -129,6 +129,16 @@ export default function Boletos() {
     }
   }, [porContrato, filtroStatus])
 
+  // Na aba Atrasados, os boletos ainda a vencer aparecem embaixo: o atrasado é o "próximo"
+  // a pagar e os demais seguem na sequência, sem precisar trocar de aba.
+  const aVencer = useMemo(
+    () =>
+      porContrato
+        .filter((f) => !f.invoice_date_credit && !estaVencida(f))
+        .sort((x, y) => (x.invoice_date_due ?? '').localeCompare(y.invoice_date_due ?? '')),
+    [porContrato],
+  )
+
   const faturasExibidas =
     filtroStatus === 'aberto' || mostrarTodosPagos ? faturasFiltradas : faturasFiltradas.slice(0, LIMITE_PAGOS_PADRAO)
 
@@ -251,25 +261,31 @@ export default function Boletos() {
             }
           />
         )
+        const compactaOuCartao = (fatura: FaturaDto) =>
+          abertaPk === fatura.invoice_pk ? (
+            cartao(fatura)
+          ) : (
+            <button key={fatura.invoice_pk} type="button" className="fatura-compacta" onClick={() => setAbertaPk(fatura.invoice_pk)}>
+              <span className="fatura-compacta-textos">
+                <strong>{formatarMoeda(valorAtual(fatura))}</strong>
+                <span className={estaVencida(fatura) ? 'atrasada' : ''}>
+                  {textoVencimento(fatura)}
+                  {fatura.contract_number != null ? ` · Contrato ${fatura.contract_number}` : ''}
+                </span>
+              </span>
+              <MdKeyboardArrowRight size={24} aria-hidden="true" />
+            </button>
+          )
         return (
           <div className="boletos-lista">
             {cartao(destaque)}
             {demais.length > 0 && <RotuloGrupo>{filtroStatus === 'atrasados' ? 'Outros atrasados' : 'Próximos'}</RotuloGrupo>}
-            {demais.map((fatura) =>
-              abertaPk === fatura.invoice_pk ? (
-                cartao(fatura)
-              ) : (
-                <button key={fatura.invoice_pk} type="button" className="fatura-compacta" onClick={() => setAbertaPk(fatura.invoice_pk)}>
-                  <span className="fatura-compacta-textos">
-                    <strong>{formatarMoeda(valorAtual(fatura))}</strong>
-                    <span className={estaVencida(fatura) ? 'atrasada' : ''}>
-                      {textoVencimento(fatura)}
-                      {fatura.contract_number != null ? ` · Contrato ${fatura.contract_number}` : ''}
-                    </span>
-                  </span>
-                  <MdKeyboardArrowRight size={24} aria-hidden="true" />
-                </button>
-              ),
+            {demais.map(compactaOuCartao)}
+            {filtroStatus === 'atrasados' && aVencer.length > 0 && (
+              <>
+                <RotuloGrupo>A vencer</RotuloGrupo>
+                {aVencer.map(compactaOuCartao)}
+              </>
             )}
           </div>
         )
