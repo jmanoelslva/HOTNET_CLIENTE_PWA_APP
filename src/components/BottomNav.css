@@ -62,8 +62,7 @@
   font-weight: 800;
 }
 
-/* Botão central "Pagar": círculo laranja que sobe acima da barra, com um
-   anel na cor do fundo separando do conteúdo atrás (como no app). */
+/* Botão central "Pagar": círculo laranja que sobe acima da barra. */
 .bottom-nav-pagar {
   justify-content: flex-end;
   padding-bottom: 14px;
