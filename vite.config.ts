@@ -52,12 +52,9 @@ export default defineConfig({
         lang: 'pt-BR',
         start_url: '/',
         display: 'standalone',
-        // Abertura na cor do fundo. Sem theme_color de propósito (undefined também anula o
-        // padrão do plugin): o Chrome do Android pinta a barra de navegação com a cor fixa do
-        // manifesto, que ficava branca no modo escuro; sem ela, a barra segue o claro/escuro do
-        // sistema. A barra de status segue o <meta name="theme-color"> trocado por utils/tema.ts.
+        // Barras do sistema e abertura na cor do fundo, como no app Android.
         background_color: '#f7f8fa',
-        theme_color: undefined,
+        theme_color: '#f7f8fa',
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
