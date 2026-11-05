@@ -186,20 +186,26 @@
   overflow-wrap: anywhere;
 }
 
-/* Cada botão na largura do próprio texto, sempre em uma linha; em tela
-   estreita demais, um desce para baixo do outro (nunca quebra o texto). */
+/* Dois botões em metades iguais, alinhados com Plano e Uso acima (mesma
+   grade), sempre em uma linha: a letra acompanha a largura da tela. */
 .home-faixa-botoes {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
   margin-top: 8px;
 }
 
 .home-faixa-botoes > * {
-  flex: 1 1 auto;
+  min-width: 0;
   gap: 6px;
-  padding: 0 12px;
+  padding: 0 8px;
   white-space: nowrap;
+  font-size: clamp(12px, 3.4vw, 14px);
+}
+
+/* Só o Diagnóstico (conexão sem teste de velocidade): linha inteira. */
+.home-faixa-botoes > :only-child {
+  grid-column: 1 / -1;
 }
 
 /* Faixa da conexão com problema: errorContainer (cancelado: cinza). */

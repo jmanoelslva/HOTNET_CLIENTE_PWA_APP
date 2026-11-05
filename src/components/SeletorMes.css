@@ -1,0 +1,60 @@
+.seletor-mes-ano {
+  display: flex;
+  align-items: center;
+}
+
+.seletor-mes-ano strong {
+  flex: 1;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.seletor-mes-ano button {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cor-texto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.seletor-mes-ano button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.seletor-mes-grade {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+/* Meses: surfaceContainerHigh; escolhido em laranja; futuros riscados. */
+.seletor-mes-item {
+  height: 44px;
+  border: none;
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie-alta);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.seletor-mes-item.selecionado {
+  background: var(--cor-primaria);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.seletor-mes-item:disabled {
+  color: var(--cor-texto-secundario);
+  text-decoration: line-through;
+  cursor: default;
+}

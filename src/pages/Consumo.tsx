@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdMemory, MdPublic } from 'react-icons/md'
+import { MdArrowDropDown, MdKeyboardArrowLeft, MdKeyboardArrowRight, MdMemory, MdPublic } from 'react-icons/md'
+import SeletorMes from '../components/SeletorMes'
 import { IcDataUsage, IcWifi, IcWifiOff } from '../components/IconesApp'
 import {
   buscarConsumoDoMes,
@@ -40,6 +41,7 @@ export default function Consumo() {
   const hoje = new Date()
   const [ano, setAno] = useState(hoje.getFullYear())
   const [mes, setMes] = useState(hoje.getMonth() + 1)
+  const [escolhendoMes, setEscolhendoMes] = useState(false)
 
   const [consumoPorContrato, setConsumoPorContrato] = useState<ConsumoPorContrato[]>([])
   const [cpePkSelecionado, setCpePkSelecionado] = useState<number | null>(null)
@@ -136,13 +138,28 @@ export default function Consumo() {
         <button type="button" onClick={irParaMesAnterior} aria-label="Mês anterior">
           <MdKeyboardArrowLeft size={22} />
         </button>
-        <span>
+        <button type="button" className="consumo-seletor-mes-nome" onClick={() => setEscolhendoMes(true)} aria-label="Selecionar mês">
           {nomesMeses[mes - 1]} de {ano}
-        </span>
+          <MdArrowDropDown size={24} aria-hidden="true" />
+        </button>
         <button type="button" onClick={irParaProximoMes} disabled={ehMesAtual(ano, mes)} aria-label="Próximo mês">
           <MdKeyboardArrowRight size={22} />
         </button>
       </div>
+
+      {escolhendoMes && (
+        <SeletorMes
+          aberto
+          mes={mes}
+          ano={ano}
+          onFechar={() => setEscolhendoMes(false)}
+          onEscolher={(m, a) => {
+            setEscolhendoMes(false)
+            setMes(m)
+            setAno(a)
+          }}
+        />
+      )}
 
       {consumoPorContrato.length > 1 && (
         <div className="consumo-seletor-contrato">

@@ -16,25 +16,37 @@
   background: var(--cor-superficie);
 }
 
-.consumo-seletor-mes span {
-  font-size: 16px;
+/* Nome do mês: toca para abrir a escolha de mês e ano (como no app). */
+.consumo-seletor-mes-nome {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 44px;
+  border: none;
+  border-radius: var(--raio-md);
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 15px;
   font-weight: 800;
 }
 
-.consumo-seletor-mes button {
+.consumo-seletor-mes > button:not(.consumo-seletor-mes-nome) {
   width: 44px;
   height: 44px;
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: var(--cor-texto);
+  color: var(--cor-primaria);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
 
-.consumo-seletor-mes button:disabled {
+.consumo-seletor-mes > button:disabled {
   opacity: 0.35;
   cursor: default;
 }
