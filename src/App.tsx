@@ -10,6 +10,7 @@ import { marcarSaidaDoApp, pinAtivo, precisaDesbloquear } from './utils/pinApp'
 import Spinner from './components/Spinner'
 import { useSessao } from './auth/useSessao'
 import { aplicarVersaoNovaSePreciso } from './utils/atualizacaoApp'
+import { atualizarCorDasBarras } from './utils/tema'
 
 // Uma página por chunk — carregada só quando o cliente navega até ela, em
 // vez de tudo num bundle inicial só (a lista de rotas só cresce).
@@ -56,6 +57,7 @@ function App() {
   // destino (ver utils/atualizacaoApp.ts).
   useEffect(() => {
     aplicarVersaoNovaSePreciso()
+    atualizarCorDasBarras()
   }, [location.pathname])
 
   return (
