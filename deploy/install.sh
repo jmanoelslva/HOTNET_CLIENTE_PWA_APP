@@ -77,24 +77,69 @@ fi
 # --------------------------------------------------------------------------
 DOMAIN_REGEX='^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$'
 
+# Padrão: cliente.<domínio da empresa>, tirado do backend (controllr.X → cliente.X).
+DOMINIO_PADRAO="cliente.${BACKEND_DOMAIN#controllr.}"
+
 DOMINIO=""
 while [ -z "$DOMINIO" ]; do
-  read -rp "Qual domínio vai ser usado pra este portal? (ex: cliente.hotnet.net.br) " resposta
+  read -rp "Domínio do portal [$DOMINIO_PADRAO]: " resposta
+  resposta="${resposta:-$DOMINIO_PADRAO}"
   if [[ "$resposta" =~ $DOMAIN_REGEX ]]; then
-    DOMINIO="$resposta"
+    DOMINIO="${resposta,,}"
   else
     warn "Domínio inválido, tente de novo (sem http://, sem barra no fim)."
   fi
 done
 
+# Servidor web: detecta o que está rodando agora e sugere esse. Apache e Nginx
+# não podem escutar a porta 80 ao mesmo tempo, então escolher o outro só é
+# aceito se nenhum dos dois estiver ativo.
+apache_rodando()   { command -v apache2ctl >/dev/null 2>&1 && systemctl is-active --quiet apache2; }
+nginx_rodando()    { command -v nginx      >/dev/null 2>&1 && systemctl is-active --quiet nginx; }
+apache_instalado() { dpkg -s apache2 >/dev/null 2>&1; }
+nginx_instalado()  { dpkg -s nginx   >/dev/null 2>&1; }
+
+WEB_ATIVO=""
+if apache_rodando && nginx_rodando; then
+  warn "Apache e Nginx estão os dois ativos neste servidor (um deles não deve estar na porta 80)."
+elif apache_rodando; then
+  WEB_ATIVO="apache"
+  ok "Detectado: Apache em execução."
+elif nginx_rodando; then
+  WEB_ATIVO="nginx"
+  ok "Detectado: Nginx em execução."
+fi
+
+WEB_PADRAO="$WEB_ATIVO"
+if [ -z "$WEB_PADRAO" ]; then
+  if apache_instalado && ! nginx_instalado; then
+    WEB_PADRAO="apache"
+  elif nginx_instalado && ! apache_instalado; then
+    WEB_PADRAO="nginx"
+  fi
+  info "Nenhum servidor web em execução agora${WEB_PADRAO:+ (instalado: $WEB_PADRAO)}."
+fi
+
 WEBSERVER=""
 while [ -z "$WEBSERVER" ]; do
-  read -rp "Usar Apache ou Nginx? [apache/nginx] " resposta
+  if [ -n "$WEB_PADRAO" ]; then
+    read -rp "Usar Apache ou Nginx? [apache/nginx] (Enter = $WEB_PADRAO) " resposta
+    resposta="${resposta:-$WEB_PADRAO}"
+  else
+    read -rp "Usar Apache ou Nginx? [apache/nginx] " resposta
+  fi
   case "${resposta,,}" in
-    apache) WEBSERVER="apache" ;;
-    nginx)  WEBSERVER="nginx" ;;
-    *) warn "Digite 'apache' ou 'nginx'." ;;
+    apache|a) escolha="apache" ;;
+    nginx|n)  escolha="nginx" ;;
+    *) warn "Digite 'apache' ou 'nginx'."; continue ;;
   esac
+  if [ "$escolha" = "nginx" ] && apache_rodando; then
+    warn "O Apache está em execução e ocupa a porta 80. Escolha Apache, ou pare o Apache antes de usar o Nginx."
+  elif [ "$escolha" = "apache" ] && nginx_rodando; then
+    warn "O Nginx está em execução e ocupa a porta 80. Escolha Nginx, ou pare o Nginx antes de usar o Apache."
+  else
+    WEBSERVER="$escolha"
+  fi
 done
 
 read -rp "E-mail pra avisos do Let's Encrypt (opcional, Enter pra pular): " EMAIL
@@ -115,7 +160,7 @@ TEMPLATE_DIR="$INSTALL_DIR/deploy"
 echo
 info "Domínio:        $DOMINIO"
 info "Backend:        $BACKEND_DOMAIN (fixo)"
-info "Servidor web:   $WEBSERVER"
+info "Servidor web:   $WEBSERVER${WEB_ATIVO:+ (em execução: $WEB_ATIVO)}"
 info "Build publicado em: $PUBLISH_DIR"
 echo
 
@@ -185,16 +230,6 @@ ok "Build gerado em $INSTALL_DIR/dist"
 # --------------------------------------------------------------------------
 # 8. Servidor web
 # --------------------------------------------------------------------------
-apache_rodando()  { command -v apache2ctl >/dev/null 2>&1 && systemctl is-active --quiet apache2; }
-nginx_rodando()   { command -v nginx      >/dev/null 2>&1 && systemctl is-active --quiet nginx; }
-
-if [ "$WEBSERVER" = "nginx" ] && apache_rodando; then
-  err "O Apache já está instalado e rodando neste servidor, mas você escolheu Nginx — os dois não podem escutar a porta 80 ao mesmo tempo. Rode de novo escolhendo Apache, ou pare o Apache manualmente antes."
-fi
-if [ "$WEBSERVER" = "apache" ] && nginx_rodando; then
-  err "O Nginx já está instalado e rodando neste servidor, mas você escolheu Apache — os dois não podem escutar a porta 80 ao mesmo tempo. Rode de novo escolhendo Nginx, ou pare o Nginx manualmente antes."
-fi
-
 if [ "$WEBSERVER" = "nginx" ]; then
   SERVICE="nginx"
   if ! dpkg -s nginx >/dev/null 2>&1; then

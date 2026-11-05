@@ -4,8 +4,10 @@
 
 Pra um servidor Debian, [`deploy/install.sh`](install.sh) automatiza os
 passos 1 a 4 abaixo (build, publicação, Apache/Nginx e Let's Encrypt com
-renovação automática) — pergunta o domínio e se é Apache ou Nginx, e não
-mexe em nenhum vhost já existente no servidor:
+renovação automática) — pergunta o domínio (Enter aceita o padrão
+`cliente.` + domínio da empresa) e se é Apache ou Nginx (Enter aceita o que
+estiver em execução no servidor; o outro só é aceito se nenhum estiver
+ativo), e não mexe em nenhum vhost já existente no servidor:
 
 ```bash
 git clone https://github.com/jmanoelslva/HOTNET_CLIENTE_PWA_APP.git
