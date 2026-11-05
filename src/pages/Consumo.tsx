@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { LuChartColumn } from 'react-icons/lu'
+import { LuChartColumn, LuChevronLeft, LuChevronRight, LuMonitorSmartphone, LuNetwork, LuWifi, LuWifiOff } from 'react-icons/lu'
 import {
   buscarConsumoDoMes,
   comNumeroDoContrato,
@@ -16,7 +16,7 @@ import CabecalhoTela from '../components/CabecalhoTela'
 import PullToRefresh from '../components/PullToRefresh'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
-import { CORES } from '../utils/cores'
+import { AbasPilula, BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import './Consumo.css'
 
 const NOMES_DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -48,7 +48,6 @@ export default function Consumo() {
   const [sessaoAtual, setSessaoAtual] = useState<SessaoAtual | null | undefined>(undefined)
   // Consulta da sessão falhou (rede, servidor): não é o mesmo que "Offline".
   const [falhaSessao, setFalhaSessao] = useState(false)
-  const [detalhesAbertos, setDetalhesAbertos] = useState(false)
 
   useEffect(() => {
     carregar()
@@ -81,7 +80,6 @@ export default function Consumo() {
   useEffect(() => {
     setSessaoAtual(undefined)
     setFalhaSessao(false)
-    setDetalhesAbertos(false)
     if (consumoSelecionado == null) return
     let cancelado = false
     buscarSessaoAtualPorCpe(consumoSelecionado.cpePk)
@@ -130,123 +128,105 @@ export default function Consumo() {
   return (
     <PullToRefresh aoAtualizar={carregar}>
     <div className="consumo-tela tela-entrada">
-      <CabecalhoTela
-        icone={LuChartColumn}
-        cor={CORES.consumo}
-        titulo="Consumo"
-        subtitulo="Acompanhe o uso diário da sua internet."
-      />
+      <CabecalhoTela titulo="Consumo" subtitulo="Quanto da internet você usou no mês." />
 
+      {/* Seletor de mês (MonthSelector do app Android). */}
       <div className="consumo-seletor-mes">
-        <button onClick={irParaMesAnterior} aria-label="Mês anterior">‹</button>
-        <span>{nomesMeses[mes - 1]} {ano}</span>
-        <button onClick={irParaProximoMes} disabled={ehMesAtual(ano, mes)} aria-label="Próximo mês">›</button>
+        <button type="button" onClick={irParaMesAnterior} aria-label="Mês anterior">
+          <LuChevronLeft size={22} />
+        </button>
+        <span>
+          {nomesMeses[mes - 1]} de {ano}
+        </span>
+        <button type="button" onClick={irParaProximoMes} disabled={ehMesAtual(ano, mes)} aria-label="Próximo mês">
+          <LuChevronRight size={22} />
+        </button>
       </div>
 
       {consumoPorContrato.length > 1 && (
-        <select
-          className="consumo-filtro-contrato"
-          value={cpePkSelecionado ?? ''}
-          onChange={(evento) => setCpePkSelecionado(Number(evento.target.value))}
-        >
-          {consumoPorContrato.map((c) => (
-            <option key={c.cpePk} value={c.cpePk}>
-              {c.contractNumber != null ? `Contrato ${c.contractNumber}` : `Conexão ${c.cpePk}`}
-            </option>
-          ))}
-        </select>
+        <div className="consumo-seletor-contrato">
+          <AbasPilula<string>
+            rotulo="Contrato"
+            opcoes={consumoPorContrato.map((c) => ({ valor: String(c.cpePk), rotulo: `Nº ${c.contractNumber ?? c.cpePk}` }))}
+            selecionada={String(cpePkSelecionado ?? '')}
+            onSelecionar={(v) => setCpePkSelecionado(Number(v))}
+          />
+        </div>
       )}
 
       {carregando && (
-        <>
-          <div className="consumo-card-resumo">
-            <Skeleton width="50%" height={12} />
-            <Skeleton width="70%" height={26} />
-          </div>
-          <div className="consumo-card-sessao">
-            <Skeleton width="40%" height={14} />
-          </div>
-        </>
+        <div className="cartao-destaque consumo-esqueleto">
+          <Skeleton width="40%" height={12} />
+          <Skeleton width="60%" height={30} />
+        </div>
       )}
 
       {!carregando && erro && (
-        <div className="consumo-status">
+        <div className="erro-carregamento">
           <p>{erro}</p>
-          <button onClick={carregar}>Tentar novamente</button>
+          <button type="button" className="botao-primario" onClick={carregar}>
+            Tentar novamente
+          </button>
         </div>
       )}
 
       {!carregando && !erro && !consumoSelecionado && (
-        <EstadoVazio icone={LuChartColumn} titulo="Nenhum consumo registrado" subtitulo="Nada por aqui neste período." />
+        <EstadoVazio
+          icone={LuChartColumn}
+          titulo="Sem dados de consumo neste mês"
+          subtitulo="O uso da internet aparece aqui conforme você navega."
+        />
       )}
 
       {!carregando && !erro && consumoSelecionado && (
         <>
-          <div className="consumo-card-resumo">
-            <span className="consumo-total-label">Consumo total no período</span>
-            <p className="consumo-total-valor">{formatarBytes(totalBytes(consumoSelecionado))}</p>
-            <div className="consumo-resumo-linhas">
-              <div>
-                <span>Download</span>
-                <strong>{formatarBytes(totalTxBytes(consumoSelecionado))}</strong>
-              </div>
-              <div>
-                <span>Upload</span>
-                <strong>{formatarBytes(totalRxBytes(consumoSelecionado))}</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="consumo-card-sessao">
-            <div className="consumo-sessao-topo">
-              <span
-                className="consumo-indicador"
-                style={{ background: sessaoAtual ? CORES.sucesso : CORES.textoFraco }}
-              />
+          <section className="cartao-destaque" aria-label="Total no mês">
+            <span className="cartao-destaque-rotulo">Total no mês</span>
+            <strong className="consumo-total">{formatarBytes(totalBytes(consumoSelecionado))}</strong>
+            <div className="consumo-legendas">
               <span>
-                {sessaoAtual === undefined
-                  ? 'Verificando conexão…'
-                  : sessaoAtual
-                    ? 'Online Agora'
-                    : falhaSessao
-                      ? 'Não foi possível verificar'
-                      : 'Offline'}
+                <i className="consumo-legenda-ponto download" aria-hidden="true" /> Download{' '}
+                {formatarBytes(totalTxBytes(consumoSelecionado))}
+              </span>
+              <span>
+                <i className="consumo-legenda-ponto upload" aria-hidden="true" /> Upload{' '}
+                {formatarBytes(totalRxBytes(consumoSelecionado))}
               </span>
             </div>
-
-            {sessaoAtual && (
-              <>
-                <button className="consumo-toggle-detalhes" onClick={() => setDetalhesAbertos((v) => !v)}>
-                  {detalhesAbertos ? 'OCULTAR DETALHES ▴' : 'DETALHES DA CONEXÃO ▾'}
-                </button>
-
-                {detalhesAbertos && (
-                  <div className="consumo-detalhes-sessao">
-                    <p>Tempo online: {formatarDuracao(sessaoAtual.tempoOnlineSegundos)}</p>
-                    <p>IP: {sessaoAtual.ip ?? 'não disponível'}</p>
-                    {sessaoAtual.callingId && <p>MAC: {sessaoAtual.callingId}</p>}
-                    {sessaoAtual.ipv6Prefixo && <p>IPv6 (prefixo): {sessaoAtual.ipv6Prefixo}</p>}
-                    {sessaoAtual.ipv6Delegado && <p>IPv6 (delegado): {sessaoAtual.ipv6Delegado}</p>}
-                    <div className="consumo-resumo-linhas">
-                      <div>
-                        <span>Download (sessão)</span>
-                        <strong>{formatarBytes(sessaoAtual.txBytes)}</strong>
-                      </div>
-                      <div>
-                        <span>Upload (sessão)</span>
-                        <strong>{formatarBytes(sessaoAtual.rxBytes)}</strong>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
+            {consumoSelecionado.dias.length > 0 && (
+              <span className="consumo-media">
+                Média de {formatarBytes(totalBytes(consumoSelecionado) / consumoSelecionado.dias.length)} por dia
+              </span>
             )}
-          </div>
+          </section>
+
+          <RotuloGrupo>Conexão agora</RotuloGrupo>
+          <BlocoBranco>
+            <LinhaItem
+              icone={sessaoAtual ? LuWifi : LuWifiOff}
+              tom={sessaoAtual ? 'primaria' : 'neutra'}
+              rotulo="Estado"
+              titulo={
+                sessaoAtual === undefined
+                  ? 'Verificando conexão…'
+                  : sessaoAtual
+                    ? `Conectado há ${formatarDuracao(sessaoAtual.tempoOnlineSegundos)}`
+                    : falhaSessao
+                      ? 'Não foi possível verificar'
+                      : 'Sem conexão agora'
+              }
+            />
+            {sessaoAtual?.ip && <LinhaItem icone={LuNetwork} tom="primaria" rotulo="IP atual" titulo={sessaoAtual.ip} />}
+            {sessaoAtual?.callingId && (
+              <LinhaItem icone={LuMonitorSmartphone} tom="primaria" rotulo="MAC" titulo={sessaoAtual.callingId} />
+            )}
+          </BlocoBranco>
 
           {consumoSelecionado.dias.length > 0 && (
-            <div className="consumo-card-historico">
-              <span className="consumo-historico-titulo">Detalhe diário</span>
-              {[...consumoSelecionado.dias]
+            <>
+              <RotuloGrupo>Consumo por dia</RotuloGrupo>
+              <div className="bloco-branco consumo-dias">
+                            {[...consumoSelecionado.dias]
                 .sort((a, b) => b.data.localeCompare(a.data))
                 .map((dia) => {
                   const { diaMes, diaSemana } = formatarDiaCurto(dia.data)
@@ -267,7 +247,8 @@ export default function Consumo() {
                     </div>
                   )
                 })}
-            </div>
+              </div>
+            </>
           )}
         </>
       )}

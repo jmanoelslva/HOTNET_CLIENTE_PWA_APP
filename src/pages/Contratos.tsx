@@ -1,40 +1,44 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { LuFileText, LuDownload, LuReceiptText } from 'react-icons/lu'
+import { LuCalendarClock, LuConstruction, LuFileText, LuReceiptText, LuStar, LuWallet, LuWifi } from 'react-icons/lu'
 import { urlImpressaoContrato } from '../api/client'
 import { buscarContratos, type Contrato } from '../api/contratos'
 import CabecalhoTela from '../components/CabecalhoTela'
 import PullToRefresh from '../components/PullToRefresh'
 import Skeleton from '../components/Skeleton'
-import { CORES, comAlpha } from '../utils/cores'
+import { AbasPilula, BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import { abrirEImprimir } from '../utils/impressao'
 import { useToast } from '../components/Toast/useToast'
 import './Contratos.css'
 
-// Valores confirmados na documentação oficial do contract_status.
-const STATUS: Record<number, { texto: string; cor: string }> = {
-  0: { texto: 'Desativado', cor: CORES.textoDesabilitado },
-  1: { texto: 'Ativo', cor: CORES.sucesso },
-  2: { texto: 'Alertado', cor: CORES.alerta },
-  3: { texto: 'Pendente', cor: CORES.atencao },
-  4: { texto: 'Bloqueado', cor: CORES.erro },
-  5: { texto: 'Cancelado', cor: CORES.textoFraco },
+// contract_status: ponto colorido + texto, como no app Android.
+const STATUS: Record<number, { texto: string; ponto: string }> = {
+  0: { texto: 'Desativado', ponto: '#b0bac5' },
+  1: { texto: 'Ativo', ponto: '#3ddc84' },
+  2: { texto: 'Com aviso', ponto: '#ffb784' },
+  3: { texto: 'Pendente', ponto: '#ffb784' },
+  4: { texto: 'Bloqueado', ponto: '#ff8a8a' },
+  5: { texto: 'Cancelado', ponto: '#b0bac5' },
 }
 
 function formatarMoeda(valorBruto: string | null): string {
   const valor = Number.parseFloat(valorBruto ?? '')
-  if (!Number.isFinite(valor)) return 'R$ 0,00'
-  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  return (Number.isFinite(valor) ? valor : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-function formatarData(data: string | null): string {
-  if (!data) return '--/--/----'
-  const soData = data.split(' ')[0]
-  const partes = soData.split('-')
-  if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`
-  return soData
+/** "2019-03-15" → "março de 2019". */
+function mesAnoPorExtenso(data: string | null): string | null {
+  const partes = (data ?? '').split(' ')[0].split('-')
+  if (partes.length !== 3) return null
+  const d = new Date(Number(partes[0]), Number(partes[1]) - 1, 1)
+  return Number.isNaN(d.getTime()) ? null : d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
 }
 
+/**
+ * Contratos — mesmo layout do app Android (contracts/ContratosScreen.kt):
+ * um contrato por vez (seletor em pílula quando há mais de um), plano no
+ * cartão grafite com o estado, Resumo e Serviços e itens em blocos brancos.
+ */
 export default function Contratos() {
   const { toast } = useToast()
   const [contratos, setContratos] = useState<Contrato[]>([])
@@ -42,19 +46,13 @@ export default function Contratos() {
   const [erro, setErro] = useState<string | null>(null)
   const navigate = useNavigate()
   const location = useLocation()
-  // Contrato pra rolar até e destacar quando chegamos aqui a partir de um
-  // boleto (ver Boletos.tsx, mesmo padrão usado no sentido inverso).
+  // Contrato aberto a partir de um boleto (Boletos.tsx).
   const contratoAlvo = (location.state as { contratoPk?: number } | null)?.contratoPk ?? null
-  const cardsRef = useRef<Map<number, HTMLLIElement>>(new Map())
+  const [selecionado, setSelecionado] = useState<number | null>(contratoAlvo)
 
   useEffect(() => {
     carregar()
   }, [])
-
-  useEffect(() => {
-    if (contratoAlvo == null || contratos.length === 0) return
-    cardsRef.current.get(contratoAlvo)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }, [contratoAlvo, contratos])
 
   async function carregar() {
     setCarregando(true)
@@ -62,10 +60,9 @@ export default function Contratos() {
     try {
       // contract_client_show=false: o contrato sai da lista (o status dele ainda vale na Início).
       const resultado = (await buscarContratos()).filter((contrato) => contrato.podeVerDados)
-      if (resultado.length === 0) {
-        setErro('Nenhum contrato disponível para exibição no momento.')
-      }
+      if (resultado.length === 0) setErro('Nenhum contrato disponível para exibição no momento.')
       setContratos(resultado)
+      setSelecionado((atual) => (resultado.some((c) => c.id === atual) ? atual : (resultado[0]?.id ?? null)))
     } catch {
       setErro('Não foi possível carregar os contratos. Tente novamente.')
     } finally {
@@ -73,118 +70,108 @@ export default function Contratos() {
     }
   }
 
+  const contrato = contratos.find((c) => c.id === selecionado) ?? contratos[0] ?? null
+  const status = (contrato?.status != null && STATUS[contrato.status]) || { texto: 'Desconhecido', ponto: '#b0bac5' }
+  const desde = contrato ? mesAnoPorExtenso(contrato.dataAtivacao) : null
+
   return (
     <PullToRefresh aoAtualizar={carregar}>
-    <div className="contratos-tela tela-entrada">
-      <CabecalhoTela
-        icone={LuFileText}
-        cor={CORES.contratos}
-        titulo="Contratos"
-        subtitulo="Seus contratos, planos e itens contratados."
-      />
+      <div className="contratos-tela tela-entrada">
+        <CabecalhoTela titulo="Contratos" subtitulo="Seus planos e serviços na HOTNET." />
 
-      {carregando && (
-        <ul className="contratos-lista">
-          {[0, 1].map((indice) => (
-            <li key={indice} className="contrato-card">
-              <Skeleton width="50%" height={16} />
-              <Skeleton width="70%" height={12} />
-              <Skeleton width="60%" height={12} />
-              <Skeleton width="40%" height={12} />
-            </li>
-          ))}
-        </ul>
-      )}
+        {carregando && (
+          <div className="cartao-destaque contratos-esqueleto">
+            <Skeleton width="40%" height={12} />
+            <Skeleton width="65%" height={22} />
+            <Skeleton width="30%" height={12} />
+          </div>
+        )}
 
-      {!carregando && erro && contratos.length === 0 && (
-        <div className="contratos-status">
-          <p>{erro}</p>
-          <button onClick={carregar}>Tentar novamente</button>
-        </div>
-      )}
+        {!carregando && erro && contratos.length === 0 && (
+          <div className="erro-carregamento">
+            <p>{erro}</p>
+            <button type="button" className="botao-primario" onClick={carregar}>
+              Tentar novamente
+            </button>
+          </div>
+        )}
 
-      {!carregando && contratos.length > 0 && (
-        <ul className="contratos-lista">
-          {contratos.map((contrato) => {
-            const status = (contrato.status != null && STATUS[contrato.status]) || {
-              texto: 'Desconhecido',
-              cor: CORES.textoDesabilitado,
-            }
+        {!carregando && contrato && (
+          <>
+            {contratos.length > 1 && (
+              <div className="contratos-seletor">
+                <AbasPilula<string>
+                  rotulo="Contrato"
+                  opcoes={contratos.map((c) => ({ valor: String(c.id), rotulo: `Nº ${c.numero ?? c.id}` }))}
+                  selecionada={String(contrato.id)}
+                  onSelecionar={(v) => setSelecionado(Number(v))}
+                />
+              </div>
+            )}
 
-            return (
-              <li
-                key={contrato.id}
-                ref={(elemento) => {
-                  if (elemento) cardsRef.current.set(contrato.id, elemento)
-                  else cardsRef.current.delete(contrato.id)
-                }}
-                className={`contrato-card ${contrato.id === contratoAlvo ? 'contrato-card-destaque' : ''}`}
+            <section className="cartao-destaque" aria-label="Plano">
+              <span className="cartao-destaque-rotulo">Plano</span>
+              <strong className="contrato-plano">{contrato.plano ?? 'Plano não informado'}</strong>
+              <span className="contrato-numero">Contrato {contrato.numero ?? contrato.id}</span>
+              <span className="etiqueta-destaque contrato-estado">
+                <span className="contrato-ponto" style={{ background: status.ponto }} aria-hidden="true" />
+                {status.texto}
+              </span>
+            </section>
+
+            <RotuloGrupo>Resumo</RotuloGrupo>
+            <BlocoBranco>
+              <LinhaItem icone={LuWallet} tom="primaria" rotulo="Valor mensal" titulo={formatarMoeda(contrato.valor)} />
+              {contrato.diaPagamento != null && (
+                <LinhaItem icone={LuCalendarClock} tom="primaria" rotulo="Vencimento" titulo={`Todo dia ${contrato.diaPagamento}`} />
+              )}
+              {desde && <LinhaItem icone={LuStar} tom="primaria" rotulo="Ativo desde" titulo={desde} />}
+            </BlocoBranco>
+
+            {contrato.itens.length > 0 && (
+              <>
+                <RotuloGrupo>Serviços e itens</RotuloGrupo>
+                <BlocoBranco>
+                  {contrato.itens.map((item, indice) => (
+                    <LinhaItem
+                      key={indice}
+                      icone={item.ehEquipamento ? LuConstruction : LuWifi}
+                      tom={item.ehEquipamento ? 'perigo' : 'primaria'}
+                      rotulo={item.ehEquipamento ? 'Equipamento' : 'Plano'}
+                      titulo={item.nome}
+                      fim={<strong className="contrato-item-valor">{formatarMoeda(item.valor)}</strong>}
+                    />
+                  ))}
+                </BlocoBranco>
+              </>
+            )}
+
+            <div className="contrato-acoes">
+              <button
+                type="button"
+                className="botao-primario"
+                onClick={() => navigate('/boletos', { state: { contratoPk: contrato.id }, viewTransition: true })}
               >
-                <div className="contrato-topo">
-                  <span className="contrato-numero">Contrato #{contrato.numero ?? contrato.id}</span>
-                  <span className="contrato-status-badge" style={{ background: status.cor }}>
-                    {status.texto}
-                  </span>
-                </div>
-
-                <div className="contrato-detalhes">
-                  <div className="contrato-linha">
-                    <span>Plano</span>
-                    <strong>{contrato.plano ?? 'Não informado'}</strong>
-                  </div>
-                  <div className="contrato-linha">
-                    <span>Valor mensal</span>
-                    <strong>{formatarMoeda(contrato.valor)}</strong>
-                  </div>
-                  <div className="contrato-linha">
-                    <span>Vencimento</span>
-                    <strong>{contrato.diaPagamento != null ? `Dia ${contrato.diaPagamento}` : 'Não informado'}</strong>
-                  </div>
-                  <div className="contrato-linha">
-                    <span>Ativado em</span>
-                    <strong>{formatarData(contrato.dataAtivacao)}</strong>
-                  </div>
-                </div>
-
-                {contrato.itens.length > 0 && (
-                  <div className="contrato-itens">
-                    <span className="contrato-itens-titulo">Itens do contrato</span>
-                    {contrato.itens.map((item, indice) => (
-                      <div className="contrato-linha" key={indice}>
-                        <span>{item.ehEquipamento ? `${item.nome} (equipamento)` : item.nome}</span>
-                        <strong>{item.valor ? formatarMoeda(item.valor) : '—'}</strong>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="contrato-acoes">
-                  <button
-                    style={{ background: comAlpha(CORES.boletos, 10), color: CORES.boletos }}
-                    onClick={() => navigate('/boletos', { state: { contratoPk: contrato.id }, viewTransition: true })}
-                  >
-                    <LuReceiptText /> Meus boletos
-                  </button>
-                  {/* contract_client_print=false: sem o documento completo (nem imprimir/salvar PDF). */}
-                  {contrato.podeVerDocumento && (
-                    <button
-                      style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
-                      onClick={() =>
-                        abrirEImprimir(urlImpressaoContrato(contrato.id), () =>
-                          toast('Não foi possível abrir o contrato agora. Tente novamente.'),
-                        )
-                      }
-                    >
-                      <LuDownload /> Ver contrato completo
-                    </button>
-                  )}
-                </div>
-              </li>
-            )
-          })}
-        </ul>
-      )}
-    </div>
+                <LuReceiptText size={18} aria-hidden="true" /> Ver boletos deste contrato
+              </button>
+              {/* contract_client_print=false: sem o documento completo. */}
+              {contrato.podeVerDocumento && (
+                <button
+                  type="button"
+                  className="botao-contorno"
+                  onClick={() =>
+                    abrirEImprimir(urlImpressaoContrato(contrato.id), () =>
+                      toast('Não foi possível abrir o contrato agora. Tente novamente.'),
+                    )
+                  }
+                >
+                  <LuFileText size={18} aria-hidden="true" /> Ver contrato completo
+                </button>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </PullToRefresh>
   )
 }

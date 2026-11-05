@@ -4,161 +4,97 @@
   padding: 16px 16px 24px;
 }
 
+/* Seletor de mês: setas e o mês no meio, num trilho branco. */
 .consumo-seletor-mes {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 12px;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 4px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
 }
 
 .consumo-seletor-mes span {
-  font-weight: 700;
-  color: var(--cor-texto);
-  font-size: 15px;
-  min-width: 140px;
-  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .consumo-seletor-mes button {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  border: none;
   border-radius: 50%;
-  border: 1px solid var(--cor-borda);
-  background: var(--cor-superficie);
-  font-size: 18px;
-  cursor: pointer;
+  background: transparent;
   color: var(--cor-texto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .consumo-seletor-mes button:disabled {
-  opacity: 0.3;
+  opacity: 0.35;
   cursor: default;
 }
 
-.consumo-filtro-contrato {
-  width: 100%;
-  height: 44px;
-  border-radius: 8px;
-  border: 1px solid var(--cor-borda);
-  padding: 0 12px;
-  font-size: 14px;
-  color: var(--cor-texto);
-  background: var(--cor-superficie);
-  margin-bottom: 20px;
+.consumo-seletor-contrato {
+  margin-bottom: 10px;
 }
 
-.consumo-status {
-  color: var(--cor-texto-secundario);
-  font-size: 14px;
-  text-align: center;
-  padding: 32px 0;
-}
-
-.consumo-status button {
-  margin-top: 12px;
-  height: 40px;
-  padding: 0 20px;
-  border: none;
-  border-radius: 8px;
-  color: var(--cor-branco-fixo);
-  font-weight: 700;
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
-}
-
-.consumo-card-resumo,
-.consumo-card-sessao,
-.consumo-card-historico {
-  background: var(--cor-superficie);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: var(--sombra-card);
-  margin-bottom: 16px;
-}
-
-.consumo-total-label {
-  font-size: 12px;
-  color: var(--cor-texto-terciario);
-}
-
-.consumo-total-valor {
-  margin: 2px 0 12px;
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--cor-texto);
-}
-
-.consumo-resumo-linhas {
-  display: flex;
-  gap: 24px;
-}
-
-.consumo-resumo-linhas > div {
+.consumo-esqueleto {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-}
-
-.consumo-resumo-linhas span {
-  font-size: 12px;
-  color: var(--cor-texto-terciario);
-}
-
-.consumo-resumo-linhas strong {
-  font-size: 16px;
-  color: var(--cor-texto);
-}
-
-.consumo-sessao-topo {
-  display: flex;
-  align-items: center;
   gap: 8px;
-  font-weight: 700;
-  color: var(--cor-texto);
-  font-size: 14px;
 }
 
-.consumo-indicador {
+.consumo-total {
+  display: block;
+  margin-top: 4px;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 800;
+}
+
+.consumo-legendas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.consumo-legendas span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.consumo-legenda-ponto {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  display: inline-block;
 }
 
-.consumo-toggle-detalhes {
-  margin-top: 12px;
-  border: none;
-  background: transparent;
-  color: var(--cor-primaria);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0;
+.consumo-legenda-ponto.download {
+  background: var(--cor-laranja-vivo);
 }
 
-.consumo-detalhes-sessao {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--cor-borda-suave);
+.consumo-legenda-ponto.upload {
+  background: #7cb8ff;
 }
 
-.consumo-detalhes-sessao p {
-  margin: 4px 0;
-  font-size: 13px;
-  color: var(--cor-texto-secundario);
-}
-
-.consumo-detalhes-sessao .consumo-resumo-linhas {
-  margin-top: 12px;
-}
-
-.consumo-historico-titulo {
+.consumo-media {
   display: block;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--cor-texto);
-  margin-bottom: 12px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.consumo-dias {
+  padding: 4px 14px;
 }
 
 .consumo-dia {

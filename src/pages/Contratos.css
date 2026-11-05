@@ -4,119 +4,53 @@
   padding: 16px 16px 24px;
 }
 
-.contratos-status {
-  color: var(--cor-texto-secundario);
-  font-size: 14px;
-  text-align: center;
-  padding: 32px 0;
-}
-
-.contratos-status button {
-  margin-top: 12px;
-  height: 40px;
-  padding: 0 20px;
-  border: none;
-  border-radius: 8px;
-  color: var(--cor-branco-fixo);
-  font-weight: 700;
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
-}
-
-.contratos-lista {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.contratos-esqueleto {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
-.contrato-card {
-  background: var(--cor-superficie);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: var(--sombra-card);
-  border: 2px solid transparent;
-  transition: border-color 0.3s ease;
+.contratos-seletor {
+  margin-bottom: 10px;
 }
 
-.contrato-card-destaque {
-  border-color: var(--cor-primaria);
-}
-
-.contrato-topo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.contrato-plano {
+  display: block;
+  margin-top: 2px;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 800;
 }
 
 .contrato-numero {
-  font-weight: 700;
-  color: var(--cor-texto);
-  font-size: 15px;
-}
-
-.contrato-status-badge {
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--cor-branco-fixo);
-  border-radius: 12px;
-  padding: 4px 10px;
-}
-
-.contrato-detalhes,
-.contrato-itens {
-  margin-top: 16px;
-}
-
-.contrato-itens-titulo {
   display: block;
   font-size: 12px;
-  font-weight: 700;
-  color: var(--cor-texto-terciario);
-  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.contrato-linha {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 13px;
-  border-bottom: 1px solid var(--cor-borda-suave);
+.contrato-estado {
+  margin-top: 10px;
 }
 
-.contrato-linha:last-child {
-  border-bottom: none;
+.contrato-ponto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
-.contrato-linha span {
-  color: var(--cor-texto-terciario);
-}
-
-.contrato-linha strong {
-  color: var(--cor-texto);
-  font-weight: 600;
-  text-align: right;
+.contrato-item-valor {
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .contrato-acoes {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 4px;
 }
 
-.contrato-acoes button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 18px;
-  border: 1px solid transparent;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
+.contrato-acoes .botao-contorno {
+  min-height: 48px;
 }

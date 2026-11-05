@@ -172,3 +172,65 @@
   background: var(--cor-terciaria-container);
   color: var(--cor-terciaria);
 }
+
+/* Cartão de destaque grafite (CartaoDestaque): cantos de 24, texto branco. */
+.cartao-destaque {
+  padding: 16px;
+  margin-bottom: 10px;
+  border-radius: var(--raio-xl);
+  background: var(--cor-cartao-conexao);
+  color: var(--cor-branco-fixo);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.cartao-destaque-rotulo {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Etiqueta translúcida sobre o grafite (EtiquetaDestaque). */
+.etiqueta-destaque {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--cor-branco-fixo);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.linha-item-copiar {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cor-primaria);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+:root[data-theme='dark'] .linha-item-copiar {
+  color: var(--cor-primaria-clara);
+}
+
+/* Erro de carregamento (ErroCarregamento). */
+.erro-carregamento {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--cor-texto-secundario);
+}
+
+.erro-carregamento p {
+  margin: 0 0 12px;
+}
