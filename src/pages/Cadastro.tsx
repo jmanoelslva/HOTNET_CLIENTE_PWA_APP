@@ -89,7 +89,7 @@ export default function Cadastro() {
   return (
     <PullToRefresh aoAtualizar={carregar}>
       <div className="cadastro-tela tela-entrada">
-        <CabecalhoTela titulo="Meus dados" subtitulo="Como seu cadastro está na HOTNET." />
+        <CabecalhoTela titulo="Meus dados" fixo subtitulo="Como seu cadastro está na HOTNET." />
 
         {carregando && (
           <div className="bloco-branco cadastro-esqueleto">

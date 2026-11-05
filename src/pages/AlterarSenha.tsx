@@ -104,7 +104,7 @@ export default function AlterarSenha() {
 
   return (
     <div className="senha-tela tela-entrada">
-      <CabecalhoTela titulo="Alterar senha" acoes={<BotaoFechar />} />
+      <CabecalhoTela titulo="Alterar senha" fixo acoes={<BotaoFechar />} />
 
       {etapa === 'confirmar' && (
         <form className="senha-card" onSubmit={confirmarSenhaAtual}>

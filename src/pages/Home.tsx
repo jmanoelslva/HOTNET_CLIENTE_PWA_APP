@@ -250,7 +250,7 @@ export default function Home() {
   return (
     <PullToRefresh aoAtualizar={atualizar}>
       <div className="home-tela tela-entrada">
-        <header className="home-cabecalho">
+        <header className="home-cabecalho topo-fixo">
           <button type="button" className="home-avatar" onClick={() => ir('/perfil')} aria-label="Abrir o Perfil">
             {foto ? <img src={foto} alt="" /> : nomeExibido.charAt(0).toUpperCase()}
           </button>

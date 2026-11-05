@@ -80,7 +80,7 @@ export default function Contratos() {
   return (
     <PullToRefresh aoAtualizar={carregar}>
       <div className="contratos-tela tela-entrada">
-        <CabecalhoTela titulo="Contratos" subtitulo="Seus planos e serviços na HOTNET." />
+        <CabecalhoTela titulo="Contratos" fixo subtitulo="Seus planos e serviços na HOTNET." />
 
         {carregando && (
           <div className="cartao-destaque contratos-esqueleto">

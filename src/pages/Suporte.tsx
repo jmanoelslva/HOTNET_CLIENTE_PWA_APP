@@ -192,6 +192,8 @@ export default function Suporte() {
   return (
     <PullToRefresh aoAtualizar={carregar}>
     <div className="suporte-tela tela-entrada">
+      {/* Cabeçalho, atalhos e abas ficam parados, como no app. */}
+      <div className="topo-fixo">
       <CabecalhoTela titulo="Suporte" subtitulo="Fale com a equipe HOTNET." />
 
       {/* Atalhos no topo (AtalhoSuporte do app Android), no lugar do botão flutuante. */}
@@ -222,6 +224,7 @@ export default function Suporte() {
           selecionada={aba}
           onSelecionar={setAba}
         />
+      </div>
       </div>
 
       {carregando && (

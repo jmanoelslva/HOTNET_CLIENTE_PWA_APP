@@ -85,7 +85,7 @@ export default function Velocidade() {
 
   return (
     <div className="velocidade-tela tela-entrada">
-      <CabecalhoTela titulo="Teste de velocidade" acoes={<BotaoFechar />} subtitulo="Medição feita pelo fast.com." />
+      <CabecalhoTela titulo="Teste de velocidade" fixo acoes={<BotaoFechar />} subtitulo="Medição feita pelo fast.com." />
 
       <RotuloGrupo>Antes de medir</RotuloGrupo>
       <BlocoBranco>

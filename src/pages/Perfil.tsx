@@ -77,7 +77,7 @@ export default function Perfil() {
 
   return (
     <div className="perfil-tela tela-entrada">
-      <CabecalhoTela titulo="Perfil" subtitulo="Seus dados, preferências e ajuda." />
+      <CabecalhoTela titulo="Perfil" fixo subtitulo="Seus dados, preferências e ajuda." />
 
       <div className="perfil-cabecalho">
         {/* Foto só neste aparelho, como no app Android. */}

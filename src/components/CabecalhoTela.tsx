@@ -10,6 +10,8 @@ interface Props {
   subtitulo?: string
   /** Botões à direita do título (ex.: atualizar, filtro). */
   acoes?: ReactNode
+  /** Fica parado no topo enquanto a tela rola (ver .topo-fixo em index.css). */
+  fixo?: boolean
 }
 
 /**
@@ -17,9 +19,9 @@ interface Props {
  * Android (ui/components/PadraoTelas.kt): título grande em negrito e
  * subtítulo em cinza, direto sobre o fundo, sem caixa colorida.
  */
-export default function CabecalhoTela({ titulo, subtitulo, acoes }: Props) {
+export default function CabecalhoTela({ titulo, subtitulo, acoes, fixo = false }: Props) {
   return (
-    <header className="cabecalho-tela">
+    <header className={`cabecalho-tela ${fixo ? 'topo-fixo' : ''}`}>
       <div className="cabecalho-tela-textos">
         <h1>{titulo}</h1>
         {subtitulo && <p>{subtitulo}</p>}

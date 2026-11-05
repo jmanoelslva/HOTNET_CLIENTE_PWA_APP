@@ -131,6 +131,8 @@ export default function Consumo() {
   return (
     <PullToRefresh aoAtualizar={carregar}>
     <div className="consumo-tela tela-entrada">
+      {/* Cabeçalho e mês ficam parados, como no app. */}
+      <div className="topo-fixo">
       <CabecalhoTela titulo="Consumo" subtitulo="Quanto da internet você usou no mês." />
 
       {/* Seletor de mês (MonthSelector do app Android). */}
@@ -145,6 +147,7 @@ export default function Consumo() {
         <button type="button" onClick={irParaProximoMes} disabled={ehMesAtual(ano, mes)} aria-label="Próximo mês">
           <MdKeyboardArrowRight size={22} />
         </button>
+      </div>
       </div>
 
       {escolhendoMes && (

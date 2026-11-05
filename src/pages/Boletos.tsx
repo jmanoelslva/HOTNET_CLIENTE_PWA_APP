@@ -168,6 +168,8 @@ export default function Boletos() {
   return (
     <PullToRefresh aoAtualizar={carregar}>
     <div className="boletos-tela tela-entrada">
+      {/* Cabeçalho, abas e filtro de contrato ficam parados, como no app. */}
+      <div className="topo-fixo">
       <CabecalhoTela titulo="Boletos" subtitulo="Pague, consulte e baixe seus recibos." />
 
       <div className="boletos-abas">
@@ -209,6 +211,7 @@ export default function Boletos() {
           />
         </div>
       )}
+      </div>
 
       {carregando && (
         <ul className="boletos-lista boletos-esqueleto">

@@ -248,6 +248,18 @@ body:has(.bottom-nav) {
   animation: fade-in 0.22s ease;
 }
 
+/* Topo fixo: cabeçalho (e abas/seletor logo abaixo) que fica parado enquanto a
+   lista rola, como nas telas do app Android em que o CabecalhoTela fica fora da
+   área de rolagem. A sombra sem desfoque estende o fundo sobre a margem lateral
+   e o topo da tela, para o conteúdo não aparecer por trás ao rolar. */
+.topo-fixo {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: var(--cor-fundo);
+  box-shadow: 0 -16px 0 16px var(--cor-fundo);
+}
+
 /* --- Toque como app nativo ------------------------------------------------ */
 html {
   /* Sem o realce do navegador ao tocar e sem zoom (pinça ou toque duplo)
