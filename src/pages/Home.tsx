@@ -13,7 +13,7 @@ import CartaoBoleto from '../components/CartaoBoleto'
 import FolhaQrCode from '../components/FolhaQrCode'
 import TourInicio from '../components/TourInicio'
 import { tourJaVisto } from '../utils/tour'
-import { fotoDaConta, lembrarConta, usaSenhaPadrao } from '../utils/contaLocal'
+import { adiarLembreteSenha, fotoDaConta, lembrarConta, mostrarLembreteSenha } from '../utils/contaLocal'
 import ChecklistConexao from '../components/ChecklistConexao'
 import { useToast } from '../components/Toast/useToast'
 import { formatarBytes } from '../utils/formatacao'
@@ -91,13 +91,7 @@ export default function Home() {
   const [confirmarJaPaguei, setConfirmarJaPaguei] = useState<FaturaDto | null>(null)
   const [qrCode, setQrCode] = useState<string | null>(null)
   const [informados, setInformados] = useState<Set<number>>(new Set())
-  const [lembreteSenha, setLembreteSenha] = useState(() => {
-    try {
-      return usaSenhaPadrao(cpf) && sessionStorage.getItem('hotnet-lembrete-senha') !== 'dispensado'
-    } catch {
-      return usaSenhaPadrao(cpf)
-    }
-  })
+  const [lembreteSenha, setLembreteSenha] = useState(() => mostrarLembreteSenha(cpf))
   const foto = fotoDaConta(cpf)
   const location = useLocation()
   // Guia da primeira vez (ou "Veja o guia rápido" em Dúvidas).
@@ -277,11 +271,7 @@ export default function Home() {
                 className="botao-contorno"
                 onClick={() => {
                   setLembreteSenha(false)
-                  try {
-                    sessionStorage.setItem('hotnet-lembrete-senha', 'dispensado')
-                  } catch {
-                    // Sem armazenamento: só esconde agora.
-                  }
+                  if (cpf) adiarLembreteSenha(cpf)
                 }}
               >
                 Agora não

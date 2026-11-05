@@ -1,5 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { contasSalvas, ehSenhaPadrao, esquecerConta, lembrarConta, marcarSenhaPadrao, usaSenhaPadrao } from './contaLocal'
+import {
+  adiarLembreteSenha,
+  contasSalvas,
+  ehSenhaPadrao,
+  esquecerConta,
+  lembrarConta,
+  marcarSenhaPadrao,
+  mostrarLembreteSenha,
+  usaSenhaPadrao,
+} from './contaLocal'
 
 describe('contas salvas', () => {
   beforeEach(() => localStorage.clear())
@@ -28,5 +37,20 @@ describe('ehSenhaPadrao', () => {
     expect(ehSenhaPadrao('25936057070', '25936057070')).toBe(true)
     expect(ehSenhaPadrao('25936057070', 'outrasenha1')).toBe(false)
     expect(ehSenhaPadrao('25936057070', '259.360.570-70')).toBe(false)
+  })
+})
+
+describe('lembrete da senha padrão', () => {
+  beforeEach(() => localStorage.clear())
+
+  it('"Agora não" esconde por 30 dias e volta depois, se a senha continuar a padrão', () => {
+    const agora = Date.UTC(2026, 10, 6)
+    marcarSenhaPadrao('11111111111', true)
+    expect(mostrarLembreteSenha('11111111111', agora)).toBe(true)
+    adiarLembreteSenha('11111111111', agora)
+    expect(mostrarLembreteSenha('11111111111', agora + 29 * 86_400_000)).toBe(false)
+    expect(mostrarLembreteSenha('11111111111', agora + 31 * 86_400_000)).toBe(true)
+    marcarSenhaPadrao('11111111111', false)
+    expect(mostrarLembreteSenha('11111111111', agora + 31 * 86_400_000)).toBe(false)
   })
 })

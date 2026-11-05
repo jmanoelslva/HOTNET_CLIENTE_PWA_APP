@@ -54,6 +54,7 @@ export function esquecerConta(documento: string): void {
   gravar(CHAVE_CONTAS, JSON.stringify(contasSalvas().filter((c) => c.documento !== documento)))
   gravar(`hotnet-foto-${documento}`, null)
   gravar(`hotnet-senha-padrao-${documento}`, null)
+  gravar(`hotnet-senha-padrao-adiado-${documento}`, null)
 }
 
 /** Senha padrão = o próprio documento (como na conta nova da HOTNET). */
@@ -67,6 +68,19 @@ export function marcarSenhaPadrao(documento: string, padrao: boolean): void {
 
 export function usaSenhaPadrao(documento: string | null): boolean {
   return !!documento && ler(`hotnet-senha-padrao-${documento}`) === '1'
+}
+
+// "Agora não" no lembrete adia por 30 dias (LembreteSenhaPadrao do app Android).
+const ADIAMENTO_LEMBRETE_MS = 30 * 24 * 60 * 60 * 1000
+
+export function adiarLembreteSenha(documento: string, agora = Date.now()): void {
+  gravar(`hotnet-senha-padrao-adiado-${documento}`, String(agora + ADIAMENTO_LEMBRETE_MS))
+}
+
+/** Mostra o lembrete se a senha ainda é a padrão e o adiamento já venceu. */
+export function mostrarLembreteSenha(documento: string | null, agora = Date.now()): boolean {
+  if (!documento || !usaSenhaPadrao(documento)) return false
+  return agora >= Number(ler(`hotnet-senha-padrao-adiado-${documento}`) ?? '0')
 }
 
 export function fotoDaConta(documento: string | null): string | null {
