@@ -1,9 +1,23 @@
 import { describe, expect, it } from 'vitest'
 import type { FaturaDto } from '../api/client'
-import { encargosDetalhados, textoCompartilharFatura, textoPrazo } from './faturas'
+import { abaDoPagamento, encargosDetalhados, textoCompartilharFatura, textoPrazo } from './faturas'
 
 const base: FaturaDto = { invoice_pk: 1, invoice_date_due: '2026-11-10', invoice_amount_document: '100.00' }
 const hoje = new Date(2026, 10, 6) // sex, 06/11/2026
+
+describe('abaDoPagamento', () => {
+  const fatura = (days_late: string, invoice_date_credit: string | null = null) =>
+    ({ days_late, invoice_date_credit }) as FaturaDto
+
+  it('abre Atrasados quando há boleto vencido em aberto', () => {
+    expect(abaDoPagamento([fatura('0'), fatura('5')])).toBe('atrasados')
+  })
+
+  it('abre Em aberto quando nada está vencido (vencido já pago não conta)', () => {
+    expect(abaDoPagamento([fatura('0'), fatura('12', '2026-10-10')])).toBe('aberto')
+    expect(abaDoPagamento([])).toBe('aberto')
+  })
+})
 
 describe('textoPrazo', () => {
   it('conta os dias até o vencimento, como no app', () => {

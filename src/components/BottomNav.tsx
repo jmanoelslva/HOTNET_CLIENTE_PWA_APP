@@ -71,9 +71,9 @@ export default function BottomNav() {
     navigate(to, { replace: substituir, state, viewTransition: true })
   }
 
-  // "Pagar" abre os boletos em aberto (no app Android: a aba do mais urgente).
+  // "Pagar" abre Boletos na aba do mais urgente (Atrasados, senão Em aberto), todos os contratos.
   function pagar() {
-    irParaAba(null, '/boletos', { filtro: 'aberto' })
+    irParaAba(null, '/boletos', { pagar: true })
   }
 
   function renderItem(item: Item) {

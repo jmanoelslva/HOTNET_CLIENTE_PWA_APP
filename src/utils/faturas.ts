@@ -6,6 +6,14 @@ export function estaVencida(fatura: FaturaDto): boolean {
   return !fatura.invoice_date_credit && dias > 0
 }
 
+/**
+ * Aba que o botão Pagar abre, como CobrancasViewModel.focarPagamento do app Android:
+ * Atrasados se houver boleto vencido (o mais urgente), senão Em aberto.
+ */
+export function abaDoPagamento(faturas: FaturaDto[]): 'atrasados' | 'aberto' {
+  return faturas.some(estaVencida) ? 'atrasados' : 'aberto'
+}
+
 export function diasDeAtraso(fatura: FaturaDto): number {
   return Number.parseInt(fatura.days_late ?? '', 10) || 0
 }

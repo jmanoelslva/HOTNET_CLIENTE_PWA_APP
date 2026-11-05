@@ -14,7 +14,7 @@ import { useToast } from '../components/Toast/useToast'
 import ReciboModal from '../components/ReciboModal'
 import { useSessao } from '../auth/useSessao'
 import { abrirEImprimir } from '../utils/impressao'
-import { estaVencida, formatarDataBr, formatarMoeda, textoVencimento, valorAtual } from '../utils/faturas'
+import { abaDoPagamento, estaVencida, formatarDataBr, formatarMoeda, textoVencimento, valorAtual } from '../utils/faturas'
 import {
   ApiError,
   SessaoExpiradaError,
@@ -38,7 +38,7 @@ export default function Boletos() {
   const navigate = useNavigate()
   const { toast } = useToast()
   const { cpf } = useSessao()
-  const estadoNavegacao = location.state as { contratoPk?: number; filtro?: FiltroStatus } | null
+  const estadoNavegacao = location.state as { contratoPk?: number; filtro?: FiltroStatus; pagar?: boolean } | null
   const contratoPreSelecionado = estadoNavegacao?.contratoPk ?? null
 
   const [faturas, setFaturas] = useState<FaturaDto[]>([])
@@ -55,6 +55,16 @@ export default function Boletos() {
   const [confirmando, setConfirmando] = useState<FaturaDto | null>(null)
   const [reciboAberto, setReciboAberto] = useState<FaturaDto | null>(null)
   const [informados, setInformados] = useState<Set<number>>(new Set())
+  // Botão Pagar: a aba sai das faturas, então só é escolhida depois que elas chegam; cada
+  // toque (location.key novo, mesmo com a tela já aberta) escolhe de novo, uma vez.
+  const pedidoPagar = estadoNavegacao?.pagar ? location.key : null
+  const [pagarAtendido, setPagarAtendido] = useState<string | null>(null)
+  if (pedidoPagar && pedidoPagar !== pagarAtendido && !carregando) {
+    setPagarAtendido(pedidoPagar)
+    setFiltroContrato(null)
+    setMostrarTodosPagos(false)
+    setFiltroStatus(abaDoPagamento(faturas))
+  }
 
   useEffect(() => {
     carregar()
