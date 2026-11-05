@@ -9,6 +9,7 @@ import PullToRefresh from '../components/PullToRefresh'
 import Skeleton from '../components/Skeleton'
 import { BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import { useToast } from '../components/Toast/useToast'
+import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
 import { mascararDocumento } from '../utils/recibo'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import './Cadastro.css'
@@ -79,7 +80,7 @@ export default function Cadastro() {
   async function copiar(texto: string) {
     try {
       await navigator.clipboard.writeText(texto)
-      toast('Copiado.', 'sucesso')
+      mostrarAvisoCopiado('Copiado')
     } catch {
       toast('Não foi possível copiar.')
     }

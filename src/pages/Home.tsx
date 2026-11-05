@@ -25,6 +25,7 @@ import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, totalBytes, vincularContra
 import { contarBoletosAtrasados, situacaoDosContratos } from '../api/situacao'
 import { listarBoletos, type FaturaDto } from '../api/client'
 import ChecklistConexao from '../components/ChecklistConexao'
+import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
 import { useToast } from '../components/Toast/useToast'
 import { formatarBytes } from '../utils/formatacao'
 import { estaVencida } from '../utils/faturas'
@@ -243,8 +244,9 @@ export default function Home() {
     if (codigo) {
       setPixCopiado(true)
       setTimeout(() => setPixCopiado(false), 2500)
-      toast('Código Pix copiado. Cole no app do seu banco.', 'sucesso')
+      mostrarAvisoCopiado('Código Pix copiado', 'Cole no app do seu banco')
     } else {
+      mostrarAvisoCopiado('Chave Pix copiada', 'Cole no app do seu banco')
       toast(
         'Você copiou a chave Pix (CNPJ). Após realizar o pagamento, envie o comprovante para o nosso WhatsApp.',
         'info',

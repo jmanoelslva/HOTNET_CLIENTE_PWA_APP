@@ -4,6 +4,7 @@ import AvisoGate from './components/AvisoGate'
 import RotaProtegida from './components/RotaProtegida'
 import BottomNav from './components/BottomNav'
 import StatusBanners from './components/StatusBanners'
+import AvisoCopiadoHost from './components/AvisoCopiado'
 import Spinner from './components/Spinner'
 import { useSessao } from './auth/useSessao'
 import { aplicarVersaoNovaSePreciso } from './utils/atualizacaoApp'
@@ -45,6 +46,7 @@ function App() {
   return (
     <AvisoGate>
       <StatusBanners />
+      <AvisoCopiadoHost />
       <Suspense fallback={<Spinner tela />}>
         <Routes>
           <Route path="/login" element={<Login />} />

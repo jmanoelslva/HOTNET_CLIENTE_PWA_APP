@@ -4,6 +4,7 @@ import { LuCircleCheck, LuFileText, LuDownload, LuReceiptText, LuQrCode, LuRecei
 import { FaBarcode } from 'react-icons/fa'
 import { SiPix } from 'react-icons/si'
 import CabecalhoTela from '../components/CabecalhoTela'
+import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
 import { AbasPilula, RotuloGrupo } from '../components/PadraoTelas'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
@@ -196,6 +197,10 @@ export default function Boletos() {
     const ok = await copiarTexto(texto)
     if (ok) {
       setCopiado(chave)
+      mostrarAvisoCopiado(
+        usandoFallback ? 'Chave Pix copiada' : chave.startsWith('barcode') ? 'Código de barras copiado' : 'Código Pix copiado',
+        'Cole no app do seu banco',
+      )
       setTimeout(() => setCopiado((atual) => (atual === chave ? null : atual)), 1500)
       if (usandoFallback) {
         toast(
