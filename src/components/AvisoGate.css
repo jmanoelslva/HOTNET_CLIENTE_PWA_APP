@@ -53,7 +53,7 @@
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
 }
 
 .aviso-gate-card button:disabled {

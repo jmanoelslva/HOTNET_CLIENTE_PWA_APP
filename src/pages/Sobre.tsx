@@ -1,33 +1,76 @@
 import { FaWhatsapp } from 'react-icons/fa'
-import logoHotnet from '../assets/logo-hotnet.png'
+import { LuGlobe, LuShare2, LuShieldCheck } from 'react-icons/lu'
+import CabecalhoTela from '../components/CabecalhoTela'
+import { BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
+import { useToast } from '../components/Toast/useToast'
+import logoApp from '../assets/logo-app.png'
 import './Sobre.css'
 
-function abrirWhatsappSobre() {
-  const numero = '5582999426613'
-  const mensagem = 'Olá, tenho uma dúvida sobre o portal do cliente HOTNET.'
-  window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`, '_blank', 'noopener,noreferrer')
+const NUMERO_WHATSAPP = '5582999426613'
+
+function abrir(url: string) {
+  window.open(url, '_blank', 'noopener,noreferrer')
 }
 
+/**
+ * Sobre — mesmo layout do app Android (SobreScreen.kt): cartão grafite com
+ * o ícone e a versão, e as ações do app num bloco branco. "Avaliar na loja"
+ * fica de fora: o portal web não está numa loja.
+ */
 export default function Sobre() {
+  const { toast } = useToast()
+
+  async function compartilhar() {
+    const dados = {
+      title: 'Indicar o app',
+      text: 'Acompanhe seus boletos, consumo e suporte da HOTNET pelo celular:',
+      url: window.location.origin,
+    }
+    try {
+      if (navigator.share) {
+        await navigator.share(dados)
+      } else {
+        await navigator.clipboard.writeText(`${dados.text} ${dados.url}`)
+        toast('Link copiado.', 'sucesso')
+      }
+    } catch {
+      // Compartilhamento cancelado pelo cliente: nada a fazer.
+    }
+  }
+
   return (
     <div className="sobre-tela tela-entrada">
+      <CabecalhoTela titulo="Sobre" subtitulo="Portal do cliente HOTNET." />
 
-      <div className="sobre-card">
-        <img src={logoHotnet} alt="HOTNET" className="sobre-logo" />
+      <section className="cartao-destaque sobre-cartao">
+        <span className="sobre-logo-circulo">
+          <img src={logoApp} alt="" className="sobre-logo" />
+        </span>
+        <div>
+          <strong className="sobre-nome">HOTNET</strong>
+          {__APP_VERSION__ && <span className="sobre-versao">Versão {__APP_VERSION__}</span>}
+        </div>
+      </section>
 
-        <p className="sobre-descricao">
-          Este é o portal do cliente HOTNET na web: acompanhe seus boletos, contratos, consumo de internet e
-          chamados de suporte direto pelo navegador, sem precisar instalar nenhum aplicativo.
-        </p>
-
-        <button className="sobre-whatsapp" onClick={abrirWhatsappSobre}>
-          <FaWhatsapp size={18} /> Falar com a gente
-        </button>
-
-        <a className="sobre-link" href="https://controllr.hotnet.net.br/policies/privacy" target="_blank" rel="noreferrer">
-          Política de Privacidade
-        </a>
-      </div>
+      <RotuloGrupo>O app</RotuloGrupo>
+      <BlocoBranco>
+        <LinhaItem icone={LuShare2} tom="primaria" titulo="Compartilhar o app" onClick={compartilhar} />
+        <LinhaItem
+          icone={FaWhatsapp}
+          tom="primaria"
+          titulo="Falar com a gente"
+          onClick={() =>
+            abrir(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent('Olá, tenho uma dúvida sobre o portal do cliente HOTNET.')}`)
+          }
+        />
+        <LinhaItem icone={LuGlobe} tom="primaria" titulo="Site da HOTNET" onClick={() => abrir('https://hotnet.net.br')} />
+        <LinhaItem
+          icone={LuShieldCheck}
+          tom="primaria"
+          titulo="Política de privacidade"
+          onClick={() => abrir('https://controllr.hotnet.net.br/policies/privacy')}
+        />
+      </BlocoBranco>
     </div>
   )
 }

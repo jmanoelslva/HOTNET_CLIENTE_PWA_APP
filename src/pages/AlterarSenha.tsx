@@ -1,11 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LuCircleCheck, LuKeyRound, LuLock, LuCircle } from 'react-icons/lu'
+import { LuCircleCheck, LuLock, LuCircle } from 'react-icons/lu'
 import { useSessao } from '../auth/useSessao'
 import { alterarSenha, login, SessaoExpiradaError } from '../api/client'
 import CabecalhoTela from '../components/CabecalhoTela'
 import VoltarInicio from '../components/VoltarInicio'
-import { CORES } from '../utils/cores'
 import { avaliarSenha, TAMANHO_MAX_SENHA } from '../utils/senha'
 import './AlterarSenha.css'
 
@@ -102,8 +101,8 @@ export default function AlterarSenha() {
 
   return (
     <div className="senha-tela tela-entrada">
-      <VoltarInicio />
-      <CabecalhoTela icone={LuKeyRound} cor={CORES.dados} titulo="Alterar senha" subtitulo="A senha que você usa para entrar no portal e no app." />
+      <VoltarInicio to="/perfil" label="Perfil" />
+      <CabecalhoTela titulo="Alterar senha" subtitulo="A senha que você usa para entrar no portal e no app." />
 
       {etapa === 'confirmar' && (
         <form className="senha-card" onSubmit={confirmarSenhaAtual}>

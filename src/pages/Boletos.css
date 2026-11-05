@@ -100,7 +100,7 @@
   color: var(--cor-branco-fixo);
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
 }
 
 .boletos-lista {
@@ -309,7 +309,7 @@
 
 .boletos-modal {
   background: var(--cor-superficie);
-  border-radius: 20px 20px 0 0;
+  border-radius: 28px 28px 0 0;
   padding: 12px 24px 28px;
   max-width: 420px;
   width: 100%;
@@ -352,7 +352,7 @@
   color: var(--cor-branco-fixo);
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
 }
 
 .boletos-modal-confirmar h2 {
@@ -388,4 +388,153 @@
   margin: 8px 0 16px;
   color: var(--cor-erro);
   text-align: center;
+}
+
+/* --- Cartões no padrão do app Android (FaturaItem / FaturaPagaLinha) ----- */
+.boletos-seletor-contrato {
+  margin-bottom: 12px;
+}
+
+.boletos-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.boletos-esqueleto .cartao-destaque {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boleto-cartao {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.boleto-cartao-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.boleto-cartao-contrato {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.boleto-cartao-valor {
+  margin-top: 4px;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 800;
+}
+
+.boleto-cartao-prazo {
+  align-self: flex-start;
+  margin-top: 6px;
+}
+
+.boleto-cartao-prazo.atrasado {
+  background: #ff8a8a;
+  color: #4a0008;
+}
+
+.boleto-cartao-encargos {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.boleto-cartao-pix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  margin-top: 12px;
+  border: none;
+  border-radius: var(--raio-md);
+  background: var(--cor-laranja-vivo);
+  color: var(--cor-texto-sobre-laranja);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.boleto-cartao-pix.copiado {
+  background: #c8f2d4;
+  color: #0b4a22;
+}
+
+.boleto-cartao-secundarios {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.boleto-cartao-secundarios button {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 6px;
+  border: none;
+  border-radius: var(--raio-md);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boleto-cartao-ja-paguei {
+  min-height: 44px;
+  margin-top: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--raio-md);
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boleto-cartao-ja-paguei:disabled {
+  opacity: 0.6;
+}
+
+.linha-item.com-divisoria {
+  border-top: 1px solid var(--cor-borda);
+}
+
+.boleto-pago-icone {
+  background: color-mix(in srgb, var(--cor-sucesso) 16%, transparent);
+  color: var(--cor-sucesso);
+}
+
+.boleto-pago-recibo {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
 }

@@ -12,7 +12,7 @@
 
 .checklist-modal {
   background: var(--cor-superficie);
-  border-radius: 20px 20px 0 0;
+  border-radius: 28px 28px 0 0;
   padding: 16px 20px calc(24px + env(safe-area-inset-bottom, 0px));
   width: 100%;
   max-width: 460px;
@@ -315,7 +315,7 @@
 .checklist-btn-primario {
   border: none;
   color: var(--cor-branco-fixo);
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
 }
 
 .checklist-btn-whatsapp {

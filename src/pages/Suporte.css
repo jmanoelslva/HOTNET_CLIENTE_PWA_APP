@@ -51,7 +51,7 @@
   color: var(--cor-branco-fixo);
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
 }
 
 .suporte-lista {
@@ -152,7 +152,7 @@
   border: none;
   color: var(--cor-branco-fixo);
   cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
   box-shadow: 0 4px 16px rgba(163, 55, 0, 0.4);
   display: flex;
   align-items: center;
@@ -173,7 +173,7 @@
 
 .suporte-modal {
   background: var(--cor-superficie);
-  border-radius: 20px 20px 0 0;
+  border-radius: 28px 28px 0 0;
   padding: 12px 24px 28px;
   max-width: 420px;
   width: 100%;
@@ -321,12 +321,12 @@
   color: var(--cor-branco-fixo);
   cursor: pointer;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
 }
 
 .suporte-checklist {
   background: var(--cor-superficie);
-  border-radius: 20px 20px 0 0;
+  border-radius: 28px 28px 0 0;
   padding: 12px 28px 28px;
   max-width: 420px;
   width: 100%;

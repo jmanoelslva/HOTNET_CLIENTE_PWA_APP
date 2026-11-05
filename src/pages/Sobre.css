@@ -1,50 +1,40 @@
 .sobre-tela {
-  max-width: 480px;
+  max-width: var(--largura-conteudo);
   margin: 0 auto;
   padding: 16px 16px 24px;
 }
 
-.sobre-card {
-  background: var(--cor-superficie);
-  border-radius: 20px;
-  padding: 32px 24px;
-  box-shadow: var(--sombra-card);
-  text-align: center;
+.sobre-cartao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.sobre-logo {
-  height: 72px;
-  width: auto;
-  margin: 0 auto 20px;
-}
-
-.sobre-descricao {
-  margin: 0 0 24px;
-  font-size: 14px;
-  color: var(--cor-texto-secundario);
-  line-height: 1.6;
-  text-align: justify;
-}
-
-.sobre-whatsapp {
-  width: 100%;
-  height: 48px;
-  border: none;
-  border-radius: 12px;
-  color: var(--cor-branco-fixo);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-whatsapp), var(--cor-whatsapp-escura));
+.sobre-logo-circulo {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  border-radius: 50%;
+  background: #ffffff;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
 }
 
-.sobre-link {
+.sobre-logo {
+  width: 60px;
+  height: 60px;
+}
+
+.sobre-nome {
   display: block;
-  margin-top: 20px;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 800;
+}
+
+.sobre-versao {
   font-size: 12px;
-  color: var(--cor-texto-terciario);
+  color: rgba(255, 255, 255, 0.85);
 }

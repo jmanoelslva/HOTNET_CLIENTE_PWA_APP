@@ -3,21 +3,16 @@
   align-items: center;
   gap: 6px;
   margin-bottom: 16px;
-  padding: 8px 16px;
-  border-radius: 20px;
+  min-height: 40px;
+  padding: 0 14px 0 10px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 999px;
   background: var(--cor-superficie);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--cor-primaria);
   text-decoration: none;
   transition:
     background-color 0.15s ease,
     box-shadow 0.15s ease;
-}
-
-.voltar-inicio:hover {
-  background: var(--cor-primaria);
-  color: var(--cor-branco-fixo);
-  box-shadow: 0 4px 12px rgba(201, 67, 0, 0.35);
 }

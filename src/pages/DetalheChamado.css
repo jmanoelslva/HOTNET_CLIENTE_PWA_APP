@@ -91,7 +91,7 @@
   color: var(--cor-branco-fixo);
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
 }
 
 .balao-linha {
@@ -238,7 +238,7 @@
   color: var(--cor-branco-fixo);
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
   flex-shrink: 0;
 }
 
@@ -346,5 +346,5 @@
 .suporte-modal-acoes button.suporte-btn-primario {
   border: none;
   color: var(--cor-branco-fixo);
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
 }

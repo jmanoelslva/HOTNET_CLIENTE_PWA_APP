@@ -12,7 +12,7 @@
 
 .modal-confirmar-logout {
   background: var(--cor-superficie);
-  border-radius: 20px 20px 0 0;
+  border-radius: 28px 28px 0 0;
   padding: 12px 24px 28px;
   max-width: 420px;
   width: 100%;
@@ -73,5 +73,5 @@
 .modal-confirmar-logout-acoes button.modal-confirmar-logout-sair {
   border: none;
   color: var(--cor-branco-fixo);
-  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  background: var(--cor-primaria);
 }

@@ -4,13 +4,13 @@ import { LuCircleCheck, LuFileText, LuDownload, LuReceiptText, LuQrCode, LuRecei
 import { FaBarcode } from 'react-icons/fa'
 import { SiPix } from 'react-icons/si'
 import CabecalhoTela from '../components/CabecalhoTela'
+import { AbasPilula, RotuloGrupo } from '../components/PadraoTelas'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
 import PullToRefresh from '../components/PullToRefresh'
 import { useToast } from '../components/Toast/useToast'
 import ReciboModal from '../components/ReciboModal'
 import { useSessao } from '../auth/useSessao'
-import { CORES, comAlpha } from '../utils/cores'
 import { abrirEImprimir } from '../utils/impressao'
 import { estaVencida } from '../utils/faturas'
 import {
@@ -229,12 +229,7 @@ export default function Boletos() {
   return (
     <PullToRefresh aoAtualizar={carregar}>
     <div className="boletos-tela tela-entrada">
-      <CabecalhoTela
-        icone={LuReceiptText}
-        cor={CORES.boletos}
-        titulo="Boletos"
-        subtitulo="Acompanhe seus boletos em aberto e pagos."
-      />
+      <CabecalhoTela titulo="Boletos" subtitulo="Acompanhe seus boletos em aberto e pagos." />
 
       <div className="boletos-abas">
         <button
@@ -263,24 +258,23 @@ export default function Boletos() {
       </div>
 
       {contratos.length > 1 && (
-        <select
-          className="boletos-filtro-contrato"
-          value={filtroContrato ?? ''}
-          onChange={(evento) => setFiltroContrato(evento.target.value ? Number(evento.target.value) : null)}
-        >
-          <option value="">Contratos: Todos</option>
-          {contratos.map(([pk, numero]) => (
-            <option key={pk} value={pk}>
-              Contrato {numero}
-            </option>
-          ))}
-        </select>
+        <div className="boletos-seletor-contrato">
+          <AbasPilula<string>
+            rotulo="Contrato"
+            opcoes={[
+              { valor: 'todos', rotulo: 'Todos' },
+              ...contratos.map(([pk, numero]) => ({ valor: String(pk), rotulo: `Nº ${numero}` })),
+            ]}
+            selecionada={filtroContrato != null ? String(filtroContrato) : 'todos'}
+            onSelecionar={(v) => setFiltroContrato(v === 'todos' ? null : Number(v))}
+          />
+        </div>
       )}
 
       {carregando && (
-        <ul className="boletos-lista">
-          {[0, 1, 2].map((indice) => (
-            <li key={indice} className="boleto-card">
+        <ul className="boletos-lista boletos-esqueleto">
+          {[0, 1].map((indice) => (
+            <li key={indice} className="cartao-destaque">
               <Skeleton width="55%" height={16} />
               <Skeleton width="35%" height={12} />
               <Skeleton width="45%" height={24} />
@@ -311,139 +305,116 @@ export default function Boletos() {
         />
       )}
 
-      {!carregando && !erro && faturasExibidas.length > 0 && (
-        <ul className="boletos-lista">
+      {!carregando && !erro && faturasExibidas.length > 0 && filtroStatus !== 'pagos' && (
+        <div className="boletos-lista">
           {faturasExibidas.map((fatura) => {
-            const paga = !!fatura.invoice_date_credit
             const dias = Number.parseInt(fatura.days_late ?? '', 10) || 0
             const vencida = estaVencida(fatura)
             const valorAtualizado = vencida ? calcularValorComEncargos(fatura) : null
             const jaInformado = informados.has(fatura.invoice_pk) || fatura.obs_pk != null
+            const pixCopiado = copiado === `pix-${fatura.invoice_pk}`
 
+            // Cartão grafite do boleto (FaturaItem + CartaoDestaque do app Android).
             return (
-              <li key={fatura.invoice_pk} className="boleto-card">
-                <div className="boleto-topo">
-                  <span className="boleto-titulo">Boleto #{fatura.invoice_pk}</span>
-                  <span
-                    className={`boleto-badge ${paga ? 'badge-paga' : vencida ? 'badge-vencida' : 'badge-em-dia'}`}
-                  >
-                    {paga ? 'PAGA' : vencida ? 'VENCIDA' : 'EM DIA'}
+              <section key={fatura.invoice_pk} className="cartao-destaque boleto-cartao" aria-label={`Boleto ${fatura.invoice_pk}`}>
+                <div className="boleto-cartao-topo">
+                  <span className="cartao-destaque-rotulo">
+                    {vencida ? 'Boleto atrasado' : 'Boleto em aberto'}
+                    {fatura.contract_number != null && contratos.length > 1 ? ` · Contrato ${fatura.contract_number}` : ''}
                   </span>
+                  {fatura.contract_number != null && (
+                    <button
+                      type="button"
+                      className="boleto-cartao-contrato"
+                      onClick={() => navigate('/contratos', { state: { contratoPk: fatura.contract_pk }, viewTransition: true })}
+                      aria-label={`Ver contrato ${fatura.contract_number}`}
+                    >
+                      <LuFileText size={16} />
+                    </button>
+                  )}
                 </div>
+                <strong className="boleto-cartao-valor">R$ {formatarValor(valorAtualizado ?? fatura.invoice_amount_document)}</strong>
+                <span className={`etiqueta-destaque boleto-cartao-prazo ${vencida ? 'atrasado' : ''}`}>
+                  {vencida
+                    ? `Venceu em ${formatarData(fatura.invoice_date_due)} · há ${dias} ${dias === 1 ? 'dia' : 'dias'}`
+                    : `Vence em ${formatarData(fatura.invoice_date_due)}`}
+                </span>
+                {valorAtualizado != null && (
+                  <span className="boleto-cartao-encargos">
+                    Original R$ {formatarValor(fatura.invoice_amount_document)} + multa de{' '}
+                    {fatura.invoice_rate_fine?.replace('.', ',')}% e juros de {fatura.invoice_rate_interest?.replace('.', ',')}% ao dia
+                  </span>
+                )}
 
-                {fatura.contract_number != null && (
+                <button
+                  type="button"
+                  className={`boleto-cartao-pix ${pixCopiado ? 'copiado' : ''}`}
+                  onClick={() => aoCopiar(`pix-${fatura.invoice_pk}`, fatura.invoice_qrcode)}
+                >
+                  {pixCopiado ? <LuCircleCheck size={18} /> : <SiPix size={18} />}
+                  {pixCopiado ? 'Código Pix copiado' : 'Copiar código Pix'}
+                </button>
+
+                <div className="boleto-cartao-secundarios">
+                  {fatura.invoice_qrcode_image && (
+                    <button type="button" onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}>
+                      <LuQrCode size={18} /> QR Code
+                    </button>
+                  )}
+                  <button type="button" onClick={() => aoCopiar(`barcode-${fatura.invoice_pk}`, fatura.invoice_barcode)}>
+                    <FaBarcode size={18} /> {copiado === `barcode-${fatura.invoice_pk}` ? 'Copiado' : 'Código de barras'}
+                  </button>
                   <button
-                    className="boleto-contrato-chip"
-                    style={{ background: comAlpha(CORES.contratos, 12), color: CORES.contratos }}
+                    type="button"
                     onClick={() =>
-                      navigate('/contratos', { state: { contratoPk: fatura.contract_pk }, viewTransition: true })
+                      abrirEImprimir(urlImpressaoBoleto(fatura.invoice_pk), () =>
+                        toast('Não foi possível abrir o boleto agora. Tente novamente.'),
+                      )
                     }
                   >
-                    <LuFileText size={14} /> Contrato {fatura.contract_number}
+                    <LuDownload size={18} /> PDF
                   </button>
-                )}
-
-                <div className="boleto-vencimento-valor">
-                  <div className="boleto-coluna-vencimento">
-                    <span className="boleto-label-valor">Vencimento</span>
-                    <p className="boleto-vencimento" style={vencida ? { color: CORES.erro } : undefined}>
-                      {formatarData(fatura.invoice_date_due)}
-                    </p>
-                    {vencida && (
-                      <p className="boleto-aviso boleto-aviso-vencida">
-                        {dias === 1 ? 'Venceu há 1 dia' : `Venceu há ${dias} dias`}
-                      </p>
-                    )}
-                    {paga && (
-                      <p className="boleto-aviso boleto-aviso-paga">
-                        ✅ Pago em {formatarData(fatura.invoice_date_credit)}
-                      </p>
-                    )}
-                  </div>
-                  <div className="boleto-coluna-valor">
-                    <span className="boleto-label-valor">{valorAtualizado != null ? 'Valor atualizado' : 'Valor total'}</span>
-                    <p className="boleto-valor">R$ {formatarValor(valorAtualizado ?? fatura.invoice_amount_document)}</p>
-                  </div>
                 </div>
 
-                {valorAtualizado != null && (
-                  <div className="boleto-detalhes-atraso">
-                    <p className="boleto-valor-original">Original: R$ {formatarValor(fatura.invoice_amount_document)}</p>
-                    <p className="boleto-taxas">
-                      Multa de {fatura.invoice_rate_fine?.replace('.', ',')}% + juros de{' '}
-                      {fatura.invoice_rate_interest?.replace('.', ',')}% ao dia ({dias}d de atraso)
-                    </p>
-                  </div>
+                {!jaInformado && fatura.contract_pk != null && (
+                  <button
+                    type="button"
+                    className="boleto-cartao-ja-paguei"
+                    disabled={informando === fatura.invoice_pk}
+                    onClick={() => setConfirmando(fatura)}
+                  >
+                    {informando === fatura.invoice_pk ? 'Enviando…' : 'Já paguei este boleto'}
+                  </button>
                 )}
-
-                {paga && (
-                  <div className="boleto-acoes">
-                    <button
-                      className="boleto-acao-principal"
-                      style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primariaEscura }}
-                      onClick={() => setReciboAberto(fatura)}
-                    >
-                      <LuReceipt /> Recibo
-                    </button>
-                  </div>
-                )}
-
-                {!paga && (
-                  <div className="boleto-acoes">
-                    {/* Ação principal, linha inteira no topo. */}
-                    <button
-                      className="boleto-acao-principal"
-                      style={{ background: comAlpha(CORES.pix, 10), color: CORES.pix }}
-                      onClick={() => aoCopiar(`pix-${fatura.invoice_pk}`, fatura.invoice_qrcode)}
-                    >
-                      <SiPix />
-                      {copiado === `pix-${fatura.invoice_pk}` ? '✓ Código PIX Copiado!' : 'Pagar com PIX'}
-                    </button>
-
-                    {/* Outras formas de pegar o código de pagamento, em par. */}
-                    <button
-                      style={{ background: comAlpha(CORES.contratos, 10), color: CORES.contratos }}
-                      onClick={() => aoCopiar(`barcode-${fatura.invoice_pk}`, fatura.invoice_barcode)}
-                    >
-                      <FaBarcode />
-                      {copiado === `barcode-${fatura.invoice_pk}` ? '✓ Copiado!' : 'Código de Barras'}
-                    </button>
-                    {fatura.invoice_qrcode_image && (
-                      <button
-                        style={{ background: comAlpha(CORES.ajuda, 10), color: CORES.ajuda }}
-                        onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}
-                      >
-                        <LuQrCode /> QR Code PIX
-                      </button>
-                    )}
-
-                    {/* Utilitário + confirmação pós-pagamento, em par. */}
-                    <button
-                      style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primaria }}
-                      onClick={() =>
-                        abrirEImprimir(urlImpressaoBoleto(fatura.invoice_pk), () =>
-                          toast('Não foi possível abrir o boleto agora. Tente novamente.'),
-                        )
-                      }
-                    >
-                      <LuDownload /> Imprimir / Salvar PDF
-                    </button>
-                    {!jaInformado && fatura.contract_pk != null && (
-                      <button
-                        style={{ background: comAlpha(CORES.sucessoVivo, 10), color: CORES.sucessoVivo }}
-                        disabled={informando === fatura.invoice_pk}
-                        onClick={() => setConfirmando(fatura)}
-                      >
-                        <LuCircleCheck />
-                        {informando === fatura.invoice_pk ? 'Enviando…' : 'Já paguei este boleto'}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </li>
+              </section>
             )
           })}
-        </ul>
+        </div>
+      )}
+
+      {!carregando && !erro && faturasExibidas.length > 0 && filtroStatus === 'pagos' && (
+        <>
+          <RotuloGrupo>Últimos pagos</RotuloGrupo>
+          <div className="bloco-branco">
+            {faturasExibidas.map((fatura, i) => (
+              <div key={fatura.invoice_pk} className={`linha-item boleto-pago ${i > 0 ? 'com-divisoria' : ''}`}>
+                <span className="linha-item-icone boleto-pago-icone" aria-hidden="true">
+                  <LuCircleCheck size={18} />
+                </span>
+                <span className="linha-item-textos">
+                  <span className="linha-item-titulo">R$ {formatarValor(fatura.invoice_amount_paid || fatura.invoice_amount_document)}</span>
+                  <span className="linha-item-rotulo">
+                    Pago em {formatarData(fatura.invoice_date_credit)}
+                    {fatura.contract_number != null && contratos.length > 1 ? ` · Contrato ${fatura.contract_number}` : ''}
+                  </span>
+                </span>
+                <button type="button" className="botao-contorno boleto-pago-recibo" onClick={() => setReciboAberto(fatura)}>
+                  <LuReceipt size={16} /> Recibo
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {filtroStatus === 'pagos' && !mostrarTodosPagos && faturasExibidas.length < faturasFiltradas.length && (

@@ -3,10 +3,10 @@ import type { IconType } from 'react-icons'
 import {
   LuChartColumn,
   LuFileText,
-  LuCircleHelp,
   LuLock,
   LuReceiptText,
   LuSearchX,
+  LuChevronDown,
   LuHeadset,
   LuWifi,
 } from 'react-icons/lu'
@@ -43,10 +43,6 @@ const CATEGORIAS: CategoriaFaq[] = [
   { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', Icone: LuChartColumn, cor: CORES.consumo },
   { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', Icone: LuLock, cor: CORES.dados },
 ]
-
-function categoriaDe(id: string): CategoriaFaq {
-  return CATEGORIAS.find((c) => c.id === id) ?? CATEGORIAS[0]
-}
 
 const PERGUNTAS: PerguntaFrequente[] = [
   {
@@ -142,18 +138,19 @@ export default function Faq() {
     }
   }
 
+  // Perguntas agrupadas por assunto, como no app Android (FaqScreen.kt).
+  const grupos = CATEGORIAS.map((categoria) => ({
+    categoria,
+    itens: listaExibida.map((p, indice) => ({ p, indice })).filter(({ p }) => p.categoriaId === categoria.id),
+  })).filter((g) => g.itens.length > 0)
+
   return (
     <div className="faq-tela tela-entrada">
-      <CabecalhoTela
-        icone={LuCircleHelp}
-        cor={CORES.ajuda}
-        titulo="Ajuda"
-        subtitulo="Perguntas frequentes e nossos canais de contato."
-      />
+      <CabecalhoTela titulo="Dúvidas" subtitulo="Perguntas frequentes e nossos canais de contato." />
 
       <input
         className="faq-busca"
-        placeholder="Buscar dúvida…"
+        placeholder="Busque: pix, recibo, Wi-Fi…"
         value={busca}
         onChange={(evento) => {
           setBusca(evento.target.value)
@@ -161,59 +158,77 @@ export default function Faq() {
         }}
       />
 
-      <div className="faq-categorias">
-        {CATEGORIAS.map((categoria) => (
-          <button
-            key={categoria.id}
-            className={`faq-categoria ${categoriaFiltro === categoria.id ? 'ativa' : ''}`}
-            style={{ borderColor: categoriaFiltro === categoria.id ? categoria.cor : undefined }}
-            onClick={() => selecionarCategoria(categoria.id)}
-          >
-            <span className="faq-categoria-icone" style={{ background: comAlpha(categoria.cor, 10), color: categoria.cor }}>
-              <categoria.Icone size={22} />
-            </span>
-            <span className="faq-categoria-nome">{categoria.nome}</span>
-            <span className="faq-categoria-subtitulo">{categoria.subtitulo}</span>
-          </button>
-        ))}
-      </div>
-
-      <h2 className="faq-titulo-lista">
-        {busca.trim()
-          ? 'Resultados da busca'
-          : categoriaFiltro
-            ? CATEGORIAS.find((c) => c.id === categoriaFiltro)?.nome
-            : 'Dúvidas mais acessadas'}
-      </h2>
-
-      {listaExibida.length === 0 ? (
-        <EstadoVazio icone={LuSearchX} titulo="Nenhuma pergunta encontrada" subtitulo="Tente buscar com outras palavras." />
-      ) : (
-        <div className="faq-lista">
-          {listaExibida.map((pergunta, indice) => {
-            const aberta = abertaId === indice
-            const categoria = categoriaDe(pergunta.categoriaId)
-            return (
-              <div key={indice} className="faq-item" onClick={() => setAbertaId(aberta ? null : indice)}>
-                <div className="faq-item-topo">
-                  <span
-                    className="faq-item-icone"
-                    style={{ background: comAlpha(categoria.cor, 10), color: categoria.cor }}
-                  >
-                    <categoria.Icone size={18} />
-                  </span>
-                  <span className="faq-item-pergunta">{pergunta.pergunta}</span>
-                  <span className={`faq-item-seta ${aberta ? 'aberta' : ''}`}>›</span>
-                </div>
-                {aberta && <p className="faq-item-resposta">{pergunta.resposta}</p>}
-              </div>
-            )
-          })}
+      <section className="faq-assuntos" aria-labelledby="faq-assuntos-titulo">
+        <div className="faq-assuntos-topo">
+          <h2 id="faq-assuntos-titulo">Assuntos</h2>
+          {categoriaFiltro && (
+            <button type="button" onClick={() => setCategoriaFiltro(null)}>
+              Ver todos
+            </button>
+          )}
         </div>
+        <div className="faq-categorias">
+          {CATEGORIAS.map((categoria) => (
+            <button
+              key={categoria.id}
+              type="button"
+              className={`faq-categoria ${categoriaFiltro === categoria.id ? 'ativa' : ''}`}
+              onClick={() => selecionarCategoria(categoria.id)}
+              aria-pressed={categoriaFiltro === categoria.id}
+            >
+              <span className="faq-categoria-icone" style={{ background: comAlpha(categoria.cor, 15), color: categoria.cor }}>
+                <categoria.Icone size={20} />
+              </span>
+              <span className="faq-categoria-nome">{categoria.nome}</span>
+              <span className="faq-categoria-subtitulo">
+                {PERGUNTAS.filter((p) => p.categoriaId === categoria.id).length} perguntas
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {grupos.length === 0 && (
+        <EstadoVazio icone={LuSearchX} titulo="Nenhuma pergunta encontrada" subtitulo="Tente buscar com outras palavras." />
       )}
 
-      <button className="faq-whatsapp" onClick={aoClicarWhatsapp}>
-        <FaWhatsapp size={18} /> Não encontrei minha dúvida — falar com a gente
+      {grupos.map(({ categoria, itens }) => (
+        <section key={categoria.id} className="faq-grupo">
+          <h2 className="faq-grupo-titulo">
+            <span className="faq-grupo-ponto" style={{ background: categoria.cor }} aria-hidden="true" />
+            {categoria.nome}
+          </h2>
+          <div className="bloco-branco">
+            {itens.map(({ p, indice }, i) => {
+              const aberta = abertaId === indice
+              return (
+                <div key={indice} className={`faq-item ${i > 0 ? 'com-divisoria' : ''}`}>
+                  <button
+                    type="button"
+                    className="faq-item-topo"
+                    onClick={() => setAbertaId(aberta ? null : indice)}
+                    aria-expanded={aberta}
+                  >
+                    <span className={`faq-item-pergunta ${aberta ? 'aberta' : ''}`}>{p.pergunta}</span>
+                    <LuChevronDown size={22} className={`faq-item-seta ${aberta ? 'aberta' : ''}`} aria-hidden="true" />
+                  </button>
+                  {aberta && <p className="faq-item-resposta">{p.resposta}</p>}
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      ))}
+
+      <button type="button" className="faq-falar" onClick={aoClicarWhatsapp}>
+        <span className="faq-falar-icone" aria-hidden="true">
+          <FaWhatsapp size={22} />
+        </span>
+        <span className="faq-falar-textos">
+          <strong>Não achou sua dúvida?</strong>
+          <span>Fale com a gente no WhatsApp</span>
+        </span>
+        <span className="faq-falar-chamar">Chamar</span>
       </button>
     </div>
   )
