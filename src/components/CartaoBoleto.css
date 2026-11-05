@@ -262,3 +262,22 @@
 .menu-hotnet-aviso {
   cursor: default;
 }
+
+/* Rótulos sempre em uma linha; em celular estreito (360 px) a letra e o
+   espaço interno diminuem um pouco para caber. */
+.cartao-boleto-linha > button {
+  white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+  .cartao-boleto-linha > button,
+  .cartao-boleto-mais > button {
+    padding: 8px;
+    font-size: 13px;
+    gap: 5px;
+  }
+
+  .cartao-boleto-mais > button {
+    min-width: 44px;
+  }
+}

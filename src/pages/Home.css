@@ -186,14 +186,20 @@
   overflow-wrap: anywhere;
 }
 
+/* Cada botão na largura do próprio texto, sempre em uma linha; em tela
+   estreita demais, um desce para baixo do outro (nunca quebra o texto). */
 .home-faixa-botoes {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
 }
 
 .home-faixa-botoes > * {
-  flex: 1;
+  flex: 1 1 auto;
+  gap: 6px;
+  padding: 0 12px;
+  white-space: nowrap;
 }
 
 /* Faixa da conexão com problema: errorContainer (cancelado: cinza). */
