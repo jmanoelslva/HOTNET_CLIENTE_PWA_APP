@@ -43,8 +43,23 @@ export default function PullToRefresh({ aoAtualizar, children }: Props) {
     const elemento = containerRef.current
     if (!elemento) return
 
+    // Toque dentro de uma lista com rolagem própria é rolagem dessa lista —
+    // subir a lista não pode virar "puxar para atualizar" só porque a
+    // página está no topo.
+    function dentroDeRolagemPropria(alvo: EventTarget | null): boolean {
+      let no = alvo instanceof Element ? alvo : null
+      while (no && no !== elemento) {
+        if (no.scrollHeight > no.clientHeight) {
+          const overflowY = getComputedStyle(no).overflowY
+          if (overflowY === 'auto' || overflowY === 'scroll') return true
+        }
+        no = no.parentElement
+      }
+      return false
+    }
+
     function aoComecar(e: TouchEvent) {
-      const podeComecar = window.scrollY <= 0 && !atualizandoRef.current
+      const podeComecar = window.scrollY <= 0 && !atualizandoRef.current && !dentroDeRolagemPropria(e.target)
       inicioYRef.current = podeComecar ? e.touches[0].clientY : null
       if (podeComecar) setArrastando(true)
     }
@@ -109,12 +124,15 @@ export default function PullToRefresh({ aoAtualizar, children }: Props) {
 
   return (
     <div ref={containerRef}>
+      {/* Bolinha flutuante (estilo Android): desce por cima do conteúdo,
+          que fica parado — antes o indicador crescia e empurrava a tela. */}
       <div
         className="pull-to-refresh-indicador"
+        aria-hidden={distancia === 0}
         style={{
-          height: distancia,
-          opacity: progresso,
-          transition: arrastando ? 'none' : 'height 0.2s ease, opacity 0.2s ease',
+          transform: `translate(-50%, ${distancia - 48}px)`,
+          opacity: distancia > 0 ? Math.max(progresso, 0.3) : 0,
+          transition: arrastando ? 'none' : 'transform 0.2s ease, opacity 0.2s ease',
         }}
       >
         <MdRefresh
