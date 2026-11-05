@@ -1,0 +1,17 @@
+.botao-fechar {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cor-texto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.botao-fechar:active {
+  background: var(--cor-superficie-alta);
+}

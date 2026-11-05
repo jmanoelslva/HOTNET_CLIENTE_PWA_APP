@@ -5,8 +5,8 @@ import { useSessao } from '../auth/useSessao'
 import { listarBoletos, type FaturaDto } from '../api/client'
 import { buscarDadosCliente } from '../api/cadastro'
 import CabecalhoTela from '../components/CabecalhoTela'
+import BotaoFechar from '../components/BotaoFechar'
 import Skeleton from '../components/Skeleton'
-import VoltarInicio from '../components/VoltarInicio'
 import { AbasPilula, RotuloGrupo } from '../components/PadraoTelas'
 import { anosQuitacao, montarDadosQuitacao, type AnoQuitacao, type DadosQuitacao } from '../utils/quitacao'
 import { EMPRESA_RECIBO, formatarReais, rotuloDocumento, valorPorExtenso } from '../utils/recibo'
@@ -157,8 +157,7 @@ export default function Quitacao() {
 
   return (
     <div className="quitacao-tela tela-entrada">
-      <VoltarInicio anterior />
-      <CabecalhoTela titulo="Declaração de quitação" subtitulo="Disponível para anos encerrados com todas as cobranças pagas." />
+      <CabecalhoTela titulo="Declaração de quitação" acoes={<BotaoFechar />} subtitulo="Disponível para anos encerrados com todas as cobranças pagas." />
 
       {faturas == null && !erro && (
         <div className="bloco-branco quitacao-esqueleto">

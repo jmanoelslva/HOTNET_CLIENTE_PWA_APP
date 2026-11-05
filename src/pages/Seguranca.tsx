@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import { useSessao } from '../auth/useSessao'
 import CabecalhoTela from '../components/CabecalhoTela'
 import TecladoPin from '../components/TecladoPin'
-import VoltarInicio from '../components/VoltarInicio'
 import { BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import { useToast } from '../components/Toast/useToast'
 import { conferirPin, definirPin, pinAtivo, removerPin } from '../utils/pinApp'
@@ -98,7 +97,6 @@ export default function Seguranca() {
 
   return (
     <div className="seguranca-tela tela-entrada">
-      <VoltarInicio anterior />
       <CabecalhoTela titulo="Segurança" subtitulo="Proteja o acesso ao app neste celular." />
 
       <section className={`cartao-destaque seguranca-estado ${ativo ? 'ligada' : ''}`}>

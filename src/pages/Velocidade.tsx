@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { buscarContratos } from '../api/contratos'
 import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, vincularContratos } from '../api/consumo'
 import CabecalhoTela from '../components/CabecalhoTela'
-import VoltarInicio from '../components/VoltarInicio'
+import BotaoFechar from '../components/BotaoFechar'
 import { BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import { formatarDuracao } from '../utils/formatacao'
 import './Velocidade.css'
@@ -85,8 +85,7 @@ export default function Velocidade() {
 
   return (
     <div className="velocidade-tela tela-entrada">
-      <VoltarInicio anterior />
-      <CabecalhoTela titulo="Teste de velocidade" subtitulo="Medição feita pelo fast.com." />
+      <CabecalhoTela titulo="Teste de velocidade" acoes={<BotaoFechar />} subtitulo="Medição feita pelo fast.com." />
 
       <RotuloGrupo>Antes de medir</RotuloGrupo>
       <BlocoBranco>
