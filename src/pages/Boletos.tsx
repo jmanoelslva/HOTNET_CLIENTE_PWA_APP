@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MdKeyboardArrowRight } from 'react-icons/md'
-import { IcCheckCircle, IcDescription, IcPayments, IcTask } from '../components/IconesApp'
+import { IcCheckCircle, IcDescription, IcInbox, IcReceiptLong, IcTask } from '../components/IconesApp'
 import { useLocation, useNavigate } from 'react-router-dom'
 import CabecalhoTela from '../components/CabecalhoTela'
 import CartaoBoleto from '../components/CartaoBoleto'
@@ -129,6 +129,17 @@ export default function Boletos() {
     }
   }, [porContrato, filtroStatus])
 
+  // Último pagamento do contrato filtrado ("yyyy-MM-dd…" ordena como texto), para "Tudo em dia".
+  const ultimoPagamento = useMemo(
+    () =>
+      porContrato
+        .map((f) => f.invoice_date_credit)
+        .filter((d): d is string => !!d)
+        .sort()
+        .at(-1) ?? null,
+    [porContrato],
+  )
+
   const faturasExibidas =
     filtroStatus === 'aberto' || mostrarTodosPagos ? faturasFiltradas : faturasFiltradas.slice(0, LIMITE_PAGOS_PADRAO)
 
@@ -219,19 +230,30 @@ export default function Boletos() {
         </div>
       )}
 
-      {!carregando && !erro && faturasFiltradas.length === 0 && (
-        <EstadoVazio
-          icone={IcPayments}
-          titulo={
-            filtroStatus === 'aberto'
-              ? 'Nenhum boleto em aberto'
-              : filtroStatus === 'atrasados'
-                ? 'Nenhum boleto atrasado'
-                : 'Nenhum boleto pago'
-          }
-          subtitulo={filtroStatus !== 'pagos' ? 'Você está em dia por aqui.' : undefined}
-        />
-      )}
+      {/* Aba vazia diz o que fazer, como EmptyFaturas do app Android. */}
+      {!carregando && !erro && faturasFiltradas.length === 0 &&
+        (filtroStatus === 'aberto' ? (
+          contagens.atrasados > 0 ? (
+            <EstadoVazio
+              icone={IcInbox}
+              titulo="Nenhum boleto a vencer"
+              subtitulo="Há boleto atrasado. Ele está na aba Atrasados."
+              acao={{ rotulo: 'Ver atrasados', onClick: () => trocarStatus('atrasados') }}
+            />
+          ) : (
+            <EstadoVazio
+              icone={IcCheckCircle}
+              tom="sucesso"
+              titulo="Tudo em dia"
+              subtitulo={ultimoPagamento ? `Último pagamento em ${formatarDataBr(ultimoPagamento)}.` : 'Nenhum boleto para pagar agora.'}
+              acao={contagens.pagos > 0 ? { rotulo: 'Ver recibos', onClick: () => trocarStatus('pagos') } : undefined}
+            />
+          )
+        ) : filtroStatus === 'atrasados' ? (
+          <EstadoVazio icone={IcCheckCircle} tom="sucesso" titulo="Nenhum boleto atrasado" />
+        ) : (
+          <EstadoVazio icone={IcReceiptLong} titulo="Nenhum pagamento ainda" subtitulo="Os boletos pagos aparecem aqui, com o recibo." />
+        ))}
 
       {!carregando && !erro && faturasExibidas.length > 0 && filtroStatus !== 'pagos' && (() => {
         // Como no app: o mais urgente em cartão grafite; os demais compactos, que abrem ao tocar.
