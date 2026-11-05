@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { LuCopy, LuEye, LuEyeOff, LuMail, LuMapPin, LuPhone } from 'react-icons/lu'
-import { FaWhatsapp } from 'react-icons/fa'
+import { MdEmail, MdPhone, MdVisibility, MdVisibilityOff } from 'react-icons/md'
+import { IcContentCopy, IcLocationOn, IcWhatsapp } from '../components/IconesApp'
 import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente, buscarEnderecos, rotuloDocumento, type Endereco } from '../api/cadastro'
 import type { ClientDto } from '../api/client'
@@ -129,7 +129,7 @@ export default function Cadastro() {
                 >
                   {rotuloDocumento(documento)}{' '}
                   {mostrarDocumento ? formatarDocumento(documento) : (mascararDocumento(documento) ?? documento)}
-                  {mostrarDocumento ? <LuEyeOff size={16} aria-hidden="true" /> : <LuEye size={16} aria-hidden="true" />}
+                  {mostrarDocumento ? <MdVisibilityOff size={16} aria-hidden="true" /> : <MdVisibility size={16} aria-hidden="true" />}
                 </button>
               )}
             </section>
@@ -139,13 +139,13 @@ export default function Cadastro() {
               {telefones.map((fone) => (
                 <LinhaItem
                   key={fone}
-                  icone={LuPhone}
+                  icone={MdPhone}
                   tom="primaria"
                   rotulo="Telefone"
                   titulo={fone}
                   fim={
                     <button type="button" className="linha-item-copiar" onClick={() => copiar(fone)} aria-label="Copiar telefone">
-                      <LuCopy size={18} />
+                      <IcContentCopy size={18} />
                     </button>
                   }
                 />
@@ -153,18 +153,18 @@ export default function Cadastro() {
               {emails.map((email) => (
                 <LinhaItem
                   key={email}
-                  icone={LuMail}
+                  icone={MdEmail}
                   tom="primaria"
                   rotulo="E-mail"
                   titulo={email}
                   fim={
                     <button type="button" className="linha-item-copiar" onClick={() => copiar(email)} aria-label="Copiar e-mail">
-                      <LuCopy size={18} />
+                      <IcContentCopy size={18} />
                     </button>
                   }
                 />
               ))}
-              {telefones.length === 0 && emails.length === 0 && <LinhaItem icone={LuMail} tom="primaria" titulo="Não informado" />}
+              {telefones.length === 0 && emails.length === 0 && <LinhaItem icone={MdEmail} tom="primaria" titulo="Não informado" />}
             </BlocoBranco>
 
             <RotuloGrupo>Endereços</RotuloGrupo>
@@ -190,7 +190,7 @@ export default function Cadastro() {
                   return (
                     <div className="linha-item" key={endereco.addressPk || indice}>
                       <span className="linha-item-icone linha-item-icone-primaria" aria-hidden="true">
-                        <LuMapPin size={18} />
+                        <IcLocationOn size={18} />
                       </span>
                       <span className="linha-item-textos">
                         <span className="linha-item-rotulo">{rotulo}</span>
@@ -209,7 +209,7 @@ export default function Cadastro() {
               onClick={() => abrirWhatsappSuporte(cliente.client_complete_name ?? null, documento || cpf)}
             >
               <span className="cadastro-dado-errado-icone" aria-hidden="true">
-                <FaWhatsapp size={20} />
+                <IcWhatsapp size={20} />
               </span>
               <span className="cadastro-dado-errado-textos">
                 <strong>Algum dado errado?</strong>

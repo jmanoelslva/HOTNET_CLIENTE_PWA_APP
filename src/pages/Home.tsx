@@ -1,23 +1,7 @@
 import { useEffect, useState } from 'react'
+import { MdBlock, MdCheck, MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md'
+import { IcCheckCircle, IcConstruction, IcDataUsage, IcHelp, IcLock, IcPayments, IcPix, IcReceiptLong, IcSpeed, IcSupportAgent, IcWhatsapp, IcWifiOff } from '../components/IconesApp'
 import { useLocation, useNavigate } from 'react-router-dom'
-import {
-  LuBan,
-  LuCheck,
-  LuChevronDown,
-  LuChevronRight,
-  LuCircleCheck,
-  LuCircleHelp,
-  LuChartColumn,
-  LuGauge,
-  LuHeadset,
-  LuLock,
-  LuReceipt,
-  LuReceiptText,
-  LuWifiOff,
-  LuWrench,
-} from 'react-icons/lu'
-import { FaWhatsapp } from 'react-icons/fa'
-import { SiPix } from 'react-icons/si'
 import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente } from '../api/cadastro'
 import { buscarContratos, type Contrato } from '../api/contratos'
@@ -125,6 +109,7 @@ export default function Home() {
   const location = useLocation()
   // Guia da primeira vez (ou "Veja o guia rápido" em Dúvidas).
   const pediuGuia = (location.state as { tour?: boolean } | null)?.tour === true
+  const pediuDiagnostico = (location.state as { diagnostico?: boolean } | null)?.diagnostico === true
   const [tourAberto, setTourAberto] = useState(false)
 
   useEffect(() => {
@@ -256,6 +241,14 @@ export default function Home() {
     contarBoletosAtrasados().then(setBoletosAtrasados)
   }
 
+  // "Fazer diagnóstico" vindo do Teste de velocidade.
+  useEffect(() => {
+    if (!pediuDiagnostico) return
+    navigate('.', { replace: true, state: null })
+    abrirDiagnostico()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pediuDiagnostico])
+
   function ir(rota: string, state?: unknown) {
     navigate(rota, { state, viewTransition: true })
   }
@@ -282,11 +275,11 @@ export default function Home() {
   }
 
   const atalhos = [
-    { titulo: 'Velocidade', descricao: 'Teste de velocidade', Icone: LuGauge, tom: 'primaria', acao: () => window.open('https://fast.com', '_blank', 'noopener,noreferrer') },
-    { titulo: 'Consumo', descricao: 'Uso da internet', Icone: LuChartColumn, tom: 'terciaria', acao: () => ir('/consumo') },
-    { titulo: 'Recibos', descricao: 'Boletos pagos', Icone: LuReceipt, tom: 'primaria', acao: () => ir('/boletos', { filtro: 'pagos' }) },
-    { titulo: 'Chamado', descricao: 'Abrir um novo chamado', Icone: LuHeadset, tom: 'terciaria', acao: () => ir('/suporte', { abrirNovoChamado: true }) },
-    { titulo: 'Dúvidas', descricao: 'Perguntas frequentes', Icone: LuCircleHelp, tom: 'primaria', acao: () => ir('/faq') },
+    { titulo: 'Velocidade', descricao: 'Teste de velocidade', Icone: IcSpeed, tom: 'primaria', acao: () => ir('/velocidade') },
+    { titulo: 'Consumo', descricao: 'Uso da internet', Icone: IcDataUsage, tom: 'terciaria', acao: () => ir('/consumo') },
+    { titulo: 'Recibos', descricao: 'Boletos pagos', Icone: IcReceiptLong, tom: 'primaria', acao: () => ir('/boletos', { filtro: 'pagos' }) },
+    { titulo: 'Chamado', descricao: 'Abrir um novo chamado', Icone: IcSupportAgent, tom: 'terciaria', acao: () => ir('/suporte', { abrirNovoChamado: true }) },
+    { titulo: 'Dúvidas', descricao: 'Perguntas frequentes', Icone: IcHelp, tom: 'primaria', acao: () => ir('/faq') },
   ] as const
 
   return (
@@ -353,7 +346,7 @@ export default function Home() {
               aria-label="Sua conexão"
             >
               <div className="home-faixa-problema-topo">
-                {estado === 'bloqueado' ? <LuLock size={22} aria-hidden="true" /> : estado === 'cancelado' ? <LuBan size={22} aria-hidden="true" /> : <LuWifiOff size={22} aria-hidden="true" />}
+                {estado === 'bloqueado' ? <IcLock size={22} aria-hidden="true" /> : estado === 'cancelado' ? <MdBlock size={22} aria-hidden="true" /> : <IcWifiOff size={22} aria-hidden="true" />}
                 <div>
                   <strong>{TITULO[estado]}</strong>
                   <p>{DESCRICAO[estado]}</p>
@@ -361,7 +354,7 @@ export default function Home() {
               </div>
               {estado === 'bloqueado' && (
                 <button type="button" className="botao-primario" onClick={() => ir('/boletos', { filtro: 'atrasados' })}>
-                  <LuReceiptText size={18} aria-hidden="true" /> Pagar agora
+                  <IcPayments size={18} aria-hidden="true" /> Pagar agora
                 </button>
               )}
               {estado === 'offline' && (
@@ -388,7 +381,7 @@ export default function Home() {
                   <strong>{TITULO[estado]}</strong>
                   <span>{resumo}</span>
                 </span>
-                <LuChevronDown size={22} className={`home-faixa-seta ${detalhesAbertos ? 'aberta' : ''}`} aria-hidden="true" />
+                <MdKeyboardArrowDown size={22} className={`home-faixa-seta ${detalhesAbertos ? 'aberta' : ''}`} aria-hidden="true" />
               </button>
               {detalhesAbertos && (
                 <div className="home-faixa-detalhes">
@@ -404,12 +397,12 @@ export default function Home() {
                   </div>
                   <div className="home-faixa-botoes">
                     {estado === 'online' && (
-                      <a className="botao-contorno" href="https://fast.com" target="_blank" rel="noopener noreferrer">
-                        <LuGauge size={18} aria-hidden="true" /> Testar velocidade
-                      </a>
+                      <button type="button" className="botao-contorno" onClick={() => ir('/velocidade')}>
+                        <IcSpeed size={18} aria-hidden="true" /> Testar velocidade
+                      </button>
                     )}
                     <button type="button" className="botao-contorno" onClick={abrirDiagnostico}>
-                      <LuWrench size={18} aria-hidden="true" /> Diagnóstico
+                      <IcConstruction size={18} aria-hidden="true" /> Diagnóstico
                     </button>
                   </div>
                 </div>
@@ -428,7 +421,7 @@ export default function Home() {
               {estaVencida(boleto) ? `Venceu em ${formatarData(boleto.invoice_date_due)}` : `Vence em ${formatarData(boleto.invoice_date_due)}`}
             </span>
             <button type="button" className={`home-boleto-pix ${pixCopiado ? 'copiado' : ''}`} onClick={() => copiarPix(boleto)}>
-              {pixCopiado ? <LuCheck size={18} aria-hidden="true" /> : <SiPix size={18} aria-hidden="true" />}
+              {pixCopiado ? <MdCheck size={18} aria-hidden="true" /> : <IcPix size={18} aria-hidden="true" />}
               {pixCopiado ? 'Código Pix copiado' : 'Copiar código Pix'}
             </button>
             <button
@@ -436,7 +429,7 @@ export default function Home() {
               className="home-boleto-secundario"
               onClick={() => ir('/boletos', { filtro: estaVencida(boleto) ? 'atrasados' : 'aberto', contratoPk: boleto.contract_pk })}
             >
-              <LuReceiptText size={18} aria-hidden="true" /> Ver boletos
+              <IcPayments size={18} aria-hidden="true" /> Ver boletos
             </button>
             {boleto.contract_pk != null &&
               (informados.has(boleto.invoice_pk) || boleto.obs_pk != null ? (
@@ -451,14 +444,14 @@ export default function Home() {
           pagoEm && (
             <button type="button" className="home-em-dia" onClick={() => ir('/boletos', { filtro: 'pagos' })}>
               <span className="home-em-dia-icone" aria-hidden="true">
-                <LuCircleCheck size={22} />
+                <IcCheckCircle size={22} />
               </span>
               <span className="home-em-dia-textos">
                 <strong>Tudo em dia</strong>
                 <span>Último pagamento em {formatarData(pagoEm)}</span>
               </span>
               <span className="home-em-dia-acao">
-                Ver recibos <LuChevronRight size={18} aria-hidden="true" />
+                Ver recibos <MdKeyboardArrowRight size={18} aria-hidden="true" />
               </span>
             </button>
           )
@@ -482,7 +475,7 @@ export default function Home() {
 
         <button type="button" className="home-whatsapp" onClick={aoClicarWhatsapp}>
           <span className="home-whatsapp-icone" aria-hidden="true">
-            <FaWhatsapp size={22} />
+            <IcWhatsapp size={22} />
           </span>
           <span className="home-whatsapp-textos">
             <strong>Fale com a gente no WhatsApp</strong>

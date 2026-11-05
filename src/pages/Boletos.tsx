@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
+import { IcBarcode, IcCheckCircle, IcDescription, IcDownload, IcPayments, IcPix, IcQrCodeScanner, IcReceiptLong, IcTask } from '../components/IconesApp'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { LuCircleCheck, LuFileText, LuDownload, LuReceiptText, LuQrCode, LuReceipt } from 'react-icons/lu'
-import { FaBarcode } from 'react-icons/fa'
-import { SiPix } from 'react-icons/si'
 import CabecalhoTela from '../components/CabecalhoTela'
 import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
-import { AbasPilula, RotuloGrupo } from '../components/PadraoTelas'
+import { AbasPilula, BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
 import PullToRefresh from '../components/PullToRefresh'
@@ -298,7 +296,7 @@ export default function Boletos() {
 
       {!carregando && !erro && faturasFiltradas.length === 0 && (
         <EstadoVazio
-          icone={LuReceiptText}
+          icone={IcPayments}
           titulo={
             filtroStatus === 'aberto'
               ? 'Nenhum boleto em aberto'
@@ -334,7 +332,7 @@ export default function Boletos() {
                       onClick={() => navigate('/contratos', { state: { contratoPk: fatura.contract_pk }, viewTransition: true })}
                       aria-label={`Ver contrato ${fatura.contract_number}`}
                     >
-                      <LuFileText size={16} />
+                      <IcDescription size={16} />
                     </button>
                   )}
                 </div>
@@ -356,18 +354,18 @@ export default function Boletos() {
                   className={`boleto-cartao-pix ${pixCopiado ? 'copiado' : ''}`}
                   onClick={() => aoCopiar(`pix-${fatura.invoice_pk}`, fatura.invoice_qrcode)}
                 >
-                  {pixCopiado ? <LuCircleCheck size={18} /> : <SiPix size={18} />}
+                  {pixCopiado ? <IcCheckCircle size={18} /> : <IcPix size={18} />}
                   {pixCopiado ? 'Código Pix copiado' : 'Copiar código Pix'}
                 </button>
 
                 <div className="boleto-cartao-secundarios">
                   {fatura.invoice_qrcode_image && (
                     <button type="button" onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}>
-                      <LuQrCode size={18} /> QR Code
+                      <IcQrCodeScanner size={18} /> QR Code
                     </button>
                   )}
                   <button type="button" onClick={() => aoCopiar(`barcode-${fatura.invoice_pk}`, fatura.invoice_barcode)}>
-                    <FaBarcode size={18} /> {copiado === `barcode-${fatura.invoice_pk}` ? 'Copiado' : 'Código de barras'}
+                    <IcBarcode size={18} /> {copiado === `barcode-${fatura.invoice_pk}` ? 'Copiado' : 'Código de barras'}
                   </button>
                   <button
                     type="button"
@@ -377,7 +375,7 @@ export default function Boletos() {
                       )
                     }
                   >
-                    <LuDownload size={18} /> PDF
+                    <IcDownload size={18} /> PDF
                   </button>
                 </div>
 
@@ -399,12 +397,16 @@ export default function Boletos() {
 
       {!carregando && !erro && faturasExibidas.length > 0 && filtroStatus === 'pagos' && (
         <>
+          {/* Atalho da declaração anual (como na aba Pagos do app Android). */}
+          <BlocoBranco>
+            <LinhaItem icone={IcTask} tom="primaria" titulo="Declaração de quitação" onClick={() => navigate('/quitacao', { viewTransition: true })} />
+          </BlocoBranco>
           <RotuloGrupo>Últimos pagos</RotuloGrupo>
           <div className="bloco-branco">
             {faturasExibidas.map((fatura, i) => (
               <div key={fatura.invoice_pk} className={`linha-item boleto-pago ${i > 0 ? 'com-divisoria' : ''}`}>
                 <span className="linha-item-icone boleto-pago-icone" aria-hidden="true">
-                  <LuCircleCheck size={18} />
+                  <IcCheckCircle size={18} />
                 </span>
                 <span className="linha-item-textos">
                   <span className="linha-item-titulo">R$ {formatarValor(fatura.invoice_amount_paid || fatura.invoice_amount_document)}</span>
@@ -414,7 +416,7 @@ export default function Boletos() {
                   </span>
                 </span>
                 <button type="button" className="botao-contorno boleto-pago-recibo" onClick={() => setReciboAberto(fatura)}>
-                  <LuReceipt size={16} /> Recibo
+                  <IcReceiptLong size={16} /> Recibo
                 </button>
               </div>
             ))}

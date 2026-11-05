@@ -1,114 +1,40 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { IconType } from 'react-icons'
-import {
-  LuChartColumn,
-  LuFileText,
-  LuLock,
-  LuReceiptText,
-  LuSearchX,
-  LuChevronDown,
-  LuChevronRight,
-  LuCompass,
-  LuHeadset,
-  LuWifi,
-} from 'react-icons/lu'
-import { FaWhatsapp } from 'react-icons/fa'
+import { MdArrowForward, MdKeyboardArrowDown, MdKeyboardArrowRight, MdOutlineLightbulb, MdSearchOff } from 'react-icons/md'
 import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente } from '../api/cadastro'
 import { abrirWhatsappAjuda } from '../utils/whatsapp'
 import CabecalhoTela from '../components/CabecalhoTela'
 import EstadoVazio from '../components/EstadoVazio'
-import { CORES, comAlpha } from '../utils/cores'
+import { IcDataUsage, IcDescription, IcLock, IcPayments, IcSupportAgent, IcWhatsapp, IcWifi } from '../components/IconesApp'
+import { comAlpha } from '../utils/cores'
+import { FAQ_CATEGORIAS, FAQ_PERGUNTAS, type FaqDestino } from './faqDados'
 import './Faq.css'
 
-interface CategoriaFaq {
-  id: string
-  nome: string
-  subtitulo: string
-  Icone: IconType
-  cor: string
+// Mesmos ícones das categorias do app Android (FaqScreen.kt).
+const ICONES: Record<string, IconType> = {
+  atendimento: IcSupportAgent,
+  wifi: IcWifi,
+  cobrancas: IcPayments,
+  contratos: IcDescription,
+  consumo: IcDataUsage,
+  seguranca: IcLock,
 }
 
-interface PerguntaFrequente {
-  categoriaId: string
-  pergunta: string
-  resposta: string
+const CATEGORIAS = FAQ_CATEGORIAS.map((c) => ({ ...c, Icone: ICONES[c.id] ?? IcSupportAgent }))
+const PERGUNTAS = FAQ_PERGUNTAS
+
+// Atalho de cada resposta: rótulo e tela, como o rotuloDestino do app.
+const DESTINOS: Record<FaqDestino, { rotulo: string; rota: string; state?: unknown }> = {
+  BOLETOS: { rotulo: 'Ir para Boletos', rota: '/boletos' },
+  SUPORTE: { rotulo: 'Abrir Suporte', rota: '/suporte' },
+  CONTRATOS: { rotulo: 'Ir para Contratos', rota: '/contratos' },
+  CONSUMO: { rotulo: 'Ir para Consumo', rota: '/consumo' },
+  TESTE_VELOCIDADE: { rotulo: 'Testar velocidade', rota: '/velocidade' },
+  SEGURANCA: { rotulo: 'Abrir Segurança', rota: '/seguranca' },
+  ALTERAR_SENHA: { rotulo: 'Alterar senha', rota: '/alterar-senha' },
 }
-
-// Mesmas cores usadas nos badges equivalentes na Home, pra manter a
-// associação visual entre uma categoria de dúvida e a tela que ela trata.
-const CATEGORIAS: CategoriaFaq[] = [
-  { id: 'atendimento', nome: 'Atendimento', subtitulo: 'Horários e canais', Icone: LuHeadset, cor: CORES.suporte },
-  { id: 'wifi', nome: 'Internet e Wi-Fi', subtitulo: 'Velocidade e sinal', Icone: LuWifi, cor: CORES.ajuda },
-  { id: 'cobrancas', nome: 'Cobranças', subtitulo: 'Boletos e pagamentos', Icone: LuReceiptText, cor: CORES.boletos },
-  { id: 'contratos', nome: 'Contratos', subtitulo: 'Planos e contratos', Icone: LuFileText, cor: CORES.contratos },
-  { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', Icone: LuChartColumn, cor: CORES.consumo },
-  { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', Icone: LuLock, cor: CORES.dados },
-]
-
-const PERGUNTAS: PerguntaFrequente[] = [
-  {
-    categoriaId: 'atendimento',
-    pergunta: 'Qual o horário de atendimento?',
-    resposta:
-      'De segunda a sexta, das 8h às 12h e das 14h às 18h. Aos sábados, das 8h às 12h. Fora desse horário, você ainda pode abrir um chamado de suporte pelo portal — nossa equipe responde assim que o atendimento for retomado.',
-  },
-  {
-    categoriaId: 'atendimento',
-    pergunta: 'Como abro um chamado de suporte?',
-    resposta:
-      'Na tela de Suporte, toque no botão de novo chamado, escolha a categoria e descreva o problema. Depois de aberto, você pode acompanhar as respostas e anexar fotos ou vídeos diretamente pelo chamado.',
-  },
-  {
-    categoriaId: 'wifi',
-    pergunta: 'Meu Wi-Fi está lento, o que pode ser?',
-    resposta:
-      'Se a velocidade está boa perto do roteador, mas diminui em outros cômodos, o problema geralmente está relacionado à cobertura do sinal Wi-Fi (distância, paredes, interferência de outros aparelhos), não à internet em si.',
-  },
-  {
-    categoriaId: 'wifi',
-    pergunta: 'Preciso trocar meu roteador/equipamento, como peço?',
-    resposta:
-      'Abra um chamado na tela de Suporte, escolha a categoria técnica e descreva a situação (é possível anexar foto do equipamento). Nossa equipe avalia e agenda uma visita técnica, se necessário.',
-  },
-  {
-    categoriaId: 'cobrancas',
-    pergunta: 'Como pago meu boleto?',
-    resposta:
-      'Na tela de Boletos, toque em "Copiar PIX" ou "Copiar código de barras" — o código já fica pronto para colar no aplicativo do seu banco.',
-  },
-  {
-    categoriaId: 'cobrancas',
-    pergunta: 'Meu boleto venceu — o valor com juros e multa já está certo?',
-    resposta:
-      'Sim. Para boletos vencidos, o portal mostra o valor original e o valor atualizado (já com a multa e os juros somados) separadamente. Não é necessário fazer nenhum cálculo — basta pagar o valor atualizado exibido na tela.',
-  },
-  {
-    categoriaId: 'contratos',
-    pergunta: 'Tenho mais de um contrato com a HOTNET, como acompanho cada um?',
-    resposta:
-      'Todos os seus contratos aparecem na tela de Contratos, com plano, valor e itens de cada um. Na tela de Boletos, um filtro por contrato é exibido automaticamente quando você possui mais de um.',
-  },
-  {
-    categoriaId: 'contratos',
-    pergunta: 'Como faço para cancelar meu contrato?',
-    resposta:
-      'O cancelamento não é feito pelo portal. Abra um chamado de suporte ou fale conosco pelo WhatsApp — nossa equipe explica o processo e os próximos passos.',
-  },
-  {
-    categoriaId: 'consumo',
-    pergunta: 'Como acompanho quanto de internet já usei?',
-    resposta:
-      'Na tela de Consumo, você visualiza o total utilizado no mês (download e upload) e o histórico diário — é possível navegar entre os meses anteriores. A tela também mostra se sua conexão está on-line no momento.',
-  },
-  {
-    categoriaId: 'seguranca',
-    pergunta: 'Não consigo entrar, o que faço?',
-    resposta:
-      'Confira se está digitando o CPF correto, sem pontos nem traço — usuário e senha são o mesmo número. Se o problema persistir, fale conosco pelo WhatsApp.',
-  },
-]
 
 export default function Faq() {
   const navigate = useNavigate()
@@ -164,13 +90,13 @@ export default function Faq() {
 
       <button type="button" className="faq-guia" onClick={() => navigate('/', { state: { tour: true }, viewTransition: true })}>
         <span className="faq-guia-icone" aria-hidden="true">
-          <LuCompass size={20} />
+          <MdOutlineLightbulb size={20} />
         </span>
         <span className="faq-falar-textos">
           <strong>Primeira vez no app?</strong>
           <span>Veja o guia rápido da tela inicial</span>
         </span>
-        <LuChevronRight size={20} aria-hidden="true" />
+        <MdKeyboardArrowRight size={22} aria-hidden="true" />
       </button>
 
       <section className="faq-assuntos" aria-labelledby="faq-assuntos-titulo">
@@ -204,7 +130,7 @@ export default function Faq() {
       </section>
 
       {grupos.length === 0 && (
-        <EstadoVazio icone={LuSearchX} titulo="Nenhuma pergunta encontrada" subtitulo="Tente buscar com outras palavras." />
+        <EstadoVazio icone={MdSearchOff} titulo="Nenhuma pergunta encontrada" subtitulo="Tente buscar com outras palavras." />
       )}
 
       {grupos.map(({ categoria, itens }) => (
@@ -225,9 +151,24 @@ export default function Faq() {
                     aria-expanded={aberta}
                   >
                     <span className={`faq-item-pergunta ${aberta ? 'aberta' : ''}`}>{p.pergunta}</span>
-                    <LuChevronDown size={22} className={`faq-item-seta ${aberta ? 'aberta' : ''}`} aria-hidden="true" />
+                    <MdKeyboardArrowDown size={22} className={`faq-item-seta ${aberta ? 'aberta' : ''}`} aria-hidden="true" />
                   </button>
-                  {aberta && <p className="faq-item-resposta">{p.resposta}</p>}
+                  {aberta && (
+                    <div className="faq-item-resposta">
+                      <p>{p.resposta}</p>
+                      {p.destino && (
+                        <button
+                          type="button"
+                          className="faq-item-destino"
+                          onClick={() =>
+                            navigate(DESTINOS[p.destino!].rota, { state: DESTINOS[p.destino!].state, viewTransition: true })
+                          }
+                        >
+                          {DESTINOS[p.destino].rotulo} <MdArrowForward size={16} aria-hidden="true" />
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -237,7 +178,7 @@ export default function Faq() {
 
       <button type="button" className="faq-falar" onClick={aoClicarWhatsapp}>
         <span className="faq-falar-icone" aria-hidden="true">
-          <FaWhatsapp size={22} />
+          <IcWhatsapp size={22} />
         </span>
         <span className="faq-falar-textos">
           <strong>Não achou sua dúvida?</strong>

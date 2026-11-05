@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { LuCircleCheck } from 'react-icons/lu'
+import { IcCheckCircle } from './IconesApp'
 import { avisoCopiadoAtual, inscreverAvisoCopiado } from '../utils/avisoCopiado'
 import './AvisoCopiado.css'
 
@@ -15,7 +15,7 @@ export default function AvisoCopiadoHost() {
     <div className="aviso-copiado-camada" aria-live="polite">
       {aviso && (
         <div key={aviso.id} className={`aviso-copiado ${aviso.visivel ? 'visivel' : 'saindo'}`}>
-          <LuCircleCheck size={36} aria-hidden="true" />
+          <IcCheckCircle size={36} aria-hidden="true" />
           <strong>{aviso.titulo}</strong>
           {aviso.dica && <span>{aviso.dica}</span>}
         </div>

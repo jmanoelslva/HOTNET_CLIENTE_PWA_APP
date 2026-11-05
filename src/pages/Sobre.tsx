@@ -1,6 +1,6 @@
-import { FaWhatsapp } from 'react-icons/fa'
-import { LuGlobe, LuShare2, LuShieldCheck } from 'react-icons/lu'
 import CabecalhoTela from '../components/CabecalhoTela'
+import { MdLanguage } from 'react-icons/md'
+import { IcPrivacyTip, IcShare, IcWhatsapp } from '../components/IconesApp'
 import { BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import { useToast } from '../components/Toast/useToast'
 import logoApp from '../assets/logo-app.png'
@@ -54,18 +54,18 @@ export default function Sobre() {
 
       <RotuloGrupo>O app</RotuloGrupo>
       <BlocoBranco>
-        <LinhaItem icone={LuShare2} tom="primaria" titulo="Compartilhar o app" onClick={compartilhar} />
+        <LinhaItem icone={IcShare} tom="primaria" titulo="Compartilhar o app" onClick={compartilhar} />
         <LinhaItem
-          icone={FaWhatsapp}
+          icone={IcWhatsapp}
           tom="primaria"
           titulo="Falar com a gente"
           onClick={() =>
             abrir(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent('Olá, tenho uma dúvida sobre o portal do cliente HOTNET.')}`)
           }
         />
-        <LinhaItem icone={LuGlobe} tom="primaria" titulo="Site da HOTNET" onClick={() => abrir('https://hotnet.net.br')} />
+        <LinhaItem icone={MdLanguage} tom="primaria" titulo="Site da HOTNET" onClick={() => abrir('https://hotnet.net.br')} />
         <LinhaItem
-          icone={LuShieldCheck}
+          icone={IcPrivacyTip}
           tom="primaria"
           titulo="Política de privacidade"
           onClick={() => abrir('https://controllr.hotnet.net.br/policies/privacy')}

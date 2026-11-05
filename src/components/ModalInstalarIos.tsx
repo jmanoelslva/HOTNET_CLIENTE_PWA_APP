@@ -1,5 +1,5 @@
-import { LuSquarePlus, LuShare } from 'react-icons/lu'
 import './ModalInstalarIos.css'
+import { MdAddBox, MdIosShare } from 'react-icons/md'
 
 interface Props {
   aberto: boolean
@@ -24,10 +24,10 @@ export default function ModalInstalarIos({ aberto, onFechar }: Props) {
         <h2>Instalar o app</h2>
         <ol className="modal-instalar-ios-passos">
           <li>
-            Toque no ícone de compartilhar <LuShare size={16} /> na barra do Safari
+            Toque no ícone de compartilhar <MdIosShare size={16} /> na barra do Safari
           </li>
           <li>
-            Escolha <strong>"Adicionar à Tela de Início"</strong> <LuSquarePlus size={16} />
+            Escolha <strong>"Adicionar à Tela de Início"</strong> <MdAddBox size={16} />
           </li>
         </ol>
         <p className="modal-instalar-ios-obs">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { MdPrint } from 'react-icons/md'
+import { IcClose, IcShare } from './IconesApp'
 import { createPortal } from 'react-dom'
-import { LuX, LuPrinter, LuShare2 } from 'react-icons/lu'
 import { listarDetalhesFatura, listarItensContrato, urlImpressaoBoleto, type FaturaDto } from '../api/client'
 import { buscarDadosCliente } from '../api/cadastro'
 import { useToast } from './Toast/useToast'
@@ -201,7 +202,7 @@ export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
         <div className="recibo-barra">
           <h2 id="recibo-titulo">Recibo</h2>
           <button className="recibo-fechar" onClick={onFechar} aria-label="Fechar recibo">
-            <LuX size={22} />
+            <IcClose size={22} />
           </button>
         </div>
 
@@ -267,10 +268,10 @@ export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
 
             <div className="recibo-acoes">
               <button className="recibo-btn-primario" onClick={() => compartilhar(dados)}>
-                <LuShare2 size={18} /> Compartilhar
+                <IcShare size={18} /> Compartilhar
               </button>
               <button className="recibo-btn-borda" onClick={imprimir}>
-                <LuPrinter size={18} /> Imprimir / PDF
+                <MdPrint size={18} /> Imprimir / PDF
               </button>
             </div>
             <button

@@ -261,3 +261,24 @@
 .faq-guia .faq-falar-textos strong {
   color: var(--cor-texto);
 }
+
+.faq-item-resposta p {
+  margin: 0;
+}
+
+/* Atalho da resposta (Surface primaryContainer + seta, como no app). */
+.faq-item-destino {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--raio-md);
+  background: var(--cor-primaria-container);
+  color: var(--cor-sobre-primaria-container);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}

@@ -1,0 +1,72 @@
+.teclado-pin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.teclado-pin-bolinhas {
+  display: flex;
+  gap: 18px;
+  margin: 8px 0 4px;
+}
+
+.teclado-pin-bolinhas span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--cor-texto-secundario);
+}
+
+.teclado-pin-bolinhas span.cheia {
+  background: var(--cor-primaria);
+  border-color: var(--cor-primaria);
+}
+
+.teclado-pin-bolinhas.erro span {
+  border-color: var(--cor-terciaria);
+  animation: teclado-pin-tremer 0.3s ease;
+}
+
+@keyframes teclado-pin-tremer {
+  25% {
+    translate: -6px 0;
+  }
+  75% {
+    translate: 6px 0;
+  }
+}
+
+.teclado-pin-erro {
+  min-height: 20px;
+  margin: 6px 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cor-terciaria);
+  text-align: center;
+}
+
+.teclado-pin-teclas {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 14px 24px;
+}
+
+.teclado-pin-teclas button {
+  width: 72px;
+  height: 72px;
+  border: none;
+  border-radius: 50%;
+  background: var(--cor-superficie-alta);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 26px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.teclado-pin-teclas button.apagar {
+  background: transparent;
+}

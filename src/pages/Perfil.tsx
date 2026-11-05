@@ -1,21 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { MdDarkMode, MdExitToApp, MdGetApp, MdInfo, MdLightMode, MdSettingsBrightness } from 'react-icons/md'
+import { IcBadge, IcDataUsage, IcDescription, IcHelp, IcLock, IcPhotoCamera, IcTask, IcWhatsapp } from '../components/IconesApp'
 import { useNavigate } from 'react-router-dom'
-import { FaWhatsapp } from 'react-icons/fa'
-import {
-  LuArrowDownToLine,
-  LuCamera,
-  LuChartColumn,
-  LuFileCheck,
-  LuCircleHelp,
-  LuFileText,
-  LuIdCard,
-  LuInfo,
-  LuKeyRound,
-  LuLogOut,
-  LuMonitorSmartphone,
-  LuMoon,
-  LuSun,
-} from 'react-icons/lu'
 import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente } from '../api/cadastro'
 import { useModoTema } from '../hooks/useTema'
@@ -24,6 +10,7 @@ import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import { mascararDocumento } from '../utils/recibo'
 import { nomeParaExibir } from '../utils/formatacao'
 import { fotoDaConta, prepararFoto, salvarFoto } from '../utils/contaLocal'
+import { pinAtivo } from '../utils/pinApp'
 import { useToast } from '../components/Toast/useToast'
 import CabecalhoTela from '../components/CabecalhoTela'
 import ModalConfirmarLogout from '../components/ModalConfirmarLogout'
@@ -97,7 +84,7 @@ export default function Perfil() {
         >
           {foto ? <img src={foto} alt="" /> : inicial}
           <span className="perfil-avatar-camera" aria-hidden="true">
-            <LuCamera size={14} />
+            <IcPhotoCamera size={14} />
           </span>
         </button>
         <input
@@ -130,10 +117,10 @@ export default function Perfil() {
 
       <RotuloGrupo>Minha conta</RotuloGrupo>
       <BlocoBranco>
-        <LinhaItem icone={LuIdCard} titulo="Meus dados" onClick={() => ir('/cadastro')} />
-        <LinhaItem icone={LuFileText} titulo="Contratos" onClick={() => ir('/contratos')} />
-        <LinhaItem icone={LuChartColumn} titulo="Consumo" onClick={() => ir('/consumo')} />
-        <LinhaItem icone={LuFileCheck} titulo="Declaração de quitação" onClick={() => ir('/quitacao')} />
+        <LinhaItem icone={IcBadge} titulo="Meus dados" onClick={() => ir('/cadastro')} />
+        <LinhaItem icone={IcDescription} titulo="Contratos" onClick={() => ir('/contratos')} />
+        <LinhaItem icone={IcDataUsage} titulo="Consumo" onClick={() => ir('/consumo')} />
+        <LinhaItem icone={IcTask} titulo="Declaração de quitação" onClick={() => ir('/quitacao')} />
       </BlocoBranco>
 
       <RotuloGrupo>Preferências</RotuloGrupo>
@@ -141,34 +128,39 @@ export default function Perfil() {
         <div className="perfil-aparencia">
           <div className="perfil-aparencia-topo">
             <span className="linha-item-icone linha-item-icone-neutra" aria-hidden="true">
-              <LuMoon size={18} />
+              <MdDarkMode size={18} />
             </span>
             <strong>Aparência</strong>
           </div>
           <AbasPilula<ModoTema>
             rotulo="Aparência"
             opcoes={[
-              { valor: 'sistema', rotulo: 'Sistema', icone: LuMonitorSmartphone },
-              { valor: 'light', rotulo: 'Claro', icone: LuSun },
-              { valor: 'dark', rotulo: 'Escuro', icone: LuMoon },
+              { valor: 'sistema', rotulo: 'Sistema', icone: MdSettingsBrightness },
+              { valor: 'light', rotulo: 'Claro', icone: MdLightMode },
+              { valor: 'dark', rotulo: 'Escuro', icone: MdDarkMode },
             ]}
             selecionada={modo}
             onSelecionar={definirModo}
           />
         </div>
-        <LinhaItem icone={LuKeyRound} titulo="Alterar senha" onClick={() => ir('/alterar-senha')} />
-        {podeInstalar && <LinhaItem icone={LuArrowDownToLine} titulo="Instalar o app" onClick={aoClicarInstalar} />}
+        <LinhaItem
+          icone={IcLock}
+          titulo="Segurança"
+          detalhe={pinAtivo(cpf) ? 'Ligada' : 'Desligada'}
+          onClick={() => ir('/seguranca')}
+        />
+        {podeInstalar && <LinhaItem icone={MdGetApp} titulo="Instalar o app" onClick={aoClicarInstalar} />}
       </BlocoBranco>
 
       <RotuloGrupo>Ajuda</RotuloGrupo>
       <BlocoBranco>
-        <LinhaItem icone={LuCircleHelp} titulo="Dúvidas frequentes" onClick={() => ir('/faq')} />
-        <LinhaItem icone={FaWhatsapp} titulo="Falar no WhatsApp" onClick={() => abrirWhatsappSuporte(nome, cpf)} />
-        <LinhaItem icone={LuInfo} titulo="Sobre" detalhe={__APP_VERSION__ || undefined} onClick={() => ir('/sobre')} />
+        <LinhaItem icone={IcHelp} titulo="Dúvidas frequentes" onClick={() => ir('/faq')} />
+        <LinhaItem icone={IcWhatsapp} titulo="Falar no WhatsApp" onClick={() => abrirWhatsappSuporte(nome, cpf)} />
+        <LinhaItem icone={MdInfo} titulo="Sobre" detalhe={__APP_VERSION__ || undefined} onClick={() => ir('/sobre')} />
       </BlocoBranco>
 
       <BlocoBranco className="perfil-sair">
-        <LinhaItem icone={LuLogOut} titulo="Sair da conta" tom="perigo" comSeta={false} onClick={() => setConfirmarSair(true)} />
+        <LinhaItem icone={MdExitToApp} titulo="Sair da conta" tom="perigo" comSeta={false} onClick={() => setConfirmarSair(true)} />
       </BlocoBranco>
 
       <ModalInstalarIos aberto={modalIosAberto} onFechar={fecharModalIos} />

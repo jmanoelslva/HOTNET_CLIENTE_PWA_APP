@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
+import { IcSupportAgent } from './IconesApp'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { LuHeadset } from 'react-icons/lu'
 import NovoChamado from './NovoChamado'
 
 const categorias = [
@@ -16,7 +16,7 @@ function renderizar(onEnviar = vi.fn().mockResolvedValue({ ticketPk: 55, protoco
       categorias={categorias}
       contratoStatus={contratoStatus}
       passosFeitos={['Reiniciou o roteador']}
-      iconeDaCategoria={() => LuHeadset}
+      iconeDaCategoria={() => IcSupportAgent}
       corDaCategoria={() => 'var(--cor-suporte)'}
       onEnviar={onEnviar}
       {...handlers}

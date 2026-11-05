@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { IcCheckCircle, IcSchedule, IcTask, IcWarning } from '../components/IconesApp'
 import { createPortal } from 'react-dom'
-import { LuCircleCheck, LuClock, LuFileCheck, LuTriangleAlert } from 'react-icons/lu'
 import { useSessao } from '../auth/useSessao'
 import { listarBoletos, type FaturaDto } from '../api/client'
 import { buscarDadosCliente } from '../api/cadastro'
@@ -157,7 +157,7 @@ export default function Quitacao() {
 
   return (
     <div className="quitacao-tela tela-entrada">
-      <VoltarInicio to="/perfil" label="Perfil" />
+      <VoltarInicio anterior />
       <CabecalhoTela titulo="Declaração de quitação" subtitulo="Disponível para anos encerrados com todas as cobranças pagas." />
 
       {faturas == null && !erro && (
@@ -186,7 +186,7 @@ export default function Quitacao() {
           <div className="bloco-branco">
             {anos.map((ano, i) => {
               const s = situacao(ano)
-              const Icone = s.tom === 'ok' ? LuCircleCheck : s.tom === 'andamento' ? LuClock : LuTriangleAlert
+              const Icone = s.tom === 'ok' ? IcCheckCircle : s.tom === 'andamento' ? IcSchedule : IcWarning
               return (
                 <div key={ano.ano} className={`linha-item ${i > 0 ? 'com-divisoria' : ''}`}>
                   <span className={`linha-item-icone quitacao-icone ${s.tom}`} aria-hidden="true">
@@ -202,7 +202,7 @@ export default function Quitacao() {
                       className="botao-contorno quitacao-gerar"
                       onClick={() => setImprimindo(montarDadosQuitacao(ano, cliente.nome, cliente.doc))}
                     >
-                      <LuFileCheck size={16} /> PDF
+                      <IcTask size={16} /> PDF
                     </button>
                   ) : (
                     <span className="quitacao-indisponivel">Indisponível</span>

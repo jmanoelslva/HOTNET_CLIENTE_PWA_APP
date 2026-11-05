@@ -1,18 +1,8 @@
 import { useEffect, useState } from 'react'
+import { MdAdd, MdKeyboardArrowRight } from 'react-icons/md'
+import { IcCampaign, IcClose, IcConstruction, IcPayments, IcSell, IcSupportAgent, IcSwapHoriz, IcWarning, IcWhatsapp } from '../components/IconesApp'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { IconType } from 'react-icons'
-import {
-  LuPlus,
-  LuChevronRight,
-  LuMegaphone,
-  LuX,
-  LuConstruction,
-  LuReceiptText,
-  LuTag,
-  LuHeadset,
-  LuArrowLeftRight,
-  LuTriangleAlert,
-} from 'react-icons/lu'
 import { useSessao } from '../auth/useSessao'
 import {
   buscarCategorias,
@@ -30,7 +20,6 @@ import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import type { CategoriaDto, TicketDto } from '../api/client'
 import CabecalhoTela from '../components/CabecalhoTela'
 import { AbasPilula } from '../components/PadraoTelas'
-import { FaWhatsapp } from 'react-icons/fa'
 import { useToast } from '../components/Toast/useToast'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
@@ -44,17 +33,17 @@ type Aba = 'abertos' | 'resolvidos'
 
 // Ícone de cada categoria pelo nome exato configurado no painel do
 // Controllr (não é lista fixa) — categoria desconhecida cai no padrão.
-const ICONE_PADRAO = LuHeadset
+const ICONE_PADRAO = IcSupportAgent
 const ICONES_CATEGORIA: Record<string, IconType> = {
-  'suporte técnico': LuHeadset,
-  'financeiro e pagamentos': LuReceiptText,
-  'vendas e comercial': LuTag,
-  'alteração de plano': LuArrowLeftRight,
-  'reclamação': LuTriangleAlert,
-  cancelamento: LuX,
-  'ouvidoria e adminstrativo': LuMegaphone,
-  'ouvidoria e administrativo': LuMegaphone,
-  instalação: LuConstruction,
+  'suporte técnico': IcSupportAgent,
+  'financeiro e pagamentos': IcPayments,
+  'vendas e comercial': IcSell,
+  'alteração de plano': IcSwapHoriz,
+  'reclamação': IcWarning,
+  cancelamento: IcClose,
+  'ouvidoria e adminstrativo': IcCampaign,
+  'ouvidoria e administrativo': IcCampaign,
+  instalação: IcConstruction,
 }
 
 function iconeParaCategoria(nome: string): IconType {
@@ -209,14 +198,14 @@ export default function Suporte() {
       <div className="suporte-atalhos">
         <button type="button" className="suporte-atalho" onClick={abrirChecklist} aria-label="Novo chamado">
           <span className="suporte-atalho-icone novo" aria-hidden="true">
-            <LuPlus size={18} />
+            <MdAdd size={18} />
           </span>
           <strong>Novo chamado</strong>
           <span>Acompanhe pelo app</span>
         </button>
         <button type="button" className="suporte-atalho" onClick={falarNoWhatsapp}>
           <span className="suporte-atalho-icone whatsapp" aria-hidden="true">
-            <FaWhatsapp size={18} />
+            <IcWhatsapp size={18} />
           </span>
           <strong>WhatsApp</strong>
           <span>Resposta rápida</span>
@@ -256,7 +245,7 @@ export default function Suporte() {
 
       {!carregando && !erro && filtrados.length === 0 && !haMaisParaCarregar && (
         <EstadoVazio
-          icone={LuHeadset}
+          icone={IcSupportAgent}
           titulo={aba === 'resolvidos' ? 'Nenhum chamado resolvido ainda' : 'Nenhum chamado em aberto'}
           subtitulo={aba === 'resolvidos' ? undefined : 'Tudo certo por aqui. Precisando, toque em "Novo chamado".'}
         />
@@ -309,7 +298,7 @@ export default function Suporte() {
                         : `Aberto em ${formatarData(chamado.ticket_date_create) ?? '—'}`}
                     </span>
                     <span className="ticket-ver">
-                      Ver conversa <LuChevronRight size={18} aria-hidden="true" />
+                      Ver conversa <MdKeyboardArrowRight size={18} aria-hidden="true" />
                     </span>
                   </span>
                 </button>

@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { LuBan, LuCheck, LuX, LuInfo, LuLock, LuReceiptText, LuTimer, LuWifi } from 'react-icons/lu'
-import { FaWhatsapp } from 'react-icons/fa'
+import { MdBlock, MdCheck, MdInfo, MdTimer } from 'react-icons/md'
+import { IcClose, IcLock, IcPayments, IcWhatsapp, IcWifi } from './IconesApp'
 import './ChecklistConexao.css'
 
 const SEGUNDOS_FORA_DA_TOMADA = 30
@@ -46,7 +46,7 @@ function Passo({ numero, titulo, descricao, feito, atual, onAlternar, children }
   return (
     <li className={`checklist-passo ${atual ? 'atual' : ''} ${feito ? 'feito' : ''}`}>
       <span className="checklist-passo-numero" aria-hidden="true">
-        {feito ? <LuCheck /> : numero}
+        {feito ? <MdCheck /> : numero}
       </span>
       <div className="checklist-passo-texto">
         <label htmlFor={id}>{titulo}</label>
@@ -113,10 +113,10 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
       <div className="checklist-modal" role="dialog" aria-modal="true" aria-labelledby="checklist-titulo" onClick={(e) => e.stopPropagation()}>
         <div className="checklist-barra">
           <span className="checklist-icone" aria-hidden="true">
-            <LuWifi size={22} />
+            <IcWifi size={22} />
           </span>
           <button className="checklist-fechar" onClick={onFechar} aria-label="Fechar">
-            <LuX size={22} />
+            <IcClose size={22} />
           </button>
         </div>
         <h2 id="checklist-titulo">Vamos tentar resolver juntos</h2>
@@ -126,7 +126,7 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
 
         {bloqueado && (
           <div className="checklist-aviso checklist-aviso-erro">
-            <LuLock size={20} aria-hidden="true" />
+            <IcLock size={20} aria-hidden="true" />
             <div>
               <strong>Conexão bloqueada</strong>
               <p>
@@ -139,7 +139,7 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
         )}
         {cancelado && (
           <div className="checklist-aviso">
-            <LuInfo size={20} aria-hidden="true" />
+            <MdInfo size={20} aria-hidden="true" />
             <div>
               <strong>Contrato cancelado</strong>
               <p>Seu contrato foi cancelado. Fale com a gente se tiver alguma dúvida.</p>
@@ -148,7 +148,7 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
         )}
         {!bloqueado && !cancelado && atrasados > 0 && (
           <div className="checklist-aviso checklist-aviso-atraso">
-            <LuReceiptText size={20} aria-hidden="true" />
+            <IcPayments size={20} aria-hidden="true" />
             <div>
               <p>
                 Há {atrasados} {plural(atrasados, 'boleto', 'boletos')} em atraso. O pagamento evita o bloqueio da conexão.
@@ -176,7 +176,7 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
                 <li>
                   <span>Contrato</span>
                   <strong className={contratoStatus === 1 ? 'bom' : 'ruim'}>
-                    {cancelado ? <LuBan aria-hidden="true" /> : null} {STATUS_CONTRATO[contratoStatus]}
+                    {cancelado ? <MdBlock aria-hidden="true" /> : null} {STATUS_CONTRATO[contratoStatus]}
                   </strong>
                 </li>
               )}
@@ -212,7 +212,7 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
                         setContando(true)
                       }}
                     >
-                      <LuTimer size={16} aria-hidden="true" /> Contar 30 segundos
+                      <MdTimer size={16} aria-hidden="true" /> Contar 30 segundos
                     </button>
                   ))}
               </Passo>
@@ -241,7 +241,7 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
           {bloqueado && (
             <>
               <button className="checklist-btn-primario" onClick={onVerBoletos}>
-                <LuReceiptText size={18} aria-hidden="true" /> Ver boletos
+                <IcPayments size={18} aria-hidden="true" /> Ver boletos
               </button>
               <button className="checklist-btn-secundario" onClick={() => onContinuar(passos)}>
                 Já paguei, abrir chamado
@@ -251,7 +251,7 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
           {cancelado && (
             <>
               <button className="checklist-btn-whatsapp" onClick={onWhatsapp}>
-                <FaWhatsapp size={18} aria-hidden="true" /> Falar no WhatsApp
+                <IcWhatsapp size={18} aria-hidden="true" /> Falar no WhatsApp
               </button>
               <button className="checklist-btn-secundario" onClick={onFechar}>
                 Fechar

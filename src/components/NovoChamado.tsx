@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { MdArrowBack } from 'react-icons/md'
+import { IcCheckCircle, IcClose, IcContentCopy, IcWhatsapp } from './IconesApp'
 import type { IconType } from 'react-icons'
-import { LuArrowLeft, LuCircleCheck, LuX, LuCopy } from 'react-icons/lu'
-import { FaWhatsapp } from 'react-icons/fa'
 import type { CategoriaDto } from '../api/client'
 import type { ChamadoCriado } from '../api/suporte'
 import './NovoChamado.css'
@@ -151,7 +151,7 @@ export default function NovoChamado({
         <h2 id="chamado-titulo">Contrato cancelado</h2>
         <p className="chamado-texto">O atendimento de contratos cancelados é feito pelo WhatsApp. Fale com a gente por lá.</p>
         <button className="chamado-btn-whatsapp" onClick={onWhatsapp}>
-          <FaWhatsapp size={18} aria-hidden="true" /> Falar no WhatsApp
+          <IcWhatsapp size={18} aria-hidden="true" /> Falar no WhatsApp
         </button>
         <button className="chamado-btn-secundario" onClick={onFechar}>
           Fechar
@@ -161,7 +161,7 @@ export default function NovoChamado({
   } else if (criado) {
     conteudo = (
       <div className="chamado-etapa chamado-sucesso">
-        <LuCircleCheck size={52} className="chamado-sucesso-icone" aria-hidden="true" />
+        <IcCheckCircle size={52} className="chamado-sucesso-icone" aria-hidden="true" />
         <h2 id="chamado-titulo">Chamado aberto</h2>
         {criado.protocolo ? (
           <>
@@ -169,7 +169,7 @@ export default function NovoChamado({
             <div className="chamado-protocolo" aria-live="polite">
               <span>{criado.protocolo}</span>
               <button onClick={() => copiar(criado.protocolo!)} aria-label="Copiar número do chamado">
-                <LuCopy size={16} aria-hidden="true" /> {copiado ? 'Copiado' : 'Copiar'}
+                <IcContentCopy size={16} aria-hidden="true" /> {copiado ? 'Copiado' : 'Copiar'}
               </button>
             </div>
           </>
@@ -227,7 +227,7 @@ export default function NovoChamado({
           <span className="on" />
         </div>
         <button type="button" className="chamado-voltar" onClick={() => setCategoriaPk(null)} disabled={enviando}>
-          <LuArrowLeft size={16} aria-hidden="true" /> {categoria.category_name}
+          <MdArrowBack size={16} aria-hidden="true" /> {categoria.category_name}
         </button>
         <h2 id="chamado-titulo">O que está acontecendo?</h2>
         {ajuda?.dicaBoletos && (
@@ -290,7 +290,7 @@ export default function NovoChamado({
     <div className="chamado-fundo" onClick={fecharSePuder}>
       <div className="chamado-modal" role="dialog" aria-modal="true" aria-labelledby="chamado-titulo" onClick={(e) => e.stopPropagation()}>
         <button className="chamado-fechar" onClick={fecharSePuder} aria-label="Fechar" disabled={enviando}>
-          <LuX size={22} />
+          <IcClose size={22} />
         </button>
         {conteudo}
       </div>

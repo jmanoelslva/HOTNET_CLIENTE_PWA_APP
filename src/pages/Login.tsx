@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { MdGetApp, MdKeyboardArrowRight, MdVisibility, MdVisibilityOff } from 'react-icons/md'
+import { IcClose, IcSupportAgent, IcWhatsapp } from '../components/IconesApp'
 import { useNavigate } from 'react-router-dom'
-import { LuArrowDownToLine, LuChevronRight, LuHeadset, LuEye, LuEyeOff, LuX } from 'react-icons/lu'
 import { contasSalvas, esquecerConta, fotoDaConta, type ContaSalva } from '../utils/contaLocal'
 import { mascararDocumento } from '../utils/recibo'
-import { FaWhatsapp } from 'react-icons/fa'
 import { useSessao } from '../auth/useSessao'
 import ModalInstalarIos from '../components/ModalInstalarIos'
 import { usePwaInstall } from '../hooks/usePwaInstall'
@@ -90,7 +90,7 @@ export default function Login() {
                     }}
                     aria-label={`Esquecer a conta de ${conta.nome ?? 'cliente'}`}
                   >
-                    <LuX size={18} />
+                    <IcClose size={18} />
                   </button>
                 </div>
               )
@@ -127,7 +127,7 @@ export default function Login() {
               onClick={() => setMostrarSenha((v) => !v)}
               aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
             >
-              {mostrarSenha ? <LuEyeOff size={20} /> : <LuEye size={20} />}
+              {mostrarSenha ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
             </button>
           </div>
 
@@ -146,18 +146,18 @@ export default function Login() {
 
       <button type="button" className="login-ajuda" onClick={() => abrirWhatsappLogin(usuario)}>
         <span className="login-ajuda-icone" aria-hidden="true">
-          <FaWhatsapp size={20} />
+          <IcWhatsapp size={20} />
         </span>
         <span className="login-ajuda-textos">
           <strong>Precisa de ajuda?</strong>
           <span>Fale com a gente no WhatsApp</span>
         </span>
-        <LuChevronRight size={22} aria-hidden="true" />
+        <MdKeyboardArrowRight size={22} aria-hidden="true" />
       </button>
 
       {podeInstalar && (
         <button type="button" className="login-btn-instalar" onClick={aoClicarInstalar}>
-          <LuArrowDownToLine size={18} /> Instalar o app
+          <MdGetApp size={18} /> Instalar o app
         </button>
       )}
 
@@ -168,7 +168,7 @@ export default function Login() {
         <div className="login-modal-fundo" onClick={() => setAjudaAberta(false)}>
           <div className="login-modal" onClick={(evento) => evento.stopPropagation()}>
             <h2>
-              <LuHeadset className="login-modal-icone" /> Precisando de ajuda?
+              <IcSupportAgent className="login-modal-icone" /> Precisando de ajuda?
             </h2>
             <p>
               Usuário e senha são o mesmo número: seu CPF ou CNPJ, sem pontos nem traço. Se o problema persistir,

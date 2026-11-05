@@ -1,10 +1,12 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import AvisoGate from './components/AvisoGate'
 import RotaProtegida from './components/RotaProtegida'
 import BottomNav from './components/BottomNav'
 import StatusBanners from './components/StatusBanners'
 import AvisoCopiadoHost from './components/AvisoCopiado'
+import BloqueioPin from './components/BloqueioPin'
+import { marcarSaidaDoApp, pinAtivo, precisaDesbloquear } from './utils/pinApp'
 import Spinner from './components/Spinner'
 import { useSessao } from './auth/useSessao'
 import { aplicarVersaoNovaSePreciso } from './utils/atualizacaoApp'
@@ -22,6 +24,8 @@ const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Login'))
 const Perfil = lazy(() => import('./pages/Perfil'))
 const Quitacao = lazy(() => import('./pages/Quitacao'))
+const Velocidade = lazy(() => import('./pages/Velocidade'))
+const Seguranca = lazy(() => import('./pages/Seguranca'))
 const Sobre = lazy(() => import('./pages/Sobre'))
 const Suporte = lazy(() => import('./pages/Suporte'))
 
@@ -35,8 +39,18 @@ function mostrarBottomNav(pathname: string): boolean {
 }
 
 function App() {
-  const { logado } = useSessao()
+  const { logado, cpf, sair } = useSessao()
   const location = useLocation()
+  // Proteção por PIN (Perfil → Segurança): pede ao abrir e depois de 5 min fora.
+  const [bloqueado, setBloqueado] = useState(() => precisaDesbloquear())
+  useEffect(() => {
+    const aoMudar = () => {
+      if (document.visibilityState === 'hidden') marcarSaidaDoApp()
+      else if (precisaDesbloquear()) setBloqueado(true)
+    }
+    document.addEventListener('visibilitychange', aoMudar)
+    return () => document.removeEventListener('visibilitychange', aoMudar)
+  }, [])
 
   // Versão nova já instalada: a troca de tela recarrega já na tela de
   // destino (ver utils/atualizacaoApp.ts).
@@ -48,6 +62,16 @@ function App() {
     <AvisoGate>
       <StatusBanners />
       <AvisoCopiadoHost />
+      {logado && cpf && bloqueado && pinAtivo(cpf) && (
+        <BloqueioPin
+          documento={cpf}
+          onDesbloquear={() => setBloqueado(false)}
+          onSair={() => {
+            setBloqueado(false)
+            sair()
+          }}
+        />
+      )}
       <Suspense fallback={<Spinner tela />}>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -96,6 +120,22 @@ function App() {
             element={
               <RotaProtegida>
                 <DetalheChamado />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/seguranca"
+            element={
+              <RotaProtegida>
+                <Seguranca />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/velocidade"
+            element={
+              <RotaProtegida>
+                <Velocidade />
               </RotaProtegida>
             }
           />

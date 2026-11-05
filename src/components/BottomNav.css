@@ -94,3 +94,29 @@
 :root[data-theme='dark'] .bottom-nav-pagar .bottom-nav-rotulo {
   color: var(--cor-primaria-clara);
 }
+
+/* Avatar da aba Perfil (AvatarAba): inicial ou foto num círculo de 26px. */
+.bottom-nav-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-superficie-alta);
+  color: var(--cor-texto);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.bottom-nav-avatar.ativo {
+  background: var(--cor-primaria);
+  color: #ffffff;
+}
+
+.bottom-nav-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

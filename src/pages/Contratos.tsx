@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { IcConstruction, IcDescription, IcPayments, IcSchedule, IcStar, IcWifi } from '../components/IconesApp'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { LuCalendarClock, LuConstruction, LuFileText, LuReceiptText, LuStar, LuWallet, LuWifi } from 'react-icons/lu'
 import { urlImpressaoContrato } from '../api/client'
 import { buscarContratos, type Contrato } from '../api/contratos'
 import CabecalhoTela from '../components/CabecalhoTela'
@@ -121,11 +121,11 @@ export default function Contratos() {
 
             <RotuloGrupo>Resumo</RotuloGrupo>
             <BlocoBranco>
-              <LinhaItem icone={LuWallet} tom="primaria" rotulo="Valor mensal" titulo={formatarMoeda(contrato.valor)} />
+              <LinhaItem icone={IcPayments} tom="primaria" rotulo="Valor mensal" titulo={formatarMoeda(contrato.valor)} />
               {contrato.diaPagamento != null && (
-                <LinhaItem icone={LuCalendarClock} tom="primaria" rotulo="Vencimento" titulo={`Todo dia ${contrato.diaPagamento}`} />
+                <LinhaItem icone={IcSchedule} tom="primaria" rotulo="Vencimento" titulo={`Todo dia ${contrato.diaPagamento}`} />
               )}
-              {desde && <LinhaItem icone={LuStar} tom="primaria" rotulo="Ativo desde" titulo={desde} />}
+              {desde && <LinhaItem icone={IcStar} tom="primaria" rotulo="Ativo desde" titulo={desde} />}
             </BlocoBranco>
 
             {contrato.itens.length > 0 && (
@@ -135,7 +135,7 @@ export default function Contratos() {
                   {contrato.itens.map((item, indice) => (
                     <LinhaItem
                       key={indice}
-                      icone={item.ehEquipamento ? LuConstruction : LuWifi}
+                      icone={item.ehEquipamento ? IcConstruction : IcWifi}
                       tom={item.ehEquipamento ? 'perigo' : 'primaria'}
                       rotulo={item.ehEquipamento ? 'Equipamento' : 'Plano'}
                       titulo={item.nome}
@@ -152,7 +152,7 @@ export default function Contratos() {
                 className="botao-primario"
                 onClick={() => navigate('/boletos', { state: { contratoPk: contrato.id }, viewTransition: true })}
               >
-                <LuReceiptText size={18} aria-hidden="true" /> Ver boletos deste contrato
+                <IcPayments size={18} aria-hidden="true" /> Ver boletos deste contrato
               </button>
               {/* contract_client_print=false: sem o documento completo. */}
               {contrato.podeVerDocumento && (
@@ -165,7 +165,7 @@ export default function Contratos() {
                     )
                   }
                 >
-                  <LuFileText size={18} aria-hidden="true" /> Ver contrato completo
+                  <IcDescription size={18} aria-hidden="true" /> Ver contrato completo
                 </button>
               )}
             </div>

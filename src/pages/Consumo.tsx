@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { LuChartColumn, LuChevronLeft, LuChevronRight, LuMonitorSmartphone, LuNetwork, LuWifi, LuWifiOff } from 'react-icons/lu'
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdMemory, MdPublic } from 'react-icons/md'
+import { IcDataUsage, IcWifi, IcWifiOff } from '../components/IconesApp'
 import {
   buscarConsumoDoMes,
   comNumeroDoContrato,
@@ -133,13 +134,13 @@ export default function Consumo() {
       {/* Seletor de mês (MonthSelector do app Android). */}
       <div className="consumo-seletor-mes">
         <button type="button" onClick={irParaMesAnterior} aria-label="Mês anterior">
-          <LuChevronLeft size={22} />
+          <MdKeyboardArrowLeft size={22} />
         </button>
         <span>
           {nomesMeses[mes - 1]} de {ano}
         </span>
         <button type="button" onClick={irParaProximoMes} disabled={ehMesAtual(ano, mes)} aria-label="Próximo mês">
-          <LuChevronRight size={22} />
+          <MdKeyboardArrowRight size={22} />
         </button>
       </div>
 
@@ -172,7 +173,7 @@ export default function Consumo() {
 
       {!carregando && !erro && !consumoSelecionado && (
         <EstadoVazio
-          icone={LuChartColumn}
+          icone={IcDataUsage}
           titulo="Sem dados de consumo neste mês"
           subtitulo="O uso da internet aparece aqui conforme você navega."
         />
@@ -203,7 +204,7 @@ export default function Consumo() {
           <RotuloGrupo>Conexão agora</RotuloGrupo>
           <BlocoBranco>
             <LinhaItem
-              icone={sessaoAtual ? LuWifi : LuWifiOff}
+              icone={sessaoAtual ? IcWifi : IcWifiOff}
               tom={sessaoAtual ? 'primaria' : 'neutra'}
               rotulo="Estado"
               titulo={
@@ -216,9 +217,9 @@ export default function Consumo() {
                       : 'Sem conexão agora'
               }
             />
-            {sessaoAtual?.ip && <LinhaItem icone={LuNetwork} tom="primaria" rotulo="IP atual" titulo={sessaoAtual.ip} />}
+            {sessaoAtual?.ip && <LinhaItem icone={MdPublic} tom="primaria" rotulo="IP atual" titulo={sessaoAtual.ip} />}
             {sessaoAtual?.callingId && (
-              <LinhaItem icone={LuMonitorSmartphone} tom="primaria" rotulo="MAC" titulo={sessaoAtual.callingId} />
+              <LinhaItem icone={MdMemory} tom="primaria" rotulo="MAC" titulo={sessaoAtual.callingId} />
             )}
           </BlocoBranco>
 

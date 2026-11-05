@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode } from 'react'
+import { MdKeyboardArrowRight } from 'react-icons/md'
 import type { IconType } from 'react-icons'
-import { LuChevronRight } from 'react-icons/lu'
 import './PadraoTelas.css'
 
 /**
@@ -58,7 +58,7 @@ export function LinhaItem({ icone: Icone, titulo, rotulo, detalhe, onClick, comS
       </span>
       {detalhe != null && <span className="linha-item-detalhe">{detalhe}</span>}
       {fim}
-      {(comSeta ?? onClick != null) && <LuChevronRight size={20} className="linha-item-seta" aria-hidden="true" />}
+      {(comSeta ?? onClick != null) && <MdKeyboardArrowRight size={20} className="linha-item-seta" aria-hidden="true" />}
     </>
   )
   if (onClick) {
