@@ -1,0 +1,57 @@
+.quitacao-tela {
+  max-width: var(--largura-conteudo);
+  margin: 0 auto;
+  padding: 16px 16px 24px;
+}
+
+.quitacao-esqueleto {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+.quitacao-seletor {
+  margin-bottom: 10px;
+}
+
+.quitacao-icone.ok {
+  background: color-mix(in srgb, var(--cor-sucesso) 16%, transparent);
+  color: var(--cor-sucesso);
+}
+
+.quitacao-icone.andamento {
+  background: var(--cor-superficie-alta);
+  color: var(--cor-texto-secundario);
+}
+
+.quitacao-icone.pendente {
+  background: var(--cor-terciaria-container);
+  color: var(--cor-terciaria);
+}
+
+.quitacao-gerar {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.quitacao-indisponivel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cor-texto-desabilitado);
+}
+
+.quitacao-nenhum {
+  margin: 8px 6px;
+  font-size: 14px;
+  color: var(--cor-texto-secundario);
+}
+
+.ri-tabela th {
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #666666;
+  padding: 6px 4px;
+}

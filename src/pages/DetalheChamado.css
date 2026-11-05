@@ -13,7 +13,7 @@
 }
 
 .detalhe-cabecalho {
-  padding: 16px 20px 12px;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
   border-bottom: 1px solid var(--cor-borda-suave);
   background: var(--cor-superficie);
 }
@@ -31,9 +31,9 @@
 }
 
 .detalhe-assunto {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--cor-texto);
-  font-size: 15px;
+  font-size: 16px;
   /* Item de flex sem limite de largura não encolhe — um assunto de
      chamado comprido estourava a linha e causava rolagem horizontal na
      tela inteira; agora trunca com "…" em vez de vazar. */
@@ -59,11 +59,21 @@
 }
 
 .badge-aberto {
-  background: var(--cor-primaria);
+  background: color-mix(in srgb, #1f5fa8 16%, transparent);
+  color: #1f5fa8;
 }
 
 .badge-fechado {
-  background: var(--cor-sucesso);
+  background: color-mix(in srgb, #1e7a46 16%, transparent);
+  color: #1e7a46;
+}
+
+:root[data-theme='dark'] .badge-aberto {
+  color: #a5c8ff;
+}
+
+:root[data-theme='dark'] .badge-fechado {
+  color: #7dd89c;
 }
 
 .detalhe-chat {
@@ -107,32 +117,36 @@
 }
 
 .balao {
-  max-width: 78%;
-  border-radius: 16px;
-  padding: 10px 14px;
+  max-width: min(78%, 280px);
+  border-radius: 18px;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
 }
 
+/* Balões do app Android (ChatMessage): o cliente em laranja com texto
+   branco; a equipe em branco com borda fina. */
 .balao-cliente {
-  background: color-mix(in srgb, var(--cor-primaria) 14%, var(--cor-superficie));
-  border: 1px solid color-mix(in srgb, var(--cor-primaria) 22%, transparent);
-  color: var(--cor-texto);
+  background: var(--cor-primaria);
+  color: var(--cor-branco-fixo);
   border-bottom-right-radius: 4px;
+}
+
+.balao-cliente .balao-autor {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .balao-equipe {
   background: var(--cor-superficie);
   border: 1px solid var(--cor-borda);
-  box-shadow: var(--sombra-card);
   color: var(--cor-texto);
   border-bottom-left-radius: 4px;
 }
 
 .balao-autor {
   font-size: 11px;
-  font-weight: 700;
-  color: var(--cor-primaria);
+  font-weight: 800;
+  color: var(--cor-texto-secundario);
   margin-bottom: 2px;
 }
 
@@ -204,12 +218,12 @@
 }
 
 .detalhe-btn-anexar {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: 1px solid var(--cor-borda);
-  background: var(--cor-fundo);
-  color: var(--cor-texto-secundario);
+  border: none;
+  background: var(--cor-superficie-alta);
+  color: var(--cor-texto);
   cursor: pointer;
   flex-shrink: 0;
   display: flex;
@@ -223,17 +237,19 @@
      navegador (~170-200px) mesmo com flex:1 — em telas de celular mais
      estreitas isso empurrava o botão "Enviar" pra fora da área visível. */
   min-width: 0;
-  height: 40px;
-  border-radius: 20px;
-  border: 1px solid var(--cor-borda);
+  height: 48px;
+  border-radius: 24px;
+  border: 1px solid var(--cor-texto-desabilitado);
   padding: 0 16px;
-  font-size: 14px;
+  font-size: 16px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
 }
 
 .detalhe-btn-enviar {
-  height: 40px;
+  height: 48px;
   padding: 0 18px;
-  border-radius: 20px;
+  border-radius: 24px;
   border: none;
   color: var(--cor-branco-fixo);
   font-weight: 700;

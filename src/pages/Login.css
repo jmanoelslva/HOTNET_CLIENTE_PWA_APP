@@ -97,6 +97,102 @@
   text-align: center;
 }
 
+/* Contas neste aparelho (SavedUserView / AccountList do app Android). */
+.login-contas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.login-contas-titulo {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--cor-texto-secundario);
+}
+
+.login-conta {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+}
+
+.login-conta.ativa {
+  border: 2px solid var(--cor-primaria);
+  background: var(--cor-primaria-container);
+}
+
+.login-conta-escolher {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.login-conta-avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-primaria-container);
+  color: var(--cor-sobre-primaria-container);
+  font-weight: 800;
+}
+
+.login-conta-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.login-conta-textos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.login-conta-textos strong {
+  font-size: 14px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.login-conta-textos span {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}
+
+.login-conta-esquecer {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
 .login-card form {
   display: flex;
   flex-direction: column;

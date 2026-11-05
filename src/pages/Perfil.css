@@ -17,6 +17,11 @@
 }
 
 .perfil-avatar {
+  position: relative;
+  padding: 0;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
   width: 60px;
   height: 60px;
   min-width: 60px;
@@ -62,4 +67,39 @@
 
 .perfil-sair {
   margin-top: 16px;
+}
+
+.perfil-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.perfil-avatar-camera {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--cor-superficie);
+  background: var(--cor-primaria);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.perfil-remover-foto {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--cor-primaria);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
 }

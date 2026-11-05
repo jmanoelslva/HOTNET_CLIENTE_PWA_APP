@@ -1,6 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LuArrowDownToLine, LuChevronRight, LuHeadset, LuEye, LuEyeOff } from 'react-icons/lu'
+import { LuArrowDownToLine, LuChevronRight, LuHeadset, LuEye, LuEyeOff, LuX } from 'react-icons/lu'
+import { contasSalvas, esquecerConta, fotoDaConta, type ContaSalva } from '../utils/contaLocal'
+import { mascararDocumento } from '../utils/recibo'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useSessao } from '../auth/useSessao'
 import ModalInstalarIos from '../components/ModalInstalarIos'
@@ -14,6 +16,15 @@ export default function Login() {
   const [senha, setSenha] = useState('')
   const [mostrarSenha, setMostrarSenha] = useState(false)
   const [ajudaAberta, setAjudaAberta] = useState(false)
+  // Contas já usadas neste aparelho (sem senha), como no app Android.
+  const [contas, setContas] = useState<ContaSalva[]>(() => contasSalvas())
+  const campoSenha = useRef<HTMLInputElement>(null)
+
+  function escolherConta(conta: ContaSalva) {
+    setUsuario(conta.documento)
+    setSenha('')
+    campoSenha.current?.focus()
+  }
   const { entrar, carregando, erro } = useSessao()
   const navigate = useNavigate()
   const { podeInstalar, podeInstalarIos, aoClicarInstalar, modalIosAberto, fecharModalIos } = usePwaInstall()
@@ -52,6 +63,41 @@ export default function Login() {
 
       <div className="login-conteudo">
       <div className="login-card">
+        {contas.length > 0 && (
+          <div className="login-contas">
+            <span className="login-contas-titulo">Contas neste aparelho</span>
+            {contas.map((conta) => {
+              const foto = fotoDaConta(conta.documento)
+              const ativa = usuario.replace(/\D/g, '') === conta.documento
+              return (
+                <div key={conta.documento} className={`login-conta ${ativa ? 'ativa' : ''}`}>
+                  <button type="button" className="login-conta-escolher" onClick={() => escolherConta(conta)}>
+                    <span className="login-conta-avatar" aria-hidden="true">
+                      {foto ? <img src={foto} alt="" /> : (conta.nome ?? 'C').charAt(0).toUpperCase()}
+                    </span>
+                    <span className="login-conta-textos">
+                      <strong>{conta.nome ?? 'Cliente HOTNET'}</strong>
+                      <span>{mascararDocumento(conta.documento) ?? conta.documento}</span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="login-conta-esquecer"
+                    onClick={() => {
+                      esquecerConta(conta.documento)
+                      setContas(contasSalvas())
+                      if (ativa) setUsuario('')
+                    }}
+                    aria-label={`Esquecer a conta de ${conta.nome ?? 'cliente'}`}
+                  >
+                    <LuX size={18} />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
         <form onSubmit={aoEnviar}>
           <label htmlFor="usuario">CPF ou CNPJ</label>
           <input
@@ -67,6 +113,7 @@ export default function Login() {
           <label htmlFor="senha">Senha</label>
           <div className="login-campo-senha">
             <input
+              ref={campoSenha}
               id="senha"
               type={mostrarSenha ? 'text' : 'password'}
               value={senha}

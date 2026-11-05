@@ -26,3 +26,13 @@ export function formatarBytes(bytes: number): string {
   }
   return `${valor.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ${unidades[indice]}`
 }
+
+/** "MARIA DA SILVA" → "Maria da Silva" (preposições em minúsculas), como no app Android. */
+export function nomeParaExibir(nome: string): string {
+  return nome
+    .toLowerCase()
+    .split(' ')
+    .filter(Boolean)
+    .map((p) => (['da', 'de', 'do', 'das', 'dos', 'e'].includes(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)))
+    .join(' ')
+}

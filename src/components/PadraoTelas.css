@@ -234,3 +234,7 @@
 .erro-carregamento p {
   margin: 0 0 12px;
 }
+
+.linha-item.com-divisoria {
+  border-top: 1px solid var(--cor-borda);
+}

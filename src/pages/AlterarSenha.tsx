@@ -5,6 +5,7 @@ import { useSessao } from '../auth/useSessao'
 import { alterarSenha, login, SessaoExpiradaError } from '../api/client'
 import CabecalhoTela from '../components/CabecalhoTela'
 import VoltarInicio from '../components/VoltarInicio'
+import { marcarSenhaPadrao } from '../utils/contaLocal'
 import { avaliarSenha, TAMANHO_MAX_SENHA } from '../utils/senha'
 import './AlterarSenha.css'
 
@@ -86,6 +87,7 @@ export default function AlterarSenha() {
       if (resposta.success) {
         setNova('')
         setConfirmacao('')
+        if (cpf) marcarSenhaPadrao(cpf, false)
         setEtapa('concluido')
       } else {
         setErro(resposta.message || 'Não foi possível alterar a senha. Tente novamente.')

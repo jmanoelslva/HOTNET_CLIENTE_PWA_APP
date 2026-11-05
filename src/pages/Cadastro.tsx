@@ -11,6 +11,8 @@ import { BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import { useToast } from '../components/Toast/useToast'
 import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
 import { mascararDocumento } from '../utils/recibo'
+import { nomeParaExibir } from '../utils/formatacao'
+import { fotoDaConta } from '../utils/contaLocal'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import './Cadastro.css'
 
@@ -33,15 +35,6 @@ function formatarDocumento(doc: string): string {
   if (d.length === 11) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
   if (d.length === 14) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`
   return doc
-}
-
-function nomeParaExibir(nome: string): string {
-  return nome
-    .toLowerCase()
-    .split(' ')
-    .filter(Boolean)
-    .map((p) => (['da', 'de', 'do', 'das', 'dos', 'e'].includes(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)))
-    .join(' ')
 }
 
 /**
@@ -120,7 +113,7 @@ export default function Cadastro() {
             <section className="cartao-destaque cadastro-titular" aria-label="Titular">
               <div className="cadastro-titular-topo">
                 <span className="cadastro-titular-inicial" aria-hidden="true">
-                  {nome.charAt(0).toUpperCase()}
+                  {fotoDaConta(cpf) ? <img src={fotoDaConta(cpf)!} alt="" /> : nome.charAt(0).toUpperCase()}
                 </span>
                 <div className="cadastro-titular-textos">
                   <strong>{nome}</strong>

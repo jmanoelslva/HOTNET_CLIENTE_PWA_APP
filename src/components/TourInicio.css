@@ -1,0 +1,76 @@
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+}
+
+.tour-fundo {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Recorte: a sombra enorme escurece tudo em volta do elemento destacado. */
+.tour-recorte {
+  position: absolute;
+  border-radius: var(--raio-xl);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+  outline: 2px solid var(--cor-laranja-vivo);
+  transition:
+    top 0.25s ease,
+    left 0.25s ease,
+    width 0.25s ease,
+    height 0.25s ease;
+  pointer-events: none;
+}
+
+.tour-cartao {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: var(--raio-xl);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.tour-passo {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--cor-primaria);
+}
+
+.tour-cartao h2 {
+  margin: 4px 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.tour-cartao p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--cor-texto-secundario);
+}
+
+.tour-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.tour-pular {
+  min-height: 48px;
+  padding: 0 14px;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
 import {
   LuArrowDownToLine,
+  LuCamera,
   LuChartColumn,
+  LuFileCheck,
   LuCircleHelp,
   LuFileText,
   LuIdCard,
@@ -20,6 +22,9 @@ import { useModoTema } from '../hooks/useTema'
 import { usePwaInstall } from '../hooks/usePwaInstall'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import { mascararDocumento } from '../utils/recibo'
+import { nomeParaExibir } from '../utils/formatacao'
+import { fotoDaConta, prepararFoto, salvarFoto } from '../utils/contaLocal'
+import { useToast } from '../components/Toast/useToast'
 import CabecalhoTela from '../components/CabecalhoTela'
 import ModalConfirmarLogout from '../components/ModalConfirmarLogout'
 import ModalInstalarIos from '../components/ModalInstalarIos'
@@ -40,13 +45,27 @@ export default function Perfil() {
   const [nome, setNome] = useState<string | null>(null)
   const [documento, setDocumento] = useState<string | null>(null)
   const [confirmarSair, setConfirmarSair] = useState(false)
+  const [foto, setFoto] = useState(() => fotoDaConta(cpf))
+  const entradaFoto = useRef<HTMLInputElement>(null)
+  const { toast } = useToast()
+
+  async function escolherFoto(arquivo: File | undefined) {
+    if (!arquivo || !cpf) return
+    try {
+      const dataUrl = await prepararFoto(arquivo)
+      salvarFoto(cpf, dataUrl)
+      setFoto(dataUrl)
+    } catch {
+      toast('Não foi possível usar essa imagem. Tente outra.')
+    }
+  }
 
   useEffect(() => {
     let cancelado = false
     buscarDadosCliente(cpf)
       .then((cliente) => {
         if (cancelado) return
-        setNome(cliente.client_complete_name?.trim() || null)
+        setNome(cliente.client_complete_name?.trim() ? nomeParaExibir(cliente.client_complete_name) : null)
         setDocumento(cliente.client_doc1 ?? cpf)
       })
       .catch(() => {
@@ -69,12 +88,43 @@ export default function Perfil() {
       <CabecalhoTela titulo="Perfil" subtitulo="Seus dados, preferências e ajuda." />
 
       <div className="perfil-cabecalho">
-        <span className="perfil-avatar" aria-hidden="true">
-          {inicial}
-        </span>
+        {/* Foto só neste aparelho, como no app Android. */}
+        <button
+          type="button"
+          className="perfil-avatar"
+          onClick={() => entradaFoto.current?.click()}
+          aria-label={foto ? 'Trocar foto de perfil' : 'Adicionar foto de perfil'}
+        >
+          {foto ? <img src={foto} alt="" /> : inicial}
+          <span className="perfil-avatar-camera" aria-hidden="true">
+            <LuCamera size={14} />
+          </span>
+        </button>
+        <input
+          ref={entradaFoto}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => {
+            escolherFoto(e.target.files?.[0])
+            e.target.value = ''
+          }}
+        />
         <div className="perfil-identidade">
           <strong>{nome ?? 'Cliente HOTNET'}</strong>
           {documentoMascarado && <span>{documentoMascarado}</span>}
+          {foto && (
+            <button
+              type="button"
+              className="perfil-remover-foto"
+              onClick={() => {
+                if (cpf) salvarFoto(cpf, null)
+                setFoto(null)
+              }}
+            >
+              Remover foto
+            </button>
+          )}
         </div>
       </div>
 
@@ -83,6 +133,7 @@ export default function Perfil() {
         <LinhaItem icone={LuIdCard} titulo="Meus dados" onClick={() => ir('/cadastro')} />
         <LinhaItem icone={LuFileText} titulo="Contratos" onClick={() => ir('/contratos')} />
         <LinhaItem icone={LuChartColumn} titulo="Consumo" onClick={() => ir('/consumo')} />
+        <LinhaItem icone={LuFileCheck} titulo="Declaração de quitação" onClick={() => ir('/quitacao')} />
       </BlocoBranco>
 
       <RotuloGrupo>Preferências</RotuloGrupo>

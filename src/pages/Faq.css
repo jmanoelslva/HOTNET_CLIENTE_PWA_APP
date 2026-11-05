@@ -228,3 +228,36 @@
   font-size: 12px;
   font-weight: 700;
 }
+
+/* "Primeira vez no app?" (GuiaRapidoCard). */
+.faq-guia {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
+  color: var(--cor-texto-secundario);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq-guia-icone {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-primaria-container);
+  color: var(--cor-primaria);
+}
+
+.faq-guia .faq-falar-textos strong {
+  color: var(--cor-texto);
+}

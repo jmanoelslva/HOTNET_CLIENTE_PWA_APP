@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { IconType } from 'react-icons'
 import {
   LuChartColumn,
@@ -7,6 +8,8 @@ import {
   LuReceiptText,
   LuSearchX,
   LuChevronDown,
+  LuChevronRight,
+  LuCompass,
   LuHeadset,
   LuWifi,
 } from 'react-icons/lu'
@@ -108,6 +111,7 @@ const PERGUNTAS: PerguntaFrequente[] = [
 ]
 
 export default function Faq() {
+  const navigate = useNavigate()
   const { cpf } = useSessao()
   const [busca, setBusca] = useState('')
   const [categoriaFiltro, setCategoriaFiltro] = useState<string | null>(null)
@@ -157,6 +161,17 @@ export default function Faq() {
           setCategoriaFiltro(null)
         }}
       />
+
+      <button type="button" className="faq-guia" onClick={() => navigate('/', { state: { tour: true }, viewTransition: true })}>
+        <span className="faq-guia-icone" aria-hidden="true">
+          <LuCompass size={20} />
+        </span>
+        <span className="faq-falar-textos">
+          <strong>Primeira vez no app?</strong>
+          <span>Veja o guia rápido da tela inicial</span>
+        </span>
+        <LuChevronRight size={20} aria-hidden="true" />
+      </button>
 
       <section className="faq-assuntos" aria-labelledby="faq-assuntos-titulo">
         <div className="faq-assuntos-topo">

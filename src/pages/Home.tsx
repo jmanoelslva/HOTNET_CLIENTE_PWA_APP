@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   LuBan,
   LuCheck,
@@ -23,7 +23,11 @@ import { buscarDadosCliente } from '../api/cadastro'
 import { buscarContratos, type Contrato } from '../api/contratos'
 import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, totalBytes, vincularContratos, type ConsumoPorContrato } from '../api/consumo'
 import { contarBoletosAtrasados, situacaoDosContratos } from '../api/situacao'
-import { listarBoletos, type FaturaDto } from '../api/client'
+import { informarPagamento, listarBoletos, type FaturaDto } from '../api/client'
+import FolhaConfirmar from '../components/FolhaConfirmar'
+import TourInicio from '../components/TourInicio'
+import { tourJaVisto } from '../utils/tour'
+import { fotoDaConta, lembrarConta, usaSenhaPadrao } from '../utils/contaLocal'
 import ChecklistConexao from '../components/ChecklistConexao'
 import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
 import { useToast } from '../components/Toast/useToast'
@@ -108,6 +112,20 @@ export default function Home() {
   const [pixCopiado, setPixCopiado] = useState(false)
   const [checklistAberto, setChecklistAberto] = useState(false)
   const [boletosAtrasados, setBoletosAtrasados] = useState<number | null>(null)
+  const [confirmarJaPaguei, setConfirmarJaPaguei] = useState<FaturaDto | null>(null)
+  const [informados, setInformados] = useState<Set<number>>(new Set())
+  const [lembreteSenha, setLembreteSenha] = useState(() => {
+    try {
+      return usaSenhaPadrao(cpf) && sessionStorage.getItem('hotnet-lembrete-senha') !== 'dispensado'
+    } catch {
+      return usaSenhaPadrao(cpf)
+    }
+  })
+  const foto = fotoDaConta(cpf)
+  const location = useLocation()
+  // Guia da primeira vez (ou "Veja o guia rápido" em Dúvidas).
+  const pediuGuia = (location.state as { tour?: boolean } | null)?.tour === true
+  const [tourAberto, setTourAberto] = useState(false)
 
   useEffect(() => {
     carregarNome()
@@ -127,6 +145,7 @@ export default function Home() {
       if (primeiroNome) {
         setNomeExibido(primeiroNome.charAt(0).toUpperCase() + primeiroNome.slice(1).toLowerCase())
         setNomeCompleto(completo)
+        if (cpf) lembrarConta(cpf, completo)
       }
     } catch {
       // Saudação fica com "Cliente": não bloqueia a Início.
@@ -217,6 +236,14 @@ export default function Home() {
         : 'Toque para ver os detalhes'
 
   const boleto = faturas ? boletoMaisUrgente(faturas) : null
+
+  // Abre o guia quando a tela já tem o que mostrar (faixa e atalhos).
+  const telaPronta = faturas != null && (contratos.length > 0 || consumoContratos.length > 0)
+  useEffect(() => {
+    if (!telaPronta || (!pediuGuia && tourJaVisto())) return
+    const t = setTimeout(() => setTourAberto(true), 600)
+    return () => clearTimeout(t)
+  }, [telaPronta, pediuGuia])
   const pagoEm = faturas ? ultimoPagamento(faturas) : null
 
   async function aoClicarWhatsapp() {
@@ -267,13 +294,39 @@ export default function Home() {
       <div className="home-tela tela-entrada">
         <header className="home-cabecalho">
           <button type="button" className="home-avatar" onClick={() => ir('/perfil')} aria-label="Abrir o Perfil">
-            {nomeExibido.charAt(0).toUpperCase()}
+            {foto ? <img src={foto} alt="" /> : nomeExibido.charAt(0).toUpperCase()}
           </button>
           <div className="home-cabecalho-textos">
             <span className="home-saudacao">{saudacaoPorHorario(nomeExibido)}</span>
             <span className="home-subtitulo">O que você precisa hoje?</span>
           </div>
         </header>
+
+        {lembreteSenha && (
+          <section className="home-lembrete" aria-label="Senha padrão">
+            <strong>Sua senha ainda é a padrão</strong>
+            <span>Deseja criar uma senha só sua?</span>
+            <div className="home-lembrete-acoes">
+              <button
+                type="button"
+                className="botao-contorno"
+                onClick={() => {
+                  setLembreteSenha(false)
+                  try {
+                    sessionStorage.setItem('hotnet-lembrete-senha', 'dispensado')
+                  } catch {
+                    // Sem armazenamento: só esconde agora.
+                  }
+                }}
+              >
+                Agora não
+              </button>
+              <button type="button" className="botao-primario" onClick={() => ir('/alterar-senha')}>
+                Criar senha
+              </button>
+            </div>
+          </section>
+        )}
 
         {consumoContratos.length > 1 && (
           <div className="home-seletor" role="tablist" aria-label="Conexão por contrato">
@@ -385,6 +438,14 @@ export default function Home() {
             >
               <LuReceiptText size={18} aria-hidden="true" /> Ver boletos
             </button>
+            {boleto.contract_pk != null &&
+              (informados.has(boleto.invoice_pk) || boleto.obs_pk != null ? (
+                <span className="home-boleto-informado">Liberação temporária já solicitada</span>
+              ) : (
+                <button type="button" className="home-boleto-ja-paguei" onClick={() => setConfirmarJaPaguei(boleto)}>
+                  Já paguei este boleto
+                </button>
+              ))}
           </section>
         ) : (
           pagoEm && (
@@ -429,6 +490,39 @@ export default function Home() {
           </span>
           <span className="home-whatsapp-chamar">Chamar</span>
         </button>
+
+        {tourAberto && (
+          <TourInicio
+            onFim={() => {
+              setTourAberto(false)
+              if (pediuGuia) navigate('.', { replace: true, state: null })
+            }}
+          />
+        )}
+
+        <FolhaConfirmar
+          aberto={confirmarJaPaguei != null}
+          titulo="Informar pagamento"
+          texto="Confirma que já pagou este boleto? Isso libera sua conexão temporariamente. Pagamentos com boleto podem levar até 72h úteis para compensar."
+          confirmar="Sim, já paguei"
+          onCancelar={() => setConfirmarJaPaguei(null)}
+          onConfirmar={async () => {
+            const f = confirmarJaPaguei
+            setConfirmarJaPaguei(null)
+            if (!f || f.contract_pk == null) return
+            try {
+              const r = await informarPagamento(f.invoice_pk, f.contract_pk)
+              if (r.success) {
+                setInformados((atual) => new Set(atual).add(f.invoice_pk))
+                toast('Pagamento informado! Sua conexão será liberada.', 'sucesso')
+              } else {
+                toast(r.message ?? 'Não foi possível informar o pagamento.')
+              }
+            } catch {
+              toast('Não foi possível informar o pagamento agora. Tente novamente.')
+            }
+          }}
+        />
 
         {checklistAberto && (
           <ChecklistConexao

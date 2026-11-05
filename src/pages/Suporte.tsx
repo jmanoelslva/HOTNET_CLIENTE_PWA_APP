@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import type { IconType } from 'react-icons'
 import {
   LuPlus,
+  LuChevronRight,
   LuMegaphone,
   LuX,
   LuConstruction,
@@ -28,11 +29,13 @@ import NovoChamado from '../components/NovoChamado'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import type { CategoriaDto, TicketDto } from '../api/client'
 import CabecalhoTela from '../components/CabecalhoTela'
+import { AbasPilula } from '../components/PadraoTelas'
+import { FaWhatsapp } from 'react-icons/fa'
 import { useToast } from '../components/Toast/useToast'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
 import PullToRefresh from '../components/PullToRefresh'
-import { CORES, comAlpha } from '../utils/cores'
+import { CORES } from '../utils/cores'
 import './Suporte.css'
 
 const TAMANHO_PAGINA = 20
@@ -200,18 +203,36 @@ export default function Suporte() {
   return (
     <PullToRefresh aoAtualizar={carregar}>
     <div className="suporte-tela tela-entrada">
-      <CabecalhoTela icone={LuHeadset} cor={CORES.suporte} titulo="Suporte" subtitulo="Seus chamados de suporte." />
+      <CabecalhoTela titulo="Suporte" subtitulo="Fale com a equipe HOTNET." />
 
-      <div className="suporte-abas">
-        <button className={`aba-chip aba-abertos ${aba === 'abertos' ? 'ativa' : ''}`} onClick={() => setAba('abertos')}>
-          Abertos
+      {/* Atalhos no topo (AtalhoSuporte do app Android), no lugar do botão flutuante. */}
+      <div className="suporte-atalhos">
+        <button type="button" className="suporte-atalho" onClick={abrirChecklist} aria-label="Novo chamado">
+          <span className="suporte-atalho-icone novo" aria-hidden="true">
+            <LuPlus size={18} />
+          </span>
+          <strong>Novo chamado</strong>
+          <span>Acompanhe pelo app</span>
         </button>
-        <button
-          className={`aba-chip aba-resolvidos ${aba === 'resolvidos' ? 'ativa' : ''}`}
-          onClick={() => setAba('resolvidos')}
-        >
-          Resolvidos
+        <button type="button" className="suporte-atalho" onClick={falarNoWhatsapp}>
+          <span className="suporte-atalho-icone whatsapp" aria-hidden="true">
+            <FaWhatsapp size={18} />
+          </span>
+          <strong>WhatsApp</strong>
+          <span>Resposta rápida</span>
         </button>
+      </div>
+
+      <div className="suporte-abas-pilula">
+        <AbasPilula<Aba>
+          rotulo="Chamados"
+          opcoes={[
+            { valor: 'abertos', rotulo: 'Abertos', contador: chamados.filter((c) => !chamadoResolvido(c)).length },
+            { valor: 'resolvidos', rotulo: 'Resolvidos' },
+          ]}
+          selecionada={aba}
+          onSelecionar={setAba}
+        />
       </div>
 
       {carregando && (
@@ -237,7 +258,7 @@ export default function Suporte() {
         <EstadoVazio
           icone={LuHeadset}
           titulo={aba === 'resolvidos' ? 'Nenhum chamado resolvido ainda' : 'Nenhum chamado em aberto'}
-          subtitulo={aba === 'resolvidos' ? undefined : 'Precisando de ajuda? Toque em "Novo chamado".'}
+          subtitulo={aba === 'resolvidos' ? undefined : 'Tudo certo por aqui. Precisando, toque em "Novo chamado".'}
         />
       )}
 
@@ -255,35 +276,43 @@ export default function Suporte() {
           {filtrados.map((chamado) => {
             const resolvido = chamadoResolvido(chamado)
             return (
-              <li
-                key={chamado.ticket_pk}
-                className="ticket-card"
-                onClick={() => navigate(`/suporte/${chamado.ticket_pk}`, { state: { chamado }, viewTransition: true })}
-              >
-                <div className="ticket-topo">
-                  <span className="ticket-assunto">{chamado.ticket_title ?? `Chamado #${chamado.ticket_pk ?? '-'}`}</span>
-                  <span className={`ticket-status-badge ${resolvido ? 'badge-fechado' : 'badge-aberto'}`}>
-                    {resolvido ? 'Fechado' : 'Aberto'}
+              <li key={chamado.ticket_pk}>
+                <button
+                  type="button"
+                  className="ticket-card"
+                  onClick={() => navigate(`/suporte/${chamado.ticket_pk}`, { state: { chamado }, viewTransition: true })}
+                >
+                  {(() => {
+                    const IconeCategoria = iconeParaCategoria(chamado.category_name ?? '')
+                    return (
+                      <span className="ticket-topo">
+                        <span className="ticket-icone" aria-hidden="true">
+                          <IconeCategoria size={18} />
+                        </span>
+                        <span className="ticket-textos">
+                          <strong className="ticket-assunto">{chamado.ticket_title ?? 'Chamado sem título'}</strong>
+                          <span className="ticket-meta">
+                            {chamado.category_name ?? 'Categoria não informada'} · Protocolo{' '}
+                            {chamado.ticket_protocol ?? chamado.ticket_pk}
+                          </span>
+                        </span>
+                        <span className={`ticket-estado ${resolvido ? 'resolvido' : 'aberto'}`}>
+                          {resolvido ? 'Resolvido' : 'Em aberto'}
+                        </span>
+                      </span>
+                    )
+                  })()}
+                  <span className="ticket-rodape">
+                    <span>
+                      {resolvido
+                        ? `Aberto em ${formatarData(chamado.ticket_date_create) ?? '—'} · fechado em ${formatarData(chamado.ticket_date_close) ?? '—'}`
+                        : `Aberto em ${formatarData(chamado.ticket_date_create) ?? '—'}`}
+                    </span>
+                    <span className="ticket-ver">
+                      Ver conversa <LuChevronRight size={18} aria-hidden="true" />
+                    </span>
                   </span>
-                </div>
-                {chamado.ticket_protocol && <p className="ticket-protocolo">Protocolo: {chamado.ticket_protocol}</p>}
-                {(() => {
-                  const nomeCategoria = chamado.category_name ?? ''
-                  const corCategoria = corParaCategoria(nomeCategoria)
-                  const IconeCategoria = iconeParaCategoria(nomeCategoria)
-                  return (
-                    <div
-                      className="ticket-categoria-badge"
-                      style={{ background: comAlpha(corCategoria, 12), color: corCategoria }}
-                    >
-                      <IconeCategoria size={13} />
-                      <span>{chamado.category_name ?? 'Categoria não informada'}</span>
-                    </div>
-                  )
-                })()}
-                <p className="ticket-data">Aberto em {formatarData(chamado.ticket_date_create) ?? 'data não informada'}</p>
-                {resolvido && <p className="ticket-data">Fechado em {formatarData(chamado.ticket_date_close) ?? '-'}</p>}
-                {chamado.ticket_desc && <p className="ticket-descricao">{chamado.ticket_desc}</p>}
+                </button>
               </li>
             )
           })}
@@ -295,10 +324,6 @@ export default function Suporte() {
           {carregandoMais ? 'Carregando…' : 'Carregar mais'}
         </button>
       )}
-
-      <button className="suporte-fab" onClick={abrirChecklist} aria-label="Novo chamado">
-        <LuPlus size={28} />
-      </button>
 
       {checklistAberto && (
         <ChecklistConexao

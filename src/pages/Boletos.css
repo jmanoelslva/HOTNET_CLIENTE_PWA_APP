@@ -524,10 +524,6 @@
   opacity: 0.6;
 }
 
-.linha-item.com-divisoria {
-  border-top: 1px solid var(--cor-borda);
-}
-
 .boleto-pago-icone {
   background: color-mix(in srgb, var(--cor-sucesso) 16%, transparent);
   color: var(--cor-sucesso);

@@ -499,3 +499,67 @@
   font-size: 12px;
   font-weight: 700;
 }
+
+.home-avatar {
+  overflow: hidden;
+  padding: 0;
+}
+
+.home-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Lembrete da senha padrão (LembreteSenhaPadraoCard): só a pergunta e duas saídas. */
+.home-lembrete {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  background: var(--cor-primaria-container);
+  color: var(--cor-sobre-primaria-container);
+}
+
+.home-lembrete strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.home-lembrete > span {
+  font-size: 13px;
+}
+
+.home-lembrete-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.home-lembrete-acoes > * {
+  min-height: 40px;
+  font-size: 14px;
+}
+
+.home-boleto-ja-paguei {
+  min-height: 44px;
+  margin-top: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--raio-md);
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.home-boleto-informado {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}

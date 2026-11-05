@@ -114,3 +114,13 @@
   line-height: 16px;
   color: var(--cor-texto-secundario);
 }
+
+.cadastro-titular-inicial {
+  overflow: hidden;
+}
+
+.cadastro-titular-inicial img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
