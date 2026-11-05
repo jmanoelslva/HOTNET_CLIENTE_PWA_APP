@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MdCheckCircle, MdKey, MdLock, MdRadioButtonUnchecked } from 'react-icons/md'
+import { LuCircleCheck, LuKeyRound, LuLock, LuCircle } from 'react-icons/lu'
 import { useSessao } from '../auth/useSessao'
 import { alterarSenha, login, SessaoExpiradaError } from '../api/client'
 import CabecalhoTela from '../components/CabecalhoTela'
@@ -18,7 +18,7 @@ const ESPERA_MS = 30_000
 function Regra({ ok, texto }: { ok: boolean; texto: string }) {
   return (
     <li className={`senha-regra ${ok ? 'ok' : ''}`}>
-      {ok ? <MdCheckCircle aria-hidden="true" /> : <MdRadioButtonUnchecked aria-hidden="true" />}
+      {ok ? <LuCircleCheck aria-hidden="true" /> : <LuCircle aria-hidden="true" />}
       <span>{texto}</span>
       <span className="sr-only">{ok ? ' (atendida)' : ' (pendente)'}</span>
     </li>
@@ -103,11 +103,11 @@ export default function AlterarSenha() {
   return (
     <div className="senha-tela tela-entrada">
       <VoltarInicio />
-      <CabecalhoTela icone={MdKey} cor={CORES.dados} titulo="Alterar senha" subtitulo="A senha que você usa para entrar no portal e no app." />
+      <CabecalhoTela icone={LuKeyRound} cor={CORES.dados} titulo="Alterar senha" subtitulo="A senha que você usa para entrar no portal e no app." />
 
       {etapa === 'confirmar' && (
         <form className="senha-card" onSubmit={confirmarSenhaAtual}>
-          <MdLock className="senha-icone" size={36} aria-hidden="true" />
+          <LuLock className="senha-icone" size={36} aria-hidden="true" />
           <h2>Confirme que é você</h2>
           <p className="senha-texto">Para sua segurança, digite a senha atual antes de criar uma nova.</p>
           <label htmlFor="senha-atual">Senha atual</label>
@@ -180,7 +180,7 @@ export default function AlterarSenha() {
 
       {etapa === 'concluido' && (
         <div className="senha-card senha-concluido">
-          <MdCheckCircle className="senha-icone senha-icone-ok" size={48} aria-hidden="true" />
+          <LuCircleCheck className="senha-icone senha-icone-ok" size={48} aria-hidden="true" />
           <h2>Senha alterada</h2>
           <p className="senha-texto">
             Use a nova senha na próxima vez que entrar. Se você usa o app HOTNET no celular, ele vai pedir a nova

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { IconType } from 'react-icons'
-import { MdArrowBack, MdCheckCircle, MdClose, MdContentCopy } from 'react-icons/md'
+import { LuArrowLeft, LuCircleCheck, LuX, LuCopy } from 'react-icons/lu'
 import { FaWhatsapp } from 'react-icons/fa'
 import type { CategoriaDto } from '../api/client'
 import type { ChamadoCriado } from '../api/suporte'
@@ -161,7 +161,7 @@ export default function NovoChamado({
   } else if (criado) {
     conteudo = (
       <div className="chamado-etapa chamado-sucesso">
-        <MdCheckCircle size={52} className="chamado-sucesso-icone" aria-hidden="true" />
+        <LuCircleCheck size={52} className="chamado-sucesso-icone" aria-hidden="true" />
         <h2 id="chamado-titulo">Chamado aberto</h2>
         {criado.protocolo ? (
           <>
@@ -169,7 +169,7 @@ export default function NovoChamado({
             <div className="chamado-protocolo" aria-live="polite">
               <span>{criado.protocolo}</span>
               <button onClick={() => copiar(criado.protocolo!)} aria-label="Copiar número do chamado">
-                <MdContentCopy size={16} aria-hidden="true" /> {copiado ? 'Copiado' : 'Copiar'}
+                <LuCopy size={16} aria-hidden="true" /> {copiado ? 'Copiado' : 'Copiar'}
               </button>
             </div>
           </>
@@ -227,7 +227,7 @@ export default function NovoChamado({
           <span className="on" />
         </div>
         <button type="button" className="chamado-voltar" onClick={() => setCategoriaPk(null)} disabled={enviando}>
-          <MdArrowBack size={16} aria-hidden="true" /> {categoria.category_name}
+          <LuArrowLeft size={16} aria-hidden="true" /> {categoria.category_name}
         </button>
         <h2 id="chamado-titulo">O que está acontecendo?</h2>
         {ajuda?.dicaBoletos && (
@@ -290,7 +290,7 @@ export default function NovoChamado({
     <div className="chamado-fundo" onClick={fecharSePuder}>
       <div className="chamado-modal" role="dialog" aria-modal="true" aria-labelledby="chamado-titulo" onClick={(e) => e.stopPropagation()}>
         <button className="chamado-fechar" onClick={fecharSePuder} aria-label="Fechar" disabled={enviando}>
-          <MdClose size={22} />
+          <LuX size={22} />
         </button>
         {conteudo}
       </div>

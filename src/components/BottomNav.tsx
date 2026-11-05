@@ -1,16 +1,16 @@
 import { useState, type CSSProperties } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { MdDescription, MdHome, MdLogout, MdPayments, MdSupportAgent } from 'react-icons/md'
+import { LuFileText, LuHouse, LuLogOut, LuReceiptText, LuHeadset } from 'react-icons/lu'
 import { useSessao } from '../auth/useSessao'
 import { CORES, comAlpha } from '../utils/cores'
 import ModalConfirmarLogout from './ModalConfirmarLogout'
 import './BottomNav.css'
 
 const ITENS = [
-  { to: '/', icone: MdHome, cor: CORES.primaria, label: 'Início', fim: true },
-  { to: '/boletos', icone: MdPayments, cor: CORES.boletos, label: 'Boletos' },
-  { to: '/contratos', icone: MdDescription, cor: CORES.contratos, label: 'Contratos' },
-  { to: '/suporte', icone: MdSupportAgent, cor: CORES.suporte, label: 'Suporte' },
+  { to: '/', icone: LuHouse, cor: CORES.primaria, label: 'Início', fim: true },
+  { to: '/boletos', icone: LuReceiptText, cor: CORES.boletos, label: 'Boletos' },
+  { to: '/contratos', icone: LuFileText, cor: CORES.contratos, label: 'Contratos' },
+  { to: '/suporte', icone: LuHeadset, cor: CORES.suporte, label: 'Suporte' },
 ]
 
 /**
@@ -59,7 +59,7 @@ export default function BottomNav() {
           </NavLink>
         ))}
         <button type="button" className="bottom-nav-item" onClick={() => setConfirmarSairAberto(true)}>
-          <MdLogout size={22} />
+          <LuLogOut size={22} />
           <span>Sair</span>
         </button>
       </nav>

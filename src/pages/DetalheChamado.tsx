@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import {
-  MdAttachFile,
-  MdCameraAlt,
-  MdChatBubbleOutline,
-  MdDescription,
-  MdImage,
-  MdLocationOn,
-  MdPictureAsPdf,
-} from 'react-icons/md'
+  LuPaperclip,
+  LuCamera,
+  LuMessageCircle,
+  LuFileText,
+  LuImage,
+  LuMapPin,
+  LuFileDown,
+} from 'react-icons/lu'
 import VoltarInicio from '../components/VoltarInicio'
 import EstadoVazio from '../components/EstadoVazio'
 import {
@@ -254,7 +254,7 @@ export default function DetalheChamado() {
         )}
 
         {!carregando && !erro && listaExibida.length === 0 && (
-          <EstadoVazio icone={MdChatBubbleOutline} titulo="Nenhuma mensagem ainda" subtitulo="Escreva algo pra começar a conversa." />
+          <EstadoVazio icone={LuMessageCircle} titulo="Nenhuma mensagem ainda" subtitulo="Escreva algo pra começar a conversa." />
         )}
 
         {!carregando &&
@@ -280,7 +280,7 @@ export default function DetalheChamado() {
                     className={`balao-anexo-documento ${ehArquivoPdf(op.arquivo) ? 'balao-anexo-pdf' : ''}`}
                   >
                     <span className="balao-anexo-documento-icone">
-                      {ehArquivoPdf(op.arquivo) ? <MdPictureAsPdf size={20} /> : <MdAttachFile size={20} />}
+                      {ehArquivoPdf(op.arquivo) ? <LuFileDown size={20} /> : <LuPaperclip size={20} />}
                     </span>
                     <span className="balao-anexo-documento-nome">{op.arquivo}</span>
                   </a>
@@ -319,20 +319,20 @@ export default function DetalheChamado() {
               onClick={() => setMenuAnexoAberto((v) => !v)}
               aria-label="Anexar"
             >
-              <MdAttachFile size={20} />
+              <LuPaperclip size={20} />
             </button>
             {menuAnexoAberto && (
               <>
                 <div className="detalhe-menu-fundo" onClick={() => setMenuAnexoAberto(false)} />
                 <div className="detalhe-menu-anexo">
                   <button onClick={() => inputFotoRef.current?.click()}>
-                    <MdCameraAlt /> Tirar foto
+                    <LuCamera /> Tirar foto
                   </button>
                   <button onClick={() => inputGaleriaRef.current?.click()}>
-                    <MdImage /> Galeria
+                    <LuImage /> Galeria
                   </button>
                   <button onClick={() => inputArquivoRef.current?.click()}>
-                    <MdDescription /> Arquivo
+                    <LuFileText /> Arquivo
                   </button>
                 </div>
               </>
@@ -345,7 +345,7 @@ export default function DetalheChamado() {
             onClick={() => setConfirmandoLocalizacao(true)}
             aria-label="Enviar localização"
           >
-            <MdLocationOn size={20} />
+            <LuMapPin size={20} />
           </button>
 
           <input

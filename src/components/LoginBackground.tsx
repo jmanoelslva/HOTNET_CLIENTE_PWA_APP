@@ -14,7 +14,7 @@ const DISTANCIA_CONEXAO = 150
 const VELOCIDADE_MAXIMA = 0.12
 const ALPHA_MAXIMO_LINHA = 200 / 255
 const ALPHA_PONTO = 150 / 255
-const COR_RGB = '242, 143, 59' // #F28F3B — login_orange_gradient_start
+const COR_RGB = '201, 67, 0' // #C94300 — laranja da marca (paleta B3)
 
 /**
  * Fundo decorativo animado da tela de login: pontos que flutuam devagar e
@@ -127,15 +127,15 @@ export default function LoginBackground() {
       >
         <defs>
           <linearGradient id="ondaVermelha" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#e57567" />
-            <stop offset="100%" stopColor="#d94a38" />
+            <stop offset="0%" stopColor="#d9612a" />
+            <stop offset="100%" stopColor="#a33700" />
           </linearGradient>
           <linearGradient id="ondaLaranja" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f6b370" />
-            <stop offset="100%" stopColor="#f28f3b" />
+            <stop offset="0%" stopColor="#ff8a4c" />
+            <stop offset="100%" stopColor="#c94300" />
           </linearGradient>
           <filter id="sombraOnda" x="-20%" y="-60%" width="140%" height="200%">
-            <feDropShadow dx="0" dy="-3" stdDeviation="5" floodColor="#f28f3b" floodOpacity="0.35" />
+            <feDropShadow dx="0" dy="-3" stdDeviation="5" floodColor="#c94300" floodOpacity="0.35" />
           </filter>
         </defs>
 

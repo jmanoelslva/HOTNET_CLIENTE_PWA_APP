@@ -1,26 +1,26 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  MdAccountCircle,
-  MdBlock,
-  MdBuild,
-  MdCheckCircle,
-  MdLock,
-  MdBadge,
-  MdDarkMode,
-  MdDataUsage,
-  MdDescription,
-  MdGetApp,
-  MdHelp,
-  MdInfoOutline,
-  MdKey,
-  MdLightMode,
-  MdLogout,
-  MdPayments,
-  MdSpeed,
-  MdSupportAgent,
-  MdWifi,
-} from 'react-icons/md'
+  LuCircleUser,
+  LuBan,
+  LuWrench,
+  LuCircleCheck,
+  LuLock,
+  LuIdCard,
+  LuMoon,
+  LuChartColumn,
+  LuFileText,
+  LuArrowDownToLine,
+  LuCircleHelp,
+  LuInfo,
+  LuKeyRound,
+  LuSun,
+  LuLogOut,
+  LuReceiptText,
+  LuGauge,
+  LuHeadset,
+  LuWifi,
+} from 'react-icons/lu'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente } from '../api/cadastro'
@@ -46,12 +46,12 @@ function saudacaoPorHorario(primeiroNome: string): string {
 }
 
 const ITENS_MENU = [
-  { to: '/boletos', Icone: MdPayments, cor: CORES.boletos, label: 'Boletos' },
-  { to: '/contratos', Icone: MdDescription, cor: CORES.contratos, label: 'Contratos' },
-  { to: '/consumo', Icone: MdDataUsage, cor: CORES.consumo, label: 'Consumo' },
-  { to: '/suporte', Icone: MdSupportAgent, cor: CORES.suporte, label: 'Suporte' },
-  { to: '/cadastro', Icone: MdBadge, cor: CORES.dados, label: 'Meus dados' },
-  { to: '/faq', Icone: MdHelp, cor: CORES.ajuda, label: 'Ajuda' },
+  { to: '/boletos', Icone: LuReceiptText, cor: CORES.boletos, label: 'Boletos' },
+  { to: '/contratos', Icone: LuFileText, cor: CORES.contratos, label: 'Contratos' },
+  { to: '/consumo', Icone: LuChartColumn, cor: CORES.consumo, label: 'Consumo' },
+  { to: '/suporte', Icone: LuHeadset, cor: CORES.suporte, label: 'Suporte' },
+  { to: '/cadastro', Icone: LuIdCard, cor: CORES.dados, label: 'Meus dados' },
+  { to: '/faq', Icone: LuCircleHelp, cor: CORES.ajuda, label: 'Ajuda' },
 ]
 
 export default function Home() {
@@ -175,37 +175,37 @@ export default function Home() {
   const cartao = (() => {
     if (bloqueada) {
       return {
-        selo: { texto: 'Bloqueada', Icone: MdLock, cor: CORES.erro },
+        selo: { texto: 'Bloqueada', Icone: LuLock, cor: CORES.erro },
         titulo: 'Conexão bloqueada',
         descricao: 'Identificamos um boleto em aberto neste contrato. Após a confirmação do pagamento, a conexão é liberada.',
-        IconeConexao: MdLock,
+        IconeConexao: LuLock,
         corIcone: CORES.erro,
       }
     }
     if (cancelada) {
       return {
-        selo: { texto: 'Cancelada', Icone: MdBlock, cor: CORES.textoFraco },
+        selo: { texto: 'Cancelada', Icone: LuBan, cor: CORES.textoFraco },
         titulo: 'Contrato cancelado',
         descricao: 'Seu contrato foi cancelado. Fale com a gente se tiver alguma dúvida.',
-        IconeConexao: MdBlock,
+        IconeConexao: LuBan,
         corIcone: CORES.textoFraco,
       }
     }
-    const selo = statusContrato != null ? { texto: 'Conta ativa', Icone: MdCheckCircle, cor: CORES.sucessoVivo } : null
+    const selo = statusContrato != null ? { texto: 'Conta ativa', Icone: LuCircleCheck, cor: CORES.sucessoVivo } : null
     if (online === true) {
-      return { selo, titulo: 'Conectado agora', descricao: 'Sua internet está funcionando normalmente.', IconeConexao: MdWifi, corIcone: CORES.sucessoVivo }
+      return { selo, titulo: 'Conectado agora', descricao: 'Sua internet está funcionando normalmente.', IconeConexao: LuWifi, corIcone: CORES.sucessoVivo }
     }
     if (online === false) {
-      return { selo, titulo: 'Sem conexão agora', descricao: 'Não detectamos conexão ativa. Confira se o roteador está ligado.', IconeConexao: MdWifi, corIcone: CORES.textoFraco }
+      return { selo, titulo: 'Sem conexão agora', descricao: 'Não detectamos conexão ativa. Confira se o roteador está ligado.', IconeConexao: LuWifi, corIcone: CORES.textoFraco }
     }
     if (online === undefined && contratoSelecionado) {
-      return { selo, titulo: 'Verificando conexão…', descricao: 'Consultando o status da sua conexão.', IconeConexao: MdWifi, corIcone: CORES.textoFraco }
+      return { selo, titulo: 'Verificando conexão…', descricao: 'Consultando o status da sua conexão.', IconeConexao: LuWifi, corIcone: CORES.textoFraco }
     }
     return {
       selo: null,
       titulo: 'Não foi possível verificar',
       descricao: 'Não conseguimos consultar sua conexão agora. Confira a internet do aparelho e puxe para atualizar.',
-      IconeConexao: MdWifi,
+      IconeConexao: LuWifi,
       corIcone: CORES.textoFraco,
     }
   })()
@@ -234,7 +234,7 @@ export default function Home() {
             onClick={() => setMenuAvatarAberto((v) => !v)}
             aria-label="Menu do usuário"
           >
-            <MdAccountCircle size={26} />
+            <LuCircleUser size={26} />
           </button>
           {menuAvatarAberto && (
             <>
@@ -242,11 +242,11 @@ export default function Home() {
               <div className="home-avatar-menu">
                 {podeInstalar && (
                   <button onClick={aoClicarInstalarMenu}>
-                    <MdGetApp size={18} /> Instalar app
+                    <LuArrowDownToLine size={18} /> Instalar app
                   </button>
                 )}
                 <button onClick={alternarTema}>
-                  {tema === 'dark' ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
+                  {tema === 'dark' ? <LuSun size={18} /> : <LuMoon size={18} />}
                   {tema === 'dark' ? 'Tema claro' : 'Tema escuro'}
                 </button>
                 <button
@@ -255,7 +255,7 @@ export default function Home() {
                     navigate('/alterar-senha', { viewTransition: true })
                   }}
                 >
-                  <MdKey size={18} /> Alterar senha
+                  <LuKeyRound size={18} /> Alterar senha
                 </button>
                 <button
                   onClick={() => {
@@ -263,7 +263,7 @@ export default function Home() {
                     navigate('/sobre', { viewTransition: true })
                   }}
                 >
-                  <MdInfoOutline size={18} /> Sobre
+                  <LuInfo size={18} /> Sobre
                 </button>
                 <button
                   className="home-avatar-menu-sair"
@@ -272,7 +272,7 @@ export default function Home() {
                     setConfirmarSairAberto(true)
                   }}
                 >
-                  <MdLogout size={18} /> Sair
+                  <LuLogOut size={18} /> Sair
                 </button>
               </div>
             </>
@@ -330,7 +330,7 @@ export default function Home() {
               className="home-conexao-acao"
               onClick={() => navigate('/boletos', { state: { filtro: 'atrasados' }, viewTransition: true })}
             >
-              <MdPayments size={18} aria-hidden="true" /> Ver boletos em atraso
+              <LuReceiptText size={18} aria-hidden="true" /> Ver boletos em atraso
             </button>
           )}
           {cancelada && (
@@ -341,12 +341,12 @@ export default function Home() {
           <div className="home-conexao-secundarias">
             {mostrarTesteVelocidade && (
               <a className="home-conexao-secundaria" href="https://fast.com" target="_blank" rel="noopener noreferrer">
-                <MdSpeed size={18} aria-hidden="true" /> Teste de velocidade
+                <LuGauge size={18} aria-hidden="true" /> Teste de velocidade
               </a>
             )}
             {!cancelada && (
               <button className="home-conexao-secundaria" onClick={abrirDiagnostico}>
-                <MdBuild size={18} aria-hidden="true" /> Diagnóstico
+                <LuWrench size={18} aria-hidden="true" /> Diagnóstico
               </button>
             )}
           </div>

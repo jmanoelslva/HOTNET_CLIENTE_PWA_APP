@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MdAccountCircle, MdGetApp, MdLock, MdSupportAgent, MdVisibility, MdVisibilityOff } from 'react-icons/md'
+import { LuCircleUser, LuArrowDownToLine, LuLock, LuHeadset, LuEye, LuEyeOff } from 'react-icons/lu'
 import { useSessao } from '../auth/useSessao'
 import LoginBackground from '../components/LoginBackground'
 import ModalInstalarIos from '../components/ModalInstalarIos'
@@ -46,7 +46,7 @@ export default function Login() {
 
         <form onSubmit={aoEnviar}>
           <label htmlFor="usuario">
-            <MdAccountCircle className="login-label-icone" /> CPF ou CNPJ
+            <LuCircleUser className="login-label-icone" /> CPF ou CNPJ
           </label>
           <input
             id="usuario"
@@ -59,7 +59,7 @@ export default function Login() {
           />
 
           <label htmlFor="senha">
-            <MdLock className="login-label-icone" /> Senha
+            <LuLock className="login-label-icone" /> Senha
           </label>
           <div className="login-campo-senha">
             <input
@@ -76,7 +76,7 @@ export default function Login() {
               onClick={() => setMostrarSenha((v) => !v)}
               aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
             >
-              {mostrarSenha ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+              {mostrarSenha ? <LuEyeOff size={20} /> : <LuEye size={20} />}
             </button>
           </div>
 
@@ -93,7 +93,7 @@ export default function Login() {
 
         {podeInstalar && (
           <button type="button" className="login-btn-instalar" onClick={aoClicarInstalar}>
-            <MdGetApp size={18} /> Instalar app
+            <LuArrowDownToLine size={18} /> Instalar app
           </button>
         )}
       </div>
@@ -102,7 +102,7 @@ export default function Login() {
         <div className="login-modal-fundo" onClick={() => setAjudaAberta(false)}>
           <div className="login-modal" onClick={(evento) => evento.stopPropagation()}>
             <h2>
-              <MdSupportAgent className="login-modal-icone" /> Precisando de ajuda?
+              <LuHeadset className="login-modal-icone" /> Precisando de ajuda?
             </h2>
             <p>
               Usuário e senha são o mesmo número: seu CPF ou CNPJ, sem pontos nem traço. Se o problema persistir,

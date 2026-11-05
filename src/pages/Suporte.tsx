@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { IconType } from 'react-icons'
 import {
-  MdAdd,
-  MdCampaign,
-  MdClose,
-  MdConstruction,
-  MdPayments,
-  MdSell,
-  MdSupportAgent,
-  MdSwapHoriz,
-  MdWarning,
-} from 'react-icons/md'
+  LuPlus,
+  LuMegaphone,
+  LuX,
+  LuConstruction,
+  LuReceiptText,
+  LuTag,
+  LuHeadset,
+  LuArrowLeftRight,
+  LuTriangleAlert,
+} from 'react-icons/lu'
 import { useSessao } from '../auth/useSessao'
 import {
   buscarCategorias,
@@ -41,17 +41,17 @@ type Aba = 'abertos' | 'resolvidos'
 
 // Ícone de cada categoria pelo nome exato configurado no painel do
 // Controllr (não é lista fixa) — categoria desconhecida cai no padrão.
-const ICONE_PADRAO = MdSupportAgent
+const ICONE_PADRAO = LuHeadset
 const ICONES_CATEGORIA: Record<string, IconType> = {
-  'suporte técnico': MdSupportAgent,
-  'financeiro e pagamentos': MdPayments,
-  'vendas e comercial': MdSell,
-  'alteração de plano': MdSwapHoriz,
-  'reclamação': MdWarning,
-  cancelamento: MdClose,
-  'ouvidoria e adminstrativo': MdCampaign,
-  'ouvidoria e administrativo': MdCampaign,
-  instalação: MdConstruction,
+  'suporte técnico': LuHeadset,
+  'financeiro e pagamentos': LuReceiptText,
+  'vendas e comercial': LuTag,
+  'alteração de plano': LuArrowLeftRight,
+  'reclamação': LuTriangleAlert,
+  cancelamento: LuX,
+  'ouvidoria e adminstrativo': LuMegaphone,
+  'ouvidoria e administrativo': LuMegaphone,
+  instalação: LuConstruction,
 }
 
 function iconeParaCategoria(nome: string): IconType {
@@ -200,7 +200,7 @@ export default function Suporte() {
   return (
     <PullToRefresh aoAtualizar={carregar}>
     <div className="suporte-tela tela-entrada">
-      <CabecalhoTela icone={MdSupportAgent} cor={CORES.suporte} titulo="Suporte" subtitulo="Seus chamados de suporte." />
+      <CabecalhoTela icone={LuHeadset} cor={CORES.suporte} titulo="Suporte" subtitulo="Seus chamados de suporte." />
 
       <div className="suporte-abas">
         <button className={`aba-chip aba-abertos ${aba === 'abertos' ? 'ativa' : ''}`} onClick={() => setAba('abertos')}>
@@ -235,7 +235,7 @@ export default function Suporte() {
 
       {!carregando && !erro && filtrados.length === 0 && !haMaisParaCarregar && (
         <EstadoVazio
-          icone={MdSupportAgent}
+          icone={LuHeadset}
           titulo={aba === 'resolvidos' ? 'Nenhum chamado resolvido ainda' : 'Nenhum chamado em aberto'}
           subtitulo={aba === 'resolvidos' ? undefined : 'Precisando de ajuda? Toque em "Novo chamado".'}
         />
@@ -297,7 +297,7 @@ export default function Suporte() {
       )}
 
       <button className="suporte-fab" onClick={abrirChecklist} aria-label="Novo chamado">
-        <MdAdd size={28} />
+        <LuPlus size={28} />
       </button>
 
       {checklistAberto && (

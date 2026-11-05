@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { MdDataUsage } from 'react-icons/md'
+import { LuChartColumn } from 'react-icons/lu'
 import {
   buscarConsumoDoMes,
   comNumeroDoContrato,
@@ -131,7 +131,7 @@ export default function Consumo() {
     <PullToRefresh aoAtualizar={carregar}>
     <div className="consumo-tela tela-entrada">
       <CabecalhoTela
-        icone={MdDataUsage}
+        icone={LuChartColumn}
         cor={CORES.consumo}
         titulo="Consumo"
         subtitulo="Acompanhe o uso diário da sua internet."
@@ -177,7 +177,7 @@ export default function Consumo() {
       )}
 
       {!carregando && !erro && !consumoSelecionado && (
-        <EstadoVazio icone={MdDataUsage} titulo="Nenhum consumo registrado" subtitulo="Nada por aqui neste período." />
+        <EstadoVazio icone={LuChartColumn} titulo="Nenhum consumo registrado" subtitulo="Nada por aqui neste período." />
       )}
 
       {!carregando && !erro && consumoSelecionado && (

@@ -253,7 +253,7 @@
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  /* Laranja vivo da marca com texto escuro: contraste alto sobre o grafite. */
+  /* Laranja da marca com texto branco (4,9:1). */
   background: var(--cor-primaria);
   color: var(--cor-texto-sobre-laranja);
 }

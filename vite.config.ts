@@ -36,6 +36,8 @@ export default defineConfig({
         // novo), em vez de só nas próximas abas/navegações.
         skipWaiting: true,
         clientsClaim: true,
+        // Padrão (js/css/html) + as fontes locais, para abrir já com elas.
+        globPatterns: ['**/*.{js,css,html,woff2}'],
       },
       manifest: {
         name: 'HOTNET — Portal do Cliente',
@@ -45,8 +47,8 @@ export default defineConfig({
         start_url: '/',
         display: 'standalone',
         // Tela de abertura (splash) na cor da marca, como o app do técnico.
-        background_color: '#f28f3b',
-        theme_color: '#f28f3b',
+        background_color: '#c94300',
+        theme_color: '#c94300',
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },

@@ -1,15 +1,15 @@
 import { useMemo, useState } from 'react'
 import type { IconType } from 'react-icons'
 import {
-  MdDataUsage,
-  MdDescription,
-  MdHelp,
-  MdLock,
-  MdPayments,
-  MdSearchOff,
-  MdSupportAgent,
-  MdWifi,
-} from 'react-icons/md'
+  LuChartColumn,
+  LuFileText,
+  LuCircleHelp,
+  LuLock,
+  LuReceiptText,
+  LuSearchX,
+  LuHeadset,
+  LuWifi,
+} from 'react-icons/lu'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente } from '../api/cadastro'
@@ -36,12 +36,12 @@ interface PerguntaFrequente {
 // Mesmas cores usadas nos badges equivalentes na Home, pra manter a
 // associação visual entre uma categoria de dúvida e a tela que ela trata.
 const CATEGORIAS: CategoriaFaq[] = [
-  { id: 'atendimento', nome: 'Atendimento', subtitulo: 'Horários e canais', Icone: MdSupportAgent, cor: CORES.suporte },
-  { id: 'wifi', nome: 'Internet e Wi-Fi', subtitulo: 'Velocidade e sinal', Icone: MdWifi, cor: CORES.ajuda },
-  { id: 'cobrancas', nome: 'Cobranças', subtitulo: 'Boletos e pagamentos', Icone: MdPayments, cor: CORES.boletos },
-  { id: 'contratos', nome: 'Contratos', subtitulo: 'Planos e contratos', Icone: MdDescription, cor: CORES.contratos },
-  { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', Icone: MdDataUsage, cor: CORES.consumo },
-  { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', Icone: MdLock, cor: CORES.dados },
+  { id: 'atendimento', nome: 'Atendimento', subtitulo: 'Horários e canais', Icone: LuHeadset, cor: CORES.suporte },
+  { id: 'wifi', nome: 'Internet e Wi-Fi', subtitulo: 'Velocidade e sinal', Icone: LuWifi, cor: CORES.ajuda },
+  { id: 'cobrancas', nome: 'Cobranças', subtitulo: 'Boletos e pagamentos', Icone: LuReceiptText, cor: CORES.boletos },
+  { id: 'contratos', nome: 'Contratos', subtitulo: 'Planos e contratos', Icone: LuFileText, cor: CORES.contratos },
+  { id: 'consumo', nome: 'Consumo e Conexão', subtitulo: 'Uso e conexão', Icone: LuChartColumn, cor: CORES.consumo },
+  { id: 'seguranca', nome: 'Segurança e Acesso', subtitulo: 'Login e segurança', Icone: LuLock, cor: CORES.dados },
 ]
 
 function categoriaDe(id: string): CategoriaFaq {
@@ -145,7 +145,7 @@ export default function Faq() {
   return (
     <div className="faq-tela tela-entrada">
       <CabecalhoTela
-        icone={MdHelp}
+        icone={LuCircleHelp}
         cor={CORES.ajuda}
         titulo="Ajuda"
         subtitulo="Perguntas frequentes e nossos canais de contato."
@@ -187,7 +187,7 @@ export default function Faq() {
       </h2>
 
       {listaExibida.length === 0 ? (
-        <EstadoVazio icone={MdSearchOff} titulo="Nenhuma pergunta encontrada" subtitulo="Tente buscar com outras palavras." />
+        <EstadoVazio icone={LuSearchX} titulo="Nenhuma pergunta encontrada" subtitulo="Tente buscar com outras palavras." />
       ) : (
         <div className="faq-lista">
           {listaExibida.map((pergunta, indice) => {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { MdDescription, MdFileDownload, MdPayments } from 'react-icons/md'
+import { LuFileText, LuDownload, LuReceiptText } from 'react-icons/lu'
 import { urlImpressaoContrato } from '../api/client'
 import { buscarContratos, type Contrato } from '../api/contratos'
 import CabecalhoTela from '../components/CabecalhoTela'
@@ -77,7 +77,7 @@ export default function Contratos() {
     <PullToRefresh aoAtualizar={carregar}>
     <div className="contratos-tela tela-entrada">
       <CabecalhoTela
-        icone={MdDescription}
+        icone={LuFileText}
         cor={CORES.contratos}
         titulo="Contratos"
         subtitulo="Seus contratos, planos e itens contratados."
@@ -163,7 +163,7 @@ export default function Contratos() {
                     style={{ background: comAlpha(CORES.boletos, 10), color: CORES.boletos }}
                     onClick={() => navigate('/boletos', { state: { contratoPk: contrato.id }, viewTransition: true })}
                   >
-                    <MdPayments /> Meus boletos
+                    <LuReceiptText /> Meus boletos
                   </button>
                   {/* contract_client_print=false: sem o documento completo (nem imprimir/salvar PDF). */}
                   {contrato.podeVerDocumento && (
@@ -175,7 +175,7 @@ export default function Contratos() {
                         )
                       }
                     >
-                      <MdFileDownload /> Ver contrato completo
+                      <LuDownload /> Ver contrato completo
                     </button>
                   )}
                 </div>

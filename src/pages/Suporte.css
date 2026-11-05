@@ -160,7 +160,7 @@
   color: var(--cor-branco-fixo);
   cursor: pointer;
   background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
-  box-shadow: 0 4px 16px rgba(217, 74, 56, 0.4);
+  box-shadow: 0 4px 16px rgba(163, 55, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { MdCheckCircle, MdDescription, MdFileDownload, MdPayments, MdQrCodeScanner, MdReceiptLong } from 'react-icons/md'
+import { LuCircleCheck, LuFileText, LuDownload, LuReceiptText, LuQrCode, LuReceipt } from 'react-icons/lu'
 import { FaBarcode } from 'react-icons/fa'
 import { SiPix } from 'react-icons/si'
 import CabecalhoTela from '../components/CabecalhoTela'
@@ -230,7 +230,7 @@ export default function Boletos() {
     <PullToRefresh aoAtualizar={carregar}>
     <div className="boletos-tela tela-entrada">
       <CabecalhoTela
-        icone={MdPayments}
+        icone={LuReceiptText}
         cor={CORES.boletos}
         titulo="Boletos"
         subtitulo="Acompanhe seus boletos em aberto e pagos."
@@ -299,7 +299,7 @@ export default function Boletos() {
 
       {!carregando && !erro && faturasFiltradas.length === 0 && (
         <EstadoVazio
-          icone={MdPayments}
+          icone={LuReceiptText}
           titulo={
             filtroStatus === 'aberto'
               ? 'Nenhum boleto em aberto'
@@ -339,7 +339,7 @@ export default function Boletos() {
                       navigate('/contratos', { state: { contratoPk: fatura.contract_pk }, viewTransition: true })
                     }
                   >
-                    <MdDescription size={14} /> Contrato {fatura.contract_number}
+                    <LuFileText size={14} /> Contrato {fatura.contract_number}
                   </button>
                 )}
 
@@ -383,7 +383,7 @@ export default function Boletos() {
                       style={{ background: comAlpha(CORES.primaria, 10), color: CORES.primariaEscura }}
                       onClick={() => setReciboAberto(fatura)}
                     >
-                      <MdReceiptLong /> Recibo
+                      <LuReceipt /> Recibo
                     </button>
                   </div>
                 )}
@@ -413,7 +413,7 @@ export default function Boletos() {
                         style={{ background: comAlpha(CORES.ajuda, 10), color: CORES.ajuda }}
                         onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}
                       >
-                        <MdQrCodeScanner /> QR Code PIX
+                        <LuQrCode /> QR Code PIX
                       </button>
                     )}
 
@@ -426,7 +426,7 @@ export default function Boletos() {
                         )
                       }
                     >
-                      <MdFileDownload /> Imprimir / Salvar PDF
+                      <LuDownload /> Imprimir / Salvar PDF
                     </button>
                     {!jaInformado && fatura.contract_pk != null && (
                       <button
@@ -434,7 +434,7 @@ export default function Boletos() {
                         disabled={informando === fatura.invoice_pk}
                         onClick={() => setConfirmando(fatura)}
                       >
-                        <MdCheckCircle />
+                        <LuCircleCheck />
                         {informando === fatura.invoice_pk ? 'Enviando…' : 'Já paguei este boleto'}
                       </button>
                     )}

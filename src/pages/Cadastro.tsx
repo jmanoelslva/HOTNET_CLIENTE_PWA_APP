@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { MdBadge } from 'react-icons/md'
+import { LuIdCard } from 'react-icons/lu'
 import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente, buscarEnderecos, formatarContatos, rotuloDocumento, tipoCadastro, type Endereco } from '../api/cadastro'
 import type { ClientDto } from '../api/client'
@@ -69,7 +69,7 @@ export default function Cadastro() {
     <PullToRefresh aoAtualizar={carregar}>
     <div className="cadastro-tela tela-entrada">
       <CabecalhoTela
-        icone={MdBadge}
+        icone={LuIdCard}
         cor={CORES.dados}
         titulo="Meus dados"
         subtitulo="Suas informações cadastrais na HOTNET."
