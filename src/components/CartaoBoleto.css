@@ -1,0 +1,299 @@
+@import './ModalConfirmarLogout.css';
+
+.cartao-boleto {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.cartao-boleto-topo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cartao-boleto-rotulos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.cartao-boleto-ponto {
+  margin: 0 2px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.cartao-boleto-contrato {
+  padding: 8px 6px;
+  border: none;
+  border-radius: var(--raio-sm);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* StatusBadge: tons claros com texto escuro sobre o grafite. */
+.cartao-boleto-estado {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.cartao-boleto-estado.aberto {
+  background: #a5c8ff;
+  color: #0f1d33;
+}
+
+.cartao-boleto-estado.atrasado {
+  background: #ffb1c5;
+  color: #3f0018;
+}
+
+/* headlineMedium (28/36) ExtraBold. */
+.cartao-boleto-valor {
+  margin-top: 4px;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 800;
+}
+
+/* EtiquetaPrazo: azul translúcido (em dia), laranja vivo (hoje), rosa (atrasado). */
+.cartao-boleto-prazo {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.cartao-boleto-prazo.em-dia {
+  background: rgba(165, 200, 255, 0.2);
+  color: #cfe0ff;
+}
+
+.cartao-boleto-prazo.hoje {
+  background: var(--cor-laranja-vivo);
+  color: var(--cor-texto-sobre-laranja);
+}
+
+.cartao-boleto-prazo.atrasado {
+  background: #ffb1c5;
+  color: #3f0018;
+}
+
+.cartao-boleto-conta {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: var(--raio-md);
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+}
+
+.cartao-boleto-conta div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cartao-boleto-conta div span:first-child {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cartao-boleto-conta hr {
+  width: 100%;
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.cartao-boleto-conta .total {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.cartao-boleto-conta .total span:first-child {
+  color: #ffffff;
+}
+
+.cartao-boleto-pix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  margin-top: 12px;
+  border: none;
+  border-radius: var(--raio-md);
+  background: var(--cor-laranja-vivo);
+  color: var(--cor-texto-sobre-laranja);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cartao-boleto-pix.copiado {
+  background: #7dd89c;
+  color: #0b2214;
+}
+
+/* BotaoTranslucidoLinha. */
+.cartao-boleto-linha {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cartao-boleto-linha > button,
+.cartao-boleto-mais > button {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--raio-md);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cartao-boleto-linha > button {
+  flex: 1;
+  min-width: 0;
+}
+
+.cartao-boleto-linha > button.largo {
+  flex: 1.6;
+}
+
+.cartao-boleto-linha > button:disabled {
+  opacity: 0.5;
+}
+
+.cartao-boleto-mais {
+  position: relative;
+}
+
+.cartao-boleto-mais > button {
+  min-width: 48px;
+  height: 100%;
+}
+
+/* MenuHotnet: branco, cantos de 16, borda fina, itens com título e descrição. */
+.menu-hotnet {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 20;
+  width: min(300px, calc(100vw - 48px));
+  padding: 6px 0;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+}
+
+.menu-hotnet > button,
+.menu-hotnet-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-hotnet > button + button,
+.menu-hotnet > button + .menu-hotnet-aviso {
+  border-top: 1px solid var(--cor-borda);
+}
+
+.menu-hotnet svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--cor-texto-secundario);
+}
+
+.menu-hotnet > button.destaque svg,
+.menu-hotnet > button.destaque strong {
+  color: var(--cor-primaria);
+}
+
+.menu-hotnet span {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-hotnet strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.menu-hotnet small {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}
+
+.menu-hotnet-aviso {
+  cursor: default;
+}
+
+/* Folha "Compartilhar boleto" (OpcaoCompartilharBloco). */
+.folha-compartilhar h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.folha-compartilhar > button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.folha-compartilhar > button strong {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.folha-compartilhar > button small {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}

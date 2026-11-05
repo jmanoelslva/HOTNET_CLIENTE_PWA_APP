@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { MdBlock, MdCheck, MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md'
-import { IcCheckCircle, IcConstruction, IcDataUsage, IcHelp, IcLock, IcPayments, IcPix, IcReceiptLong, IcSpeed, IcSupportAgent, IcWhatsapp, IcWifiOff } from '../components/IconesApp'
+import { MdBlock, MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md'
+import { IcCheckCircle, IcConstruction, IcDataUsage, IcHelp, IcLock, IcPayments, IcReceiptLong, IcSpeed, IcSupportAgent, IcWhatsapp, IcWifiOff } from '../components/IconesApp'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSessao } from '../auth/useSessao'
 import { buscarDadosCliente } from '../api/cadastro'
@@ -9,11 +9,12 @@ import { buscarConsumoDoMes, buscarSessaoAtualPorCpe, totalBytes, vincularContra
 import { contarBoletosAtrasados, situacaoDosContratos } from '../api/situacao'
 import { informarPagamento, listarBoletos, type FaturaDto } from '../api/client'
 import FolhaConfirmar from '../components/FolhaConfirmar'
+import CartaoBoleto from '../components/CartaoBoleto'
+import FolhaQrCode from '../components/FolhaQrCode'
 import TourInicio from '../components/TourInicio'
 import { tourJaVisto } from '../utils/tour'
 import { fotoDaConta, lembrarConta, usaSenhaPadrao } from '../utils/contaLocal'
 import ChecklistConexao from '../components/ChecklistConexao'
-import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
 import { useToast } from '../components/Toast/useToast'
 import { formatarBytes } from '../utils/formatacao'
 import { estaVencida } from '../utils/faturas'
@@ -21,18 +22,10 @@ import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import PullToRefresh from '../components/PullToRefresh'
 import './Home.css'
 
-// Chave PIX (CNPJ) quando o boleto não traz código próprio (mesma de Boletos).
-const CNPJ_FALLBACK = '17.659.900/0001-48'
-
 function saudacaoPorHorario(primeiroNome: string): string {
   const hora = new Date().getHours()
   const periodo = hora >= 5 && hora < 12 ? 'Bom dia' : hora >= 12 && hora < 18 ? 'Boa tarde' : 'Boa noite'
   return `${periodo}, ${primeiroNome}!`
-}
-
-function formatarValor(valorBruto: string | undefined): string {
-  const valor = Number.parseFloat(String(valorBruto ?? '0').replace(',', '.'))
-  return (Number.isFinite(valor) ? valor : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 function formatarData(data: string | undefined): string {
@@ -93,10 +86,10 @@ export default function Home() {
   const [contratos, setContratos] = useState<Contrato[]>([])
   const [faturas, setFaturas] = useState<FaturaDto[] | null>(null)
   const [detalhesAbertos, setDetalhesAbertos] = useState(false)
-  const [pixCopiado, setPixCopiado] = useState(false)
   const [checklistAberto, setChecklistAberto] = useState(false)
   const [boletosAtrasados, setBoletosAtrasados] = useState<number | null>(null)
   const [confirmarJaPaguei, setConfirmarJaPaguei] = useState<FaturaDto | null>(null)
+  const [qrCode, setQrCode] = useState<string | null>(null)
   const [informados, setInformados] = useState<Set<number>>(new Set())
   const [lembreteSenha, setLembreteSenha] = useState(() => {
     try {
@@ -253,27 +246,6 @@ export default function Home() {
     navigate(rota, { state, viewTransition: true })
   }
 
-  async function copiarPix(fatura: FaturaDto) {
-    const codigo = fatura.invoice_qrcode || null
-    try {
-      await navigator.clipboard.writeText(codigo ?? CNPJ_FALLBACK)
-    } catch {
-      toast('Não foi possível copiar. Abra o boleto em Boletos.')
-      return
-    }
-    if (codigo) {
-      setPixCopiado(true)
-      setTimeout(() => setPixCopiado(false), 2500)
-      mostrarAvisoCopiado('Código Pix copiado', 'Cole no app do seu banco')
-    } else {
-      mostrarAvisoCopiado('Chave Pix copiada', 'Cole no app do seu banco')
-      toast(
-        'Você copiou a chave Pix (CNPJ). Após realizar o pagamento, envie o comprovante para o nosso WhatsApp.',
-        'info',
-      )
-    }
-  }
-
   const atalhos = [
     { titulo: 'Velocidade', descricao: 'Teste de velocidade', Icone: IcSpeed, tom: 'primaria', acao: () => ir('/velocidade') },
     { titulo: 'Consumo', descricao: 'Uso da internet', Icone: IcDataUsage, tom: 'terciaria', acao: () => ir('/consumo') },
@@ -411,35 +383,15 @@ export default function Home() {
           ))}
 
         {boleto ? (
-          <section className="home-boleto" aria-label="Próximo boleto">
-            <span className="home-boleto-rotulo">
-              {estaVencida(boleto) ? 'Boleto atrasado' : 'Próximo boleto'}
-              {boleto.contract_number != null && contratos.length > 1 ? ` · Contrato ${boleto.contract_number}` : ''}
-            </span>
-            <strong className="home-boleto-valor">{formatarValor(boleto.invoice_amount_document)}</strong>
-            <span className={`home-boleto-prazo ${estaVencida(boleto) ? 'atrasado' : ''}`}>
-              {estaVencida(boleto) ? `Venceu em ${formatarData(boleto.invoice_date_due)}` : `Vence em ${formatarData(boleto.invoice_date_due)}`}
-            </span>
-            <button type="button" className={`home-boleto-pix ${pixCopiado ? 'copiado' : ''}`} onClick={() => copiarPix(boleto)}>
-              {pixCopiado ? <MdCheck size={18} aria-hidden="true" /> : <IcPix size={18} aria-hidden="true" />}
-              {pixCopiado ? 'Código Pix copiado' : 'Copiar código Pix'}
-            </button>
-            <button
-              type="button"
-              className="home-boleto-secundario"
-              onClick={() => ir('/boletos', { filtro: estaVencida(boleto) ? 'atrasados' : 'aberto', contratoPk: boleto.contract_pk })}
-            >
-              <IcPayments size={18} aria-hidden="true" /> Ver boletos
-            </button>
-            {boleto.contract_pk != null &&
-              (informados.has(boleto.invoice_pk) || boleto.obs_pk != null ? (
-                <span className="home-boleto-informado">Liberação temporária já solicitada</span>
-              ) : (
-                <button type="button" className="home-boleto-ja-paguei" onClick={() => setConfirmarJaPaguei(boleto)}>
-                  Já paguei este boleto
-                </button>
-              ))}
-          </section>
+          <CartaoBoleto
+            fatura={boleto}
+            variante="inicio"
+            mostrarContrato={contratos.length > 1}
+            jaInformado={informados.has(boleto.invoice_pk) || boleto.obs_pk != null}
+            onVerBoletos={() => ir('/boletos', { filtro: estaVencida(boleto) ? 'atrasados' : 'aberto', contratoPk: boleto.contract_pk })}
+            onQrCode={setQrCode}
+            onJaPaguei={() => setConfirmarJaPaguei(boleto)}
+          />
         ) : (
           pagoEm && (
             <button type="button" className="home-em-dia" onClick={() => ir('/boletos', { filtro: 'pagos' })}>
@@ -483,6 +435,8 @@ export default function Home() {
           </span>
           <span className="home-whatsapp-chamar">Chamar</span>
         </button>
+
+        {qrCode && <FolhaQrCode imagem={qrCode} onFechar={() => setQrCode(null)} />}
 
         {tourAberto && (
           <TourInicio

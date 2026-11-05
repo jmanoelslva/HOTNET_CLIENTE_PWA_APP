@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { IcBarcode, IcCheckCircle, IcDescription, IcDownload, IcPayments, IcPix, IcQrCodeScanner, IcReceiptLong, IcTask } from '../components/IconesApp'
+import { MdKeyboardArrowRight } from 'react-icons/md'
+import { IcDescription, IcPayments, IcTask } from '../components/IconesApp'
 import { useLocation, useNavigate } from 'react-router-dom'
 import CabecalhoTela from '../components/CabecalhoTela'
-import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
+import CartaoBoleto from '../components/CartaoBoleto'
+import FolhaConfirmar from '../components/FolhaConfirmar'
+import FolhaQrCode from '../components/FolhaQrCode'
 import { AbasPilula, BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import Skeleton from '../components/Skeleton'
 import EstadoVazio from '../components/EstadoVazio'
@@ -11,7 +14,7 @@ import { useToast } from '../components/Toast/useToast'
 import ReciboModal from '../components/ReciboModal'
 import { useSessao } from '../auth/useSessao'
 import { abrirEImprimir } from '../utils/impressao'
-import { estaVencida } from '../utils/faturas'
+import { estaVencida, formatarDataBr, formatarMoeda, textoVencimento, valorAtual } from '../utils/faturas'
 import {
   ApiError,
   SessaoExpiradaError,
@@ -22,69 +25,12 @@ import {
 } from '../api/client'
 import './Boletos.css'
 
-// Chave PIX (CNPJ) de fallback — mostrada quando o boleto não traz código
-// de barras/PIX próprio (ex: contas antigas), igual ao app Android.
-const CNPJ_FALLBACK = '17.659.900/0001-48'
 const LIMITE_PAGOS_PADRAO = 3
 
 type FiltroStatus = 'aberto' | 'atrasados' | 'pagos'
 
 function formatarContagem(qtd: number): string {
   return qtd > 99 ? '99+' : String(qtd)
-}
-
-function formatarValor(valorBruto: string | number | null | undefined): string {
-  const valor = typeof valorBruto === 'number' ? valorBruto : Number.parseFloat(String(valorBruto ?? '0').replace(',', '.'))
-  const valorFinal = Number.isFinite(valor) ? valor : 0
-  return valorFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
-
-function formatarData(data: string | null | undefined): string {
-  if (!data) return ''
-  const soData = data.split(' ')[0]
-  const partes = soData.split('-')
-  if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`
-  return soData
-}
-
-/**
- * Valor com multa + juros somados (fórmula padrão de boleto/Febraban:
- * multa fixa + juros simples ao dia, ambos sobre o valor original) — só
- * calculado pra boletos vencidos com as duas taxas presentes, igual ao
- * Fatura.calcularValorComEncargos() do app Android.
- */
-function calcularValorComEncargos(fatura: FaturaDto): number | null {
-  const dias = Number.parseInt(fatura.days_late ?? '', 10)
-  if (!Number.isFinite(dias) || dias <= 0) return null
-  const valorOriginal = Number.parseFloat((fatura.invoice_amount_document ?? '').replace(',', '.'))
-  const multaPercentual = Number.parseFloat(fatura.invoice_rate_fine ?? '')
-  const jurosDiaPercentual = Number.parseFloat(fatura.invoice_rate_interest ?? '')
-  if (!Number.isFinite(valorOriginal) || !Number.isFinite(multaPercentual) || !Number.isFinite(jurosDiaPercentual)) {
-    return null
-  }
-  const multa = valorOriginal * (multaPercentual / 100)
-  const juros = valorOriginal * (jurosDiaPercentual / 100) * dias
-  return valorOriginal + multa + juros
-}
-
-/**
- * invoice_qrcode_image pode vir com ou sem o prefixo "data:image/...;base64,". Só aceita
- * imagem em base64: qualquer outra coisa vira uma imagem inválida e cai no aviso de
- * "QR Code indisponível" (antes aparecia o ícone de imagem quebrada).
- */
-function srcQrCode(valor: string): string {
-  const texto = valor.trim()
-  if (/^data:image\/[a-z+]+;base64,/i.test(texto)) return texto
-  return `data:image/png;base64,${texto}`
-}
-
-async function copiarTexto(texto: string): Promise<boolean> {
-  try {
-    await navigator.clipboard.writeText(texto)
-    return true
-  } catch {
-    return false
-  }
 }
 
 export default function Boletos() {
@@ -104,13 +50,10 @@ export default function Boletos() {
   const [filtroContrato, setFiltroContrato] = useState<number | null>(contratoPreSelecionado)
   const [mostrarTodosPagos, setMostrarTodosPagos] = useState(false)
 
-  const [copiado, setCopiado] = useState<string | null>(null)
   const [qrCodeAberto, setQrCodeAberto] = useState<string | null>(null)
-  // Imagem do QR não carregou (base64 inválido): mostra o aviso em vez da imagem quebrada.
-  const [qrIndisponivel, setQrIndisponivel] = useState(false)
+  const [abertaPk, setAbertaPk] = useState<number | null>(null)
   const [confirmando, setConfirmando] = useState<FaturaDto | null>(null)
   const [reciboAberto, setReciboAberto] = useState<FaturaDto | null>(null)
-  const [informando, setInformando] = useState<number | null>(null)
   const [informados, setInformados] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -184,36 +127,10 @@ export default function Boletos() {
     setMostrarTodosPagos(false)
   }
 
-  function fecharQrCode() {
-    setQrCodeAberto(null)
-    setQrIndisponivel(false)
-  }
-
-  async function aoCopiar(chave: string, valor: string | null | undefined) {
-    const usandoFallback = !valor
-    const texto = valor || CNPJ_FALLBACK
-    const ok = await copiarTexto(texto)
-    if (ok) {
-      setCopiado(chave)
-      mostrarAvisoCopiado(
-        usandoFallback ? 'Chave Pix copiada' : chave.startsWith('barcode') ? 'Código de barras copiado' : 'Código Pix copiado',
-        'Cole no app do seu banco',
-      )
-      setTimeout(() => setCopiado((atual) => (atual === chave ? null : atual)), 1500)
-      if (usandoFallback) {
-        toast(
-          'Você copiou os dados da empresa (CNPJ). Após realizar o pagamento, envie o comprovante para o nosso WhatsApp.',
-          'info',
-        )
-      }
-    }
-  }
-
   async function confirmarInformarPagamento() {
     const fatura = confirmando
     if (!fatura || fatura.contract_pk == null) return
     setConfirmando(null)
-    setInformando(fatura.invoice_pk)
     try {
       const resposta = await informarPagamento(fatura.invoice_pk, fatura.contract_pk)
       if (resposta.success) {
@@ -224,15 +141,13 @@ export default function Boletos() {
       }
     } catch {
       toast('Não foi possível informar o pagamento agora. Tente novamente.')
-    } finally {
-      setInformando(null)
     }
   }
 
   return (
     <PullToRefresh aoAtualizar={carregar}>
     <div className="boletos-tela tela-entrada">
-      <CabecalhoTela titulo="Boletos" subtitulo="Acompanhe seus boletos em aberto e pagos." />
+      <CabecalhoTela titulo="Boletos" subtitulo="Pague, consulte e baixe seus recibos." />
 
       <div className="boletos-abas">
         <button
@@ -308,92 +223,47 @@ export default function Boletos() {
         />
       )}
 
-      {!carregando && !erro && faturasExibidas.length > 0 && filtroStatus !== 'pagos' && (
-        <div className="boletos-lista">
-          {faturasExibidas.map((fatura) => {
-            const dias = Number.parseInt(fatura.days_late ?? '', 10) || 0
-            const vencida = estaVencida(fatura)
-            const valorAtualizado = vencida ? calcularValorComEncargos(fatura) : null
-            const jaInformado = informados.has(fatura.invoice_pk) || fatura.obs_pk != null
-            const pixCopiado = copiado === `pix-${fatura.invoice_pk}`
-
-            // Cartão grafite do boleto (FaturaItem + CartaoDestaque do app Android).
-            return (
-              <section key={fatura.invoice_pk} className="cartao-destaque boleto-cartao" aria-label={`Boleto ${fatura.invoice_pk}`}>
-                <div className="boleto-cartao-topo">
-                  <span className="cartao-destaque-rotulo">
-                    {vencida ? 'Boleto atrasado' : 'Boleto em aberto'}
-                    {fatura.contract_number != null && contratos.length > 1 ? ` · Contrato ${fatura.contract_number}` : ''}
+      {!carregando && !erro && faturasExibidas.length > 0 && filtroStatus !== 'pagos' && (() => {
+        // Como no app: o mais urgente em cartão grafite; os demais compactos, que abrem ao tocar.
+        const ordenadas = [...faturasExibidas].sort((x, y) => (x.invoice_date_due ?? '').localeCompare(y.invoice_date_due ?? ''))
+        const [destaque, ...demais] = ordenadas
+        const cartao = (fatura: FaturaDto) => (
+          <CartaoBoleto
+            key={fatura.invoice_pk}
+            fatura={fatura}
+            variante="boletos"
+            jaInformado={informados.has(fatura.invoice_pk) || fatura.obs_pk != null}
+            onVerContrato={() => navigate('/contratos', { state: { contratoPk: fatura.contract_pk }, viewTransition: true })}
+            onQrCode={setQrCodeAberto}
+            onJaPaguei={() => setConfirmando(fatura)}
+            onImprimir={() =>
+              abrirEImprimir(urlImpressaoBoleto(fatura.invoice_pk), () => toast('Não foi possível abrir o boleto agora. Tente novamente.'))
+            }
+          />
+        )
+        return (
+          <div className="boletos-lista">
+            {cartao(destaque)}
+            {demais.length > 0 && <RotuloGrupo>{filtroStatus === 'atrasados' ? 'Outros atrasados' : 'Próximos'}</RotuloGrupo>}
+            {demais.map((fatura) =>
+              abertaPk === fatura.invoice_pk ? (
+                cartao(fatura)
+              ) : (
+                <button key={fatura.invoice_pk} type="button" className="fatura-compacta" onClick={() => setAbertaPk(fatura.invoice_pk)}>
+                  <span className="fatura-compacta-textos">
+                    <strong>{formatarMoeda(valorAtual(fatura))}</strong>
+                    <span className={estaVencida(fatura) ? 'atrasada' : ''}>
+                      {textoVencimento(fatura)}
+                      {fatura.contract_number != null ? ` · Contrato ${fatura.contract_number}` : ''}
+                    </span>
                   </span>
-                  {fatura.contract_number != null && (
-                    <button
-                      type="button"
-                      className="boleto-cartao-contrato"
-                      onClick={() => navigate('/contratos', { state: { contratoPk: fatura.contract_pk }, viewTransition: true })}
-                      aria-label={`Ver contrato ${fatura.contract_number}`}
-                    >
-                      <IcDescription size={16} />
-                    </button>
-                  )}
-                </div>
-                <strong className="boleto-cartao-valor">R$ {formatarValor(valorAtualizado ?? fatura.invoice_amount_document)}</strong>
-                <span className={`etiqueta-destaque boleto-cartao-prazo ${vencida ? 'atrasado' : ''}`}>
-                  {vencida
-                    ? `Venceu em ${formatarData(fatura.invoice_date_due)} · há ${dias} ${dias === 1 ? 'dia' : 'dias'}`
-                    : `Vence em ${formatarData(fatura.invoice_date_due)}`}
-                </span>
-                {valorAtualizado != null && (
-                  <span className="boleto-cartao-encargos">
-                    Original R$ {formatarValor(fatura.invoice_amount_document)} + multa de{' '}
-                    {fatura.invoice_rate_fine?.replace('.', ',')}% e juros de {fatura.invoice_rate_interest?.replace('.', ',')}% ao dia
-                  </span>
-                )}
-
-                <button
-                  type="button"
-                  className={`boleto-cartao-pix ${pixCopiado ? 'copiado' : ''}`}
-                  onClick={() => aoCopiar(`pix-${fatura.invoice_pk}`, fatura.invoice_qrcode)}
-                >
-                  {pixCopiado ? <IcCheckCircle size={18} /> : <IcPix size={18} />}
-                  {pixCopiado ? 'Código Pix copiado' : 'Copiar código Pix'}
+                  <MdKeyboardArrowRight size={24} aria-hidden="true" />
                 </button>
-
-                <div className="boleto-cartao-secundarios">
-                  {fatura.invoice_qrcode_image && (
-                    <button type="button" onClick={() => setQrCodeAberto(fatura.invoice_qrcode_image!)}>
-                      <IcQrCodeScanner size={18} /> QR Code
-                    </button>
-                  )}
-                  <button type="button" onClick={() => aoCopiar(`barcode-${fatura.invoice_pk}`, fatura.invoice_barcode)}>
-                    <IcBarcode size={18} /> {copiado === `barcode-${fatura.invoice_pk}` ? 'Copiado' : 'Código de barras'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      abrirEImprimir(urlImpressaoBoleto(fatura.invoice_pk), () =>
-                        toast('Não foi possível abrir o boleto agora. Tente novamente.'),
-                      )
-                    }
-                  >
-                    <IcDownload size={18} /> PDF
-                  </button>
-                </div>
-
-                {!jaInformado && fatura.contract_pk != null && (
-                  <button
-                    type="button"
-                    className="boleto-cartao-ja-paguei"
-                    disabled={informando === fatura.invoice_pk}
-                    onClick={() => setConfirmando(fatura)}
-                  >
-                    {informando === fatura.invoice_pk ? 'Enviando…' : 'Já paguei este boleto'}
-                  </button>
-                )}
-              </section>
-            )
-          })}
-        </div>
-      )}
+              ),
+            )}
+          </div>
+        )
+      })()}
 
       {!carregando && !erro && faturasExibidas.length > 0 && filtroStatus === 'pagos' && (
         <>
@@ -404,19 +274,21 @@ export default function Boletos() {
           <RotuloGrupo>Últimos pagos</RotuloGrupo>
           <div className="bloco-branco">
             {faturasExibidas.map((fatura, i) => (
-              <div key={fatura.invoice_pk} className={`linha-item boleto-pago ${i > 0 ? 'com-divisoria' : ''}`}>
-                <span className="linha-item-icone boleto-pago-icone" aria-hidden="true">
-                  <IcCheckCircle size={18} />
-                </span>
-                <span className="linha-item-textos">
-                  <span className="linha-item-titulo">R$ {formatarValor(fatura.invoice_amount_paid || fatura.invoice_amount_document)}</span>
-                  <span className="linha-item-rotulo">
-                    Pago em {formatarData(fatura.invoice_date_credit)}
-                    {fatura.contract_number != null && contratos.length > 1 ? ` · Contrato ${fatura.contract_number}` : ''}
+              <div key={fatura.invoice_pk} className={`fatura-paga ${i > 0 ? 'com-divisoria' : ''}`}>
+                <span className="fatura-paga-textos">
+                  <span className="fatura-paga-topo">
+                    <strong>{formatarMoeda(Number.parseFloat((fatura.invoice_amount_paid || fatura.invoice_amount_document || '0').replace(',', '.')) || 0)}</strong>
+                    <span className="fatura-paga-selo">Pago</span>
                   </span>
+                  <span className="fatura-paga-data">Pago em {formatarDataBr(fatura.invoice_date_credit)}</span>
                 </span>
-                <button type="button" className="botao-contorno boleto-pago-recibo" onClick={() => setReciboAberto(fatura)}>
-                  <IcReceiptLong size={16} /> Recibo
+                <button
+                  type="button"
+                  className="fatura-paga-recibo"
+                  onClick={() => setReciboAberto(fatura)}
+                  aria-label={`Recibo do pagamento de ${formatarDataBr(fatura.invoice_date_credit)}`}
+                >
+                  <IcDescription size={16} /> Recibo
                 </button>
               </div>
             ))}
@@ -432,36 +304,16 @@ export default function Boletos() {
 
       {reciboAberto && <ReciboModal fatura={reciboAberto} cpf={cpf} onFechar={() => setReciboAberto(null)} />}
 
-      {qrCodeAberto && (
-        <div className="boletos-modal-fundo" onClick={() => fecharQrCode()}>
-          <div className="boletos-modal" onClick={(evento) => evento.stopPropagation()}>
-            {qrIndisponivel ? (
-              <p className="boletos-qr-indisponivel">QR Code indisponível no momento. Use o Pix copia e cola.</p>
-            ) : (
-              <img src={srcQrCode(qrCodeAberto)} alt="QR Code do PIX" onError={() => setQrIndisponivel(true)} />
-            )}
-            <button onClick={() => fecharQrCode()}>Fechar</button>
-          </div>
-        </div>
-      )}
+      {qrCodeAberto && <FolhaQrCode imagem={qrCodeAberto} onFechar={() => setQrCodeAberto(null)} />}
 
-      {confirmando && (
-        <div className="boletos-modal-fundo" onClick={() => setConfirmando(null)}>
-          <div className="boletos-modal boletos-modal-confirmar" onClick={(evento) => evento.stopPropagation()}>
-            <h2>Informar pagamento</h2>
-            <p>
-              Deseja informar o pagamento deste boleto para liberação temporária da conexão? Para pagamentos com
-              boleto, a compensação poderá ocorrer em até 72h úteis.
-            </p>
-            <div className="boletos-modal-acoes">
-              <button onClick={() => setConfirmando(null)}>Cancelar</button>
-              <button className="boleto-btn-informar" onClick={confirmarInformarPagamento}>
-                Sim, informar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <FolhaConfirmar
+        aberto={confirmando != null}
+        titulo="Informar pagamento"
+        texto="Confirma que já pagou este boleto? Isso libera sua conexão temporariamente. Pagamentos com boleto podem levar até 72h úteis para compensar."
+        confirmar="Sim, já paguei"
+        onCancelar={() => setConfirmando(null)}
+        onConfirmar={confirmarInformarPagamento}
+      />
     </div>
     </PullToRefresh>
   )

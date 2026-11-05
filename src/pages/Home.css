@@ -243,85 +243,13 @@
   width: 100%;
 }
 
-/* Cartão grafite do próximo boleto (BoletoDestaqueInicio + CartaoDestaque). */
-.home-boleto {
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  border-radius: var(--raio-xl);
-  background: var(--cor-cartao-conexao);
-  color: var(--cor-branco-fixo);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-}
 
-.home-boleto-rotulo {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
-}
 
-.home-boleto-valor {
-  margin-top: 4px;
-  font-size: 32px;
-  line-height: 40px;
-  font-weight: 800;
-}
 
-.home-boleto-prazo {
-  align-self: flex-start;
-  margin-top: 6px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  font-size: 12px;
-  font-weight: 800;
-}
 
-.home-boleto-prazo.atrasado {
-  background: #ff8a8a;
-  color: #4a0008;
-}
 
-.home-boleto-pix {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  margin-top: 12px;
-  border: none;
-  border-radius: var(--raio-md);
-  background: var(--cor-laranja-vivo);
-  color: var(--cor-texto-sobre-laranja);
-  font: inherit;
-  font-size: 15px;
-  font-weight: 800;
-  cursor: pointer;
-}
 
-.home-boleto-pix.copiado {
-  background: #c8f2d4;
-  color: #0b4a22;
-}
 
-.home-boleto-secundario {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  margin-top: 8px;
-  border: none;
-  border-radius: var(--raio-md);
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--cor-branco-fixo);
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
 
 /* "Tudo em dia" (TudoEmDiaCard). */
 .home-em-dia {
@@ -544,22 +472,4 @@
   font-size: 14px;
 }
 
-.home-boleto-ja-paguei {
-  min-height: 44px;
-  margin-top: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: var(--raio-md);
-  background: transparent;
-  color: #ffffff;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
 
-.home-boleto-informado {
-  margin-top: 10px;
-  text-align: center;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
-}

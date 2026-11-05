@@ -410,127 +410,122 @@
   gap: 8px;
 }
 
-.boleto-cartao {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0;
-}
 
-.boleto-cartao-topo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
 
-.boleto-cartao-contrato {
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
 
-.boleto-cartao-valor {
-  margin-top: 4px;
-  font-size: 32px;
-  line-height: 40px;
-  font-weight: 800;
-}
 
-.boleto-cartao-prazo {
-  align-self: flex-start;
-  margin-top: 6px;
-}
 
-.boleto-cartao-prazo.atrasado {
-  background: #ff8a8a;
-  color: #4a0008;
-}
 
-.boleto-cartao-encargos {
-  margin-top: 8px;
-  font-size: 12px;
-  line-height: 16px;
-  color: rgba(255, 255, 255, 0.8);
-}
 
-.boleto-cartao-pix {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  margin-top: 12px;
-  border: none;
-  border-radius: var(--raio-md);
-  background: var(--cor-laranja-vivo);
-  color: var(--cor-texto-sobre-laranja);
-  font: inherit;
-  font-size: 15px;
-  font-weight: 800;
-  cursor: pointer;
-}
 
-.boleto-cartao-pix.copiado {
-  background: #c8f2d4;
-  color: #0b4a22;
-}
 
-.boleto-cartao-secundarios {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
 
-.boleto-cartao-secundarios button {
-  flex: 1;
-  min-width: 0;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0 6px;
-  border: none;
-  border-radius: var(--raio-md);
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
 
-.boleto-cartao-ja-paguei {
-  min-height: 44px;
-  margin-top: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: var(--raio-md);
-  background: transparent;
-  color: #ffffff;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
 
 .boleto-cartao-ja-paguei:disabled {
   opacity: 0.6;
 }
 
-.boleto-pago-icone {
-  background: color-mix(in srgb, var(--cor-sucesso) 16%, transparent);
-  color: var(--cor-sucesso);
+
+
+/* Boleto compacto em "Próximos"/"Outros atrasados" (FaturaCompacta). */
+.fatura-compacta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
+  color: var(--cor-primaria);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-.boleto-pago-recibo {
-  min-height: 36px;
+.fatura-compacta-textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.fatura-compacta-textos strong {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 800;
+  color: var(--cor-texto);
+}
+
+.fatura-compacta-textos span {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}
+
+.fatura-compacta-textos span.atrasada {
+  color: var(--cor-erro);
+}
+
+/* Linha de pago (FaturaPagaLinha): valor, selo "Pago", data e Recibo. */
+.fatura-paga {
+  display: flex;
+  align-items: center;
+  padding: 8px 6px 8px 14px;
+}
+
+.fatura-paga.com-divisoria {
+  border-top: 1px solid var(--cor-borda);
+}
+
+.fatura-paga-textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.fatura-paga-topo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fatura-paga-topo strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.fatura-paga-selo {
+  padding: 0 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #1e7a46 14%, transparent);
+  color: #1e7a46;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+:root[data-theme='dark'] .fatura-paga-selo {
+  color: #7dd89c;
+}
+
+.fatura-paga-data {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}
+
+.fatura-paga-recibo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
   padding: 0 12px;
-  font-size: 13px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cor-primaria);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
 }

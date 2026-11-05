@@ -1,0 +1,8 @@
+.folha-qrcode img {
+  display: block;
+  width: min(100%, 320px);
+  height: auto;
+  margin: 8px auto 0;
+  border-radius: var(--raio-md);
+  background: #ffffff;
+}
