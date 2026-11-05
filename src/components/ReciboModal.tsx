@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useFecharComVoltar } from '../hooks/useFecharComVoltar'
 import { compartilharPdf, pdfRecibo } from '../utils/pdfDocumentos'
 import { IcClose, IcDownload, IcShare } from './IconesApp'
 import { listarDetalhesFatura, listarItensContrato, urlImpressaoBoleto, type FaturaDto } from '../api/client'
@@ -65,6 +66,7 @@ interface Props {
  * do app Android: demonstrativo, valor por extenso, CPF/CNPJ mascarado.
  */
 export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
+  useFecharComVoltar(true, onFechar)
   const { toast } = useToast()
   const [dados, setDados] = useState<DadosRecibo | null | undefined>(undefined)
 

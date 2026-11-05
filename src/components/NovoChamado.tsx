@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { MdArrowBack } from 'react-icons/md'
 import { IcCheckCircle, IcClose, IcContentCopy, IcWhatsapp } from './IconesApp'
+import { useFecharComVoltar } from '../hooks/useFecharComVoltar'
 import type { IconType } from 'react-icons'
 import type { CategoriaDto } from '../api/client'
 import type { ChamadoCriado } from '../api/suporte'
@@ -96,6 +97,8 @@ export default function NovoChamado({
   const [enviando, setEnviando] = useState(false)
   const [criado, setCriado] = useState<ChamadoCriado | null>(null)
   const [copiado, setCopiado] = useState(false)
+  // Voltar do celular fecha a janela, como no app.
+  useFecharComVoltar(true, onFechar)
 
   const ordenadas = useMemo(
     () =>

@@ -1,35 +1,36 @@
 import { useState } from 'react'
-import './ModalConfirmarLogout.css'
+import DialogoHotnet from './DialogoHotnet'
+import { IcQrCodeScanner } from './IconesApp'
 import './FolhaQrCode.css'
 
-/**
- * invoice_qrcode_image pode vir com ou sem o prefixo "data:image/...;base64,".
- * Só aceita imagem em base64; o resto cai no aviso de indisponível.
- */
+/** invoice_qrcode_image pode vir com ou sem o prefixo "data:image/...;base64,". */
 function srcQrCode(valor: string): string {
   const texto = valor.trim()
   if (/^data:image\/[a-z+]+;base64,/i.test(texto)) return texto
   return `data:image/png;base64,${texto}`
 }
 
-/** QR Code do Pix numa folha que sobe de baixo (QrCodeDialog do app). */
+/** QR Code do Pix no diálogo do app (QrCodeDialog). */
 export default function FolhaQrCode({ imagem, onFechar }: { imagem: string; onFechar: () => void }) {
   const [indisponivel, setIndisponivel] = useState(false)
   return (
-    <div className="modal-confirmar-logout-fundo" onClick={onFechar}>
-      <div className="modal-confirmar-logout folha-qrcode" role="dialog" aria-modal="true" aria-label="QR Code do Pix" onClick={(e) => e.stopPropagation()}>
-        <h2>QR Code do Pix</h2>
-        {indisponivel ? (
-          <p>QR Code indisponível no momento. Use o Pix copia e cola.</p>
-        ) : (
-          <img src={srcQrCode(imagem)} alt="QR Code do Pix" onError={() => setIndisponivel(true)} />
-        )}
-        <div className="modal-confirmar-logout-acoes">
-          <button type="button" className="modal-confirmar-logout-sair" onClick={onFechar}>
-            Fechar
-          </button>
-        </div>
-      </div>
-    </div>
+    <DialogoHotnet
+      aberto
+      onFechar={onFechar}
+      titulo="QR Code Pix"
+      texto="Abra o app do seu banco, escolha pagar com Pix e aponte a câmera para o código."
+      icone={IcQrCodeScanner}
+      acoes={
+        <button type="button" className="botao-contorno" onClick={onFechar}>
+          Fechar
+        </button>
+      }
+    >
+      {indisponivel ? (
+        <p className="dialogo-texto">QR Code indisponível no momento. Use o Pix copia e cola.</p>
+      ) : (
+        <img className="folha-qrcode-imagem" src={srcQrCode(imagem)} alt="QR Code do Pix" onError={() => setIndisponivel(true)} />
+      )}
+    </DialogoHotnet>
   )
 }

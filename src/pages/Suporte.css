@@ -373,8 +373,10 @@
   cursor: pointer;
 }
 
-.suporte-dropdown-item:hover {
-  background: var(--cor-fundo);
+@media (hover: hover) {
+  .suporte-dropdown-item:hover {
+    background: var(--cor-fundo);
+  }
 }
 
 .suporte-modal-acoes {

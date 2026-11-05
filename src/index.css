@@ -413,3 +413,58 @@ h3 {
 :root[data-theme='dark'] .botao-contorno {
   color: var(--cor-primaria-clara);
 }
+
+/* --- Janelas como no app Android ------------------------------------------
+   O app não tem folhas que sobem de baixo: toda janela abre centralizada
+   (Dialog do Compose), com cantos de 28 e fundo escurecido a 32%. */
+.checklist-fundo,
+.chamado-fundo,
+.recibo-fundo,
+.modal-instalar-ios-fundo,
+.suporte-modal-fundo {
+  align-items: center !important;
+  padding: 24px 16px !important;
+  background: rgba(0, 0, 0, 0.32) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.checklist-modal,
+.chamado-modal,
+.recibo-modal,
+.modal-instalar-ios,
+.suporte-modal,
+.suporte-checklist {
+  border-radius: 28px !important;
+  max-width: 560px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: janela-entra 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.modal-instalar-ios::before,
+.suporte-modal::before,
+.suporte-checklist::before {
+  display: none !important;
+}
+
+@keyframes janela-entra {
+  from {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+
+/* Imagens não se arrastam nem abrem o menu "salvar imagem" ao segurar,
+   como num app nativo (a foto do chamado continua abrindo pelo toque). */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Foco visível só para quem navega pelo teclado; o toque não deixa contorno. */
+:focus:not(:focus-visible) {
+  outline: none;
+}

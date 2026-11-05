@@ -1,4 +1,5 @@
-import './ModalConfirmarLogout.css'
+import { MdExitToApp } from 'react-icons/md'
+import DialogoHotnet from './DialogoHotnet'
 
 interface Props {
   aberto: boolean
@@ -6,26 +7,26 @@ interface Props {
   onConfirmar: () => void
 }
 
-/**
- * Confirmação antes de sair de verdade — evita deslogar sem querer num
- * toque acidental no botão (menu do avatar em Home, ou o atalho na
- * barra de navegação inferior).
- */
+/** "Sair da conta?" — mesmo diálogo do app Android (ContaScreen.kt). */
 export default function ModalConfirmarLogout({ aberto, onCancelar, onConfirmar }: Props) {
-  if (!aberto) return null
-
   return (
-    <div className="modal-confirmar-logout-fundo" onClick={onCancelar}>
-      <div className="modal-confirmar-logout" onClick={(evento) => evento.stopPropagation()}>
-        <h2>Sair da conta?</h2>
-        <p>Você vai precisar informar CPF/CNPJ e senha de novo pra entrar.</p>
-        <div className="modal-confirmar-logout-acoes">
-          <button onClick={onCancelar}>Cancelar</button>
-          <button className="modal-confirmar-logout-sair" onClick={onConfirmar}>
-            Sair
+    <DialogoHotnet
+      aberto={aberto}
+      onFechar={onCancelar}
+      titulo="Sair da conta?"
+      texto="Sua conta continua salva neste aparelho para entrar de novo."
+      icone={MdExitToApp}
+      tom="perigo"
+      acoes={
+        <>
+          <button type="button" className="botao-perigo" onClick={onConfirmar}>
+            Sair da conta
           </button>
-        </div>
-      </div>
-    </div>
+          <button type="button" className="botao-contorno" onClick={onCancelar}>
+            Continuar no app
+          </button>
+        </>
+      }
+    />
   )
 }

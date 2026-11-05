@@ -440,7 +440,8 @@ export default function Home() {
         <FolhaConfirmar
           aberto={confirmarJaPaguei != null}
           titulo="Informar pagamento"
-          texto="Confirma que já pagou este boleto? Isso libera sua conexão temporariamente. Pagamentos com boleto podem levar até 72h úteis para compensar."
+          texto="Confirma que já pagou este boleto? Isso libera sua conexão temporariamente enquanto o pagamento é processado."
+          icone={IcCheckCircle}
           confirmar="Sim, já paguei"
           onCancelar={() => setConfirmarJaPaguei(null)}
           onConfirmar={async () => {

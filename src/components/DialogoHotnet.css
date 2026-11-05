@@ -1,0 +1,170 @@
+/* Fundo escurecido do Dialog do Compose (scrim 32%). */
+.dialogo-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: rgba(0, 0, 0, 0.32);
+  animation: dialogo-fundo-entra 0.15s ease;
+}
+
+/* Surface extraLarge (28), 280–560 de largura, rolagem própria. */
+.dialogo {
+  width: 100%;
+  min-width: 280px;
+  max-width: 560px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 22px 22px 18px;
+  border-radius: 28px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.24);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: dialogo-entra 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes dialogo-fundo-entra {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dialogo-entra {
+  from {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+
+/* IconeEmCirculo: 52 de diâmetro, ícone com metade do tamanho. */
+.dialogo-icone {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-primaria-container);
+  color: var(--cor-primaria);
+}
+
+.dialogo-icone.perigo {
+  background: var(--cor-terciaria-container);
+  color: var(--cor-terciaria);
+}
+
+.dialogo-icone.sucesso {
+  background: color-mix(in srgb, #1e7a46 16%, transparent);
+  color: #1e7a46;
+}
+
+:root[data-theme='dark'] .dialogo-icone.primaria {
+  color: var(--cor-primaria-clara);
+}
+
+/* titleLarge ExtraBold (22/28). */
+.dialogo-titulo {
+  margin: 0;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 800;
+}
+
+/* bodyMedium em onSurfaceVariant. */
+.dialogo-texto {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--cor-texto-secundario);
+}
+
+.dialogo-acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.dialogo-acoes > button {
+  width: 100%;
+  min-height: 48px;
+}
+
+/* Botão principal vermelho (Sair da conta). */
+.botao-perigo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--raio-md);
+  background: var(--cor-terciaria);
+  color: #ffffff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+:root[data-theme='dark'] .botao-perigo {
+  color: #4a0008;
+}
+
+/* Opção em bloco dentro do diálogo (ajuda do login, compartilhar). */
+.dialogo-opcao {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dialogo-opcao-icone {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-primaria-container);
+  color: var(--cor-primaria);
+}
+
+.dialogo-opcao-icone.whatsapp {
+  background: var(--cor-whatsapp);
+  color: #ffffff;
+}
+
+.dialogo-opcao-textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dialogo-opcao-textos strong {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.dialogo-opcao-textos small {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import FolhaConfirmar from '../components/FolhaConfirmar'
 import { MdChatBubbleOutline, MdPictureAsPdf } from 'react-icons/md'
 import { IcAttachFile, IcDescription, IcLocationOn, IcPhotoCamera, IcPhotoLibrary } from '../components/IconesApp'
 import { useLocation, useParams } from 'react-router-dom'
@@ -355,23 +356,15 @@ export default function DetalheChamado() {
         </div>
       )}
 
-      {confirmandoLocalizacao && (
-        <div className="suporte-modal-fundo" onClick={() => setConfirmandoLocalizacao(false)}>
-          <div className="suporte-modal" onClick={(evento) => evento.stopPropagation()}>
-            <h2>Enviar sua localização?</h2>
-            <p className="detalhe-confirmar-texto">
-              Isso manda sua localização atual como mensagem neste chamado — útil pra equipe encontrar o endereço numa
-              visita técnica.
-            </p>
-            <div className="suporte-modal-acoes">
-              <button onClick={() => setConfirmandoLocalizacao(false)}>Cancelar</button>
-              <button className="suporte-btn-primario" onClick={confirmarEnviarLocalizacao}>
-                Sim, enviar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <FolhaConfirmar
+        aberto={confirmandoLocalizacao}
+        titulo="Enviar sua localização?"
+        texto="Isso manda sua localização atual como mensagem neste chamado, útil para a equipe encontrar o endereço numa visita técnica."
+        icone={IcLocationOn}
+        confirmar="Sim, enviar"
+        onCancelar={() => setConfirmandoLocalizacao(false)}
+        onConfirmar={confirmarEnviarLocalizacao}
+      />
     </div>
   )
 }

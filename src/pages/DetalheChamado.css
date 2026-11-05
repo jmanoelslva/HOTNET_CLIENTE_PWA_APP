@@ -303,8 +303,10 @@
   gap: 8px;
 }
 
-.detalhe-menu-anexo button:hover {
-  background: var(--cor-fundo);
+@media (hover: hover) {
+  .detalhe-menu-anexo button:hover {
+    background: var(--cor-fundo);
+  }
 }
 
 .detalhe-confirmar-texto {

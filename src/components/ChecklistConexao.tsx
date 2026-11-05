@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { useFecharComVoltar } from '../hooks/useFecharComVoltar'
 import { MdBlock, MdCheck, MdInfo, MdTimer } from 'react-icons/md'
 import { IcClose, IcLock, IcPayments, IcWhatsapp, IcWifi } from './IconesApp'
 import './ChecklistConexao.css'
@@ -65,6 +66,8 @@ function Passo({ numero, titulo, descricao, feito, atual, onAlternar, children }
  * cancelamento trocam o conteúdo: reiniciar o roteador não resolve. Cancelado: só WhatsApp.
  */
 export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onVerBoletos, onFechar, onContinuar, onWhatsapp }: Props) {
+  // Voltar do celular fecha a janela, como no app.
+  useFecharComVoltar(true, onFechar)
   const [reiniciou, setReiniciou] = useState(false)
   const [luzes, setLuzes] = useState(false)
   const [cabos, setCabos] = useState(false)

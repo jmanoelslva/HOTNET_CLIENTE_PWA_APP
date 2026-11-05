@@ -1,4 +1,5 @@
-import './ModalConfirmarLogout.css'
+import type { IconType } from 'react-icons'
+import DialogoHotnet from './DialogoHotnet'
 
 interface Props {
   aberto: boolean
@@ -6,27 +7,30 @@ interface Props {
   texto: string
   confirmar: string
   cancelar?: string
+  icone?: IconType
   onConfirmar: () => void
   onCancelar: () => void
 }
 
-/** Folha de confirmação genérica (mesmo visual da de "Sair da conta"). */
-export default function FolhaConfirmar({ aberto, titulo, texto, confirmar, cancelar = 'Cancelar', onConfirmar, onCancelar }: Props) {
-  if (!aberto) return null
+/** Confirmação no diálogo padrão do app (principal em cima, Cancelar embaixo). */
+export default function FolhaConfirmar({ aberto, titulo, texto, confirmar, cancelar = 'Cancelar', icone, onConfirmar, onCancelar }: Props) {
   return (
-    <div className="modal-confirmar-logout-fundo" onClick={onCancelar}>
-      <div className="modal-confirmar-logout" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-        <h2>{titulo}</h2>
-        <p>{texto}</p>
-        <div className="modal-confirmar-logout-acoes">
-          <button type="button" onClick={onCancelar}>
-            {cancelar}
-          </button>
-          <button type="button" className="modal-confirmar-logout-sair" onClick={onConfirmar}>
+    <DialogoHotnet
+      aberto={aberto}
+      onFechar={onCancelar}
+      titulo={titulo}
+      texto={texto}
+      icone={icone}
+      acoes={
+        <>
+          <button type="button" className="botao-primario" onClick={onConfirmar}>
             {confirmar}
           </button>
-        </div>
-      </div>
-    </div>
+          <button type="button" className="botao-contorno" onClick={onCancelar}>
+            {cancelar}
+          </button>
+        </>
+      }
+    />
   )
 }

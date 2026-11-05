@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { MdGetApp, MdKeyboardArrowRight, MdVisibility, MdVisibilityOff } from 'react-icons/md'
-import { IcClose, IcSupportAgent, IcWhatsapp } from '../components/IconesApp'
+import { IcClose, IcWhatsapp } from '../components/IconesApp'
 import { useNavigate } from 'react-router-dom'
 import { contasSalvas, esquecerConta, fotoDaConta, type ContaSalva } from '../utils/contaLocal'
 import { mascararDocumento } from '../utils/recibo'
 import { useSessao } from '../auth/useSessao'
 import ModalInstalarIos from '../components/ModalInstalarIos'
+import AjudaLogin from '../components/AjudaLogin'
 import { usePwaInstall } from '../hooks/usePwaInstall'
 import logoApp from '../assets/logo-app.png'
 import { abrirWhatsappLogin } from '../utils/whatsapp'
@@ -144,7 +145,7 @@ export default function Login() {
 
       </div>
 
-      <button type="button" className="login-ajuda" onClick={() => abrirWhatsappLogin(usuario)}>
+      <button type="button" className="login-ajuda" onClick={() => setAjudaAberta(true)}>
         <span className="login-ajuda-icone" aria-hidden="true">
           <IcWhatsapp size={20} />
         </span>
@@ -164,31 +165,14 @@ export default function Login() {
       {__APP_VERSION__ && <p className="login-versao">Versão {__APP_VERSION__}</p>}
       </div>
 
-      {ajudaAberta && (
-        <div className="login-modal-fundo" onClick={() => setAjudaAberta(false)}>
-          <div className="login-modal" onClick={(evento) => evento.stopPropagation()}>
-            <h2>
-              <IcSupportAgent className="login-modal-icone" /> Precisando de ajuda?
-            </h2>
-            <p>
-              Usuário e senha são o mesmo número: seu CPF ou CNPJ, sem pontos nem traço. Se o problema persistir,
-              fale com a gente pelo WhatsApp.
-            </p>
-            <div className="login-modal-acoes">
-              <button onClick={() => setAjudaAberta(false)}>Entendi</button>
-              <button
-                className="login-modal-whatsapp"
-                onClick={() => {
-                  setAjudaAberta(false)
-                  abrirWhatsappLogin(usuario)
-                }}
-              >
-                Falar com a gente
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AjudaLogin
+        aberto={ajudaAberta}
+        onFechar={() => setAjudaAberta(false)}
+        onWhatsapp={(esqueci) => {
+          const conta = contas.find((c) => c.documento === usuario.replace(/\D/g, ''))
+          abrirWhatsappLogin(usuario, conta?.nome ?? null, esqueci)
+        }}
+      />
 
       <ModalInstalarIos aberto={modalIosAberto} onFechar={fecharModalIos} />
     </div>

@@ -3,6 +3,7 @@ import { MdCalendarMonth, MdCheck, MdMoreHoriz, MdPrint, MdShare } from 'react-i
 import type { FaturaDto } from '../api/client'
 import { IcBarcode, IcCheckCircle, IcPayments, IcPix, IcQrCodeScanner, IcSchedule } from './IconesApp'
 import { useToast } from './Toast/useToast'
+import DialogoHotnet from './DialogoHotnet'
 import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
 import {
   calcularPrazo,
@@ -244,41 +245,52 @@ export default function CartaoBoleto({
         </div>
       </div>
 
-      {compartilharAberto && (
-        <div className="modal-confirmar-logout-fundo" onClick={() => setCompartilharAberto(false)}>
-          <div className="modal-confirmar-logout folha-compartilhar" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-            <h2>
-              <MdShare size={22} aria-hidden="true" /> Compartilhar boleto
-            </h2>
-            {pix && (
-              <button type="button" onClick={() => (setCompartilharAberto(false), compartilharTexto(pix, () => mostrarAvisoCopiado('Código Pix copiado')))}>
-                <strong>Só o código Pix</strong>
-                <small>Quem recebe toca e segura a mensagem para copiar</small>
-              </button>
-            )}
-            {barras && (
-              <button type="button" onClick={() => (setCompartilharAberto(false), compartilharTexto(barras, () => mostrarAvisoCopiado('Código de barras copiado')))}>
-                <strong>Só o código de barras</strong>
-                <small>Linha digitável para pagar no app do banco</small>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => (
-                setCompartilharAberto(false), compartilharTexto(textoCompartilharFatura(fatura), () => mostrarAvisoCopiado('Mensagem copiada'))
-              )}
-            >
-              <strong>Mensagem completa</strong>
-              <small>Valor, vencimento, Pix e código de barras</small>
-            </button>
-            <div className="modal-confirmar-logout-acoes">
-              <button type="button" onClick={() => setCompartilharAberto(false)}>
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DialogoHotnet
+        aberto={compartilharAberto}
+        onFechar={() => setCompartilharAberto(false)}
+        titulo="Compartilhar boleto"
+        icone={MdShare}
+        acoes={
+          <button type="button" className="botao-contorno" onClick={() => setCompartilharAberto(false)}>
+            Cancelar
+          </button>
+        }
+      >
+        {pix && (
+          <button
+            type="button"
+            className="dialogo-opcao"
+            onClick={() => (setCompartilharAberto(false), compartilharTexto(pix, () => mostrarAvisoCopiado('Código Pix copiado')))}
+          >
+            <span className="dialogo-opcao-textos">
+              <strong>Só o código Pix</strong>
+              <small>Quem recebe toca e segura a mensagem para copiar</small>
+            </span>
+          </button>
+        )}
+        {barras && (
+          <button
+            type="button"
+            className="dialogo-opcao"
+            onClick={() => (setCompartilharAberto(false), compartilharTexto(barras, () => mostrarAvisoCopiado('Código de barras copiado')))}
+          >
+            <span className="dialogo-opcao-textos">
+              <strong>Só o código de barras</strong>
+              <small>Linha digitável para pagar no app do banco</small>
+            </span>
+          </button>
+        )}
+        <button
+          type="button"
+          className="dialogo-opcao"
+          onClick={() => (setCompartilharAberto(false), compartilharTexto(textoCompartilharFatura(fatura), () => mostrarAvisoCopiado('Mensagem copiada')))}
+        >
+          <span className="dialogo-opcao-textos">
+            <strong>Mensagem completa</strong>
+            <small>Valor, vencimento, Pix e código de barras</small>
+          </span>
+        </button>
+      </DialogoHotnet>
     </section>
   )
 }

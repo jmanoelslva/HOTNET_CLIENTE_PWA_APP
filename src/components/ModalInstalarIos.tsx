@@ -1,4 +1,5 @@
 import './ModalInstalarIos.css'
+import { useFecharComVoltar } from '../hooks/useFecharComVoltar'
 import { MdAddBox, MdIosShare } from 'react-icons/md'
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
  * cliente fechar, não sumir sozinha em poucos segundos.
  */
 export default function ModalInstalarIos({ aberto, onFechar }: Props) {
+  useFecharComVoltar(aberto, onFechar)
   if (!aberto) return null
 
   return (

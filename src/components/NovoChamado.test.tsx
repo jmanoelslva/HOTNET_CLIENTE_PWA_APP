@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { IcSupportAgent } from './IconesApp'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
@@ -12,6 +13,7 @@ const categorias = [
 function renderizar(onEnviar = vi.fn().mockResolvedValue({ ticketPk: 55, protocolo: '2026101500012' }), contratoStatus: number | null = 1) {
   const handlers = { onVerConversa: vi.fn(), onVerBoletos: vi.fn(), onWhatsapp: vi.fn(), onFechar: vi.fn() }
   render(
+    <MemoryRouter>
     <NovoChamado
       categorias={categorias}
       contratoStatus={contratoStatus}
@@ -20,7 +22,8 @@ function renderizar(onEnviar = vi.fn().mockResolvedValue({ ticketPk: 55, protoco
       corDaCategoria={() => 'var(--cor-suporte)'}
       onEnviar={onEnviar}
       {...handlers}
-    />,
+    />
+    </MemoryRouter>,
   )
   return { onEnviar, ...handlers }
 }

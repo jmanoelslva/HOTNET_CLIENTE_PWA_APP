@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import ChecklistConexao from './ChecklistConexao'
@@ -10,7 +11,11 @@ function renderizar(props: Partial<Parameters<typeof ChecklistConexao>[0]> = {})
     onContinuar: vi.fn(),
     onWhatsapp: vi.fn(),
   }
-  render(<ChecklistConexao boletosAtrasados={0} contratoStatus={1} {...handlers} {...props} />)
+  render(
+    <MemoryRouter>
+      <ChecklistConexao boletosAtrasados={0} contratoStatus={1} {...handlers} {...props} />
+    </MemoryRouter>,
+  )
   return handlers
 }
 

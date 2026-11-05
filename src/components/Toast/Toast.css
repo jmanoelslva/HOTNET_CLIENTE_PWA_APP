@@ -2,28 +2,38 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 24px;
+  bottom: 16px;
   z-index: 1000;
   /* Sem esconder atrás da barra de baixo (ver body:has(.bottom-nav) abaixo). */
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 0 20px;
+  padding: 0 12px;
   pointer-events: none;
 }
 
+/* Snackbar do Material 3, como no app: fundo inverso (grafite no claro,
+   cinza claro no escuro), cantos de 4, texto à esquerda, um estilo só. */
 .toast {
-  max-width: 420px;
+  max-width: 600px;
   width: 100%;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--cor-branco-fixo);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  text-align: center;
+  min-height: 48px;
+  padding: 14px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  background: #243642;
+  color: #f1f3f5;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.24);
+  text-align: left;
   animation: toast-entrar 0.2s ease;
+}
+
+:root[data-theme='dark'] .toast {
+  background: #e2e3e5;
+  color: #243642;
 }
 
 @keyframes toast-entrar {
@@ -31,24 +41,8 @@
     opacity: 0;
     transform: translateY(12px);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.toast-info {
-  background: var(--cor-contratos);
-}
-
-.toast-sucesso {
-  background: var(--cor-sucesso-vivo);
-}
-
-.toast-erro {
-  background: var(--cor-primaria-escura);
 }
 
 body:has(.bottom-nav) .toast-pilha {
-  bottom: calc(var(--altura-nav) + 32px);
+  bottom: calc(var(--altura-nav) + 12px);
 }

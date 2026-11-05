@@ -100,8 +100,10 @@
   min-height: 56px;
 }
 
-.chamado-categorias button:hover {
-  border-color: var(--cor-suporte);
+@media (hover: hover) {
+  .chamado-categorias button:hover {
+    border-color: var(--cor-suporte);
+  }
 }
 
 .chamado-categoria-icone {

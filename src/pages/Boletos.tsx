@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MdKeyboardArrowRight } from 'react-icons/md'
-import { IcDescription, IcPayments, IcTask } from '../components/IconesApp'
+import { IcCheckCircle, IcDescription, IcPayments, IcTask } from '../components/IconesApp'
 import { useLocation, useNavigate } from 'react-router-dom'
 import CabecalhoTela from '../components/CabecalhoTela'
 import CartaoBoleto from '../components/CartaoBoleto'
@@ -309,7 +309,8 @@ export default function Boletos() {
       <FolhaConfirmar
         aberto={confirmando != null}
         titulo="Informar pagamento"
-        texto="Confirma que já pagou este boleto? Isso libera sua conexão temporariamente. Pagamentos com boleto podem levar até 72h úteis para compensar."
+        texto="Confirma que já pagou este boleto? Isso libera sua conexão temporariamente enquanto o pagamento é processado."
+        icone={IcCheckCircle}
         confirmar="Sim, já paguei"
         onCancelar={() => setConfirmando(null)}
         onConfirmar={confirmarInformarPagamento}
