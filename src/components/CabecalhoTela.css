@@ -1,31 +1,29 @@
 .cabecalho-tela {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding: 16px;
-  border-radius: 18px;
-  border: 1px solid transparent;
+  gap: 8px;
+  padding: 12px 4px 4px;
+  margin-bottom: 16px;
 }
 
-.cabecalho-tela-icone {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.cabecalho-tela-textos {
+  flex: 1;
+  min-width: 0;
 }
 
+/* headlineSmall do M3 em Manrope ExtraBold (24/32). */
 .cabecalho-tela h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
+  line-height: 32px;
   font-weight: 800;
+  color: var(--cor-texto);
 }
 
+/* bodyMedium em onSurfaceVariant (14/20). */
 .cabecalho-tela p {
-  margin: 2px 0 0;
-  color: var(--cor-texto-terciario);
-  font-size: 13px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--cor-texto-secundario);
 }

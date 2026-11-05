@@ -22,6 +22,23 @@ export function definirTema(tema: Tema): void {
   aplicar(tema)
 }
 
+/** Escolha da tela Perfil → Aparência: "sistema" segue o celular (padrão). */
+export type ModoTema = 'sistema' | Tema
+
+export function modoTemaAtual(): ModoTema {
+  const salvo = localStorage.getItem(CHAVE_TEMA)
+  return salvo === 'light' || salvo === 'dark' ? salvo : 'sistema'
+}
+
+export function definirModoTema(modo: ModoTema): void {
+  if (modo === 'sistema') {
+    localStorage.removeItem(CHAVE_TEMA)
+    aplicar(temaDoSistema())
+  } else {
+    definirTema(modo)
+  }
+}
+
 /**
  * Aplica o tema assim que o app carrega e mantém sincronizado com o
  * sistema operacional enquanto o cliente não tiver escolhido nada

@@ -1,0 +1,65 @@
+.perfil-tela {
+  max-width: var(--largura-conteudo);
+  margin: 0 auto;
+  padding: 16px 16px 24px;
+}
+
+/* Cabeçalho: shapes.extraLarge (24), borda fina, inicial no círculo laranja-claro. */
+.perfil-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-xl);
+}
+
+.perfil-avatar {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-primaria-container);
+  color: var(--cor-sobre-primaria-container);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.perfil-identidade {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.perfil-identidade strong {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.perfil-identidade span {
+  font-size: 14px;
+  color: var(--cor-texto-secundario);
+}
+
+.perfil-aparencia {
+  padding: 10px 14px 12px;
+}
+
+.perfil-aparencia-topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.perfil-sair {
+  margin-top: 16px;
+}

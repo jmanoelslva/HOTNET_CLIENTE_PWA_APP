@@ -1,0 +1,174 @@
+/* Rótulo de grupo: labelMedium ExtraBold, maiúsculas, espaçado. */
+.rotulo-grupo {
+  display: flex;
+  align-items: center;
+  padding: 8px 2px 0 6px;
+  margin-bottom: 6px;
+}
+
+.rotulo-grupo h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--cor-texto-secundario);
+}
+
+/* Bloco branco: shapes.large (16), borda outlineVariant, divisória entre linhas. */
+.bloco-branco {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.bloco-branco-divisoria {
+  margin: 0 0 0 60px;
+  border: none;
+  border-top: 1px solid var(--cor-borda);
+}
+
+/* Linha com ícone em círculo de 34px (ItemConta / LinhaInfo). */
+.linha-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+}
+
+.linha-item-clicavel {
+  cursor: pointer;
+}
+
+.linha-item-clicavel:active {
+  background: var(--cor-superficie-media);
+}
+
+.linha-item-icone {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.linha-item-icone-neutra {
+  background: var(--cor-superficie-alta);
+  color: var(--cor-texto);
+}
+
+.linha-item-icone-primaria {
+  background: var(--cor-primaria-container);
+  color: var(--cor-primaria);
+}
+
+.linha-item-icone-perigo {
+  background: var(--cor-terciaria-container);
+  color: var(--cor-terciaria);
+}
+
+.linha-item-textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.linha-item-rotulo {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--cor-texto-secundario);
+}
+
+.linha-item-titulo {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.linha-item-titulo-perigo {
+  color: var(--cor-terciaria);
+}
+
+.linha-item-detalhe {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+  white-space: nowrap;
+}
+
+.linha-item-seta {
+  color: var(--cor-texto-secundario);
+  flex-shrink: 0;
+}
+
+/* Abas em pílula: trilho surfaceContainerHigh, aba ativa branca. */
+.abas-pilula {
+  display: flex;
+  gap: 0;
+  padding: 3px;
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie-alta);
+}
+
+.abas-pilula-item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 4px;
+  border: none;
+  border-radius: var(--raio-sm);
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.abas-pilula-item.ativa {
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-weight: 800;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.abas-pilula-rotulo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.abas-pilula-contador {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
+  background: var(--cor-primaria-container);
+  color: var(--cor-sobre-primaria-container);
+}
+
+.abas-pilula-contador.alerta {
+  background: var(--cor-terciaria-container);
+  color: var(--cor-terciaria);
+}

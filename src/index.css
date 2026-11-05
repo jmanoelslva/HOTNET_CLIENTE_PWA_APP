@@ -1,16 +1,49 @@
-/* Inter variável (pesos 100–900), só o subconjunto latino (cobre o
-   português), servida pelo próprio app e pré-cacheada pelo service worker:
-   abre sem esperar o Google Fonts. Licença: assets/fonts/Inter-LICENSE.txt. */
+/* Manrope — a mesma fonte do app Android (res/font), nos 5 pesos que ele
+   usa, só o subconjunto latino (cobre o português). Servida pelo próprio
+   app e pré-cacheada pelo service worker. Licença OFL:
+   assets/fonts/Manrope-LICENSE.txt. */
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Manrope';
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 400;
   font-display: swap;
-  src: url('./assets/fonts/inter-latin.woff2') format('woff2');
+  src: url('./assets/fonts/manrope-regular-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./assets/fonts/manrope-medium-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./assets/fonts/manrope-semibold-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./assets/fonts/manrope-bold-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800 900;
+  font-display: swap;
+  src: url('./assets/fonts/manrope-extrabold-latin.woff2') format('woff2');
 }
 
 :root {
-  font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Manrope', system-ui, 'Segoe UI', Roboto, sans-serif;
   /* Algarismos de largura fixa: valores, datas e consumo alinham em coluna. */
   font-variant-numeric: tabular-nums;
   color-scheme: light dark;
@@ -35,11 +68,27 @@
      branco, diferente de --cor-superficie (que vira escura). */
   --cor-branco-fixo: #ffffff;
   /* Cartão de conexão da Início: grafite nos dois temas, texto branco fixo por cima. */
-  --cor-cartao-conexao: #243642;
-  --cor-cartao-conexao-fim: #2f4554;
-  /* Texto sobre o laranja da marca (botão de ação no cartão grafite):
-     branco, 4,9:1 sobre #C94300. */
-  --cor-texto-sobre-laranja: #ffffff;
+  /* Grafite liso do app Android (HomeColors.kt, GrafiteLight), sem degradê. */
+  --cor-cartao-conexao: #273945;
+  --cor-cartao-conexao-fim: #273945;
+  /* Laranja vivo do logotipo: no cartão grafite, só com texto escuro (7:1). */
+  --cor-laranja-vivo: #ff8a4c;
+  --cor-texto-sobre-laranja: #2a1000;
+
+  /* Papéis do Material 3 do app Android (ui/theme/Color.kt). */
+  --cor-primaria-container: #ffe6d6;
+  --cor-sobre-primaria-container: #5c1f00;
+  --cor-terciaria: #c21624;
+  --cor-terciaria-container: #fde8ea;
+  --cor-superficie-alta: #e7ebef;
+  --cor-superficie-media: #edf0f3;
+
+  /* Raios (ui/theme/Shape.kt): 4 / 8 / 12 / 16 / 24. */
+  --raio-xs: 4px;
+  --raio-sm: 8px;
+  --raio-md: 12px;
+  --raio-lg: 16px;
+  --raio-xl: 24px;
 
   /* Texto — grafite da marca; cinzas de apoio escurecidos para passar no
      contraste mínimo (WCAG AA, 4,5:1) sobre o branco e o fundo. */
@@ -86,6 +135,9 @@
      vindo só do padding de cada "-tela" (20-24px), igual em qualquer
      tamanho de tela — não deste token. */
   --largura-conteudo: 100%;
+
+  /* NavigationBar do Material 3 (80dp) + a linha de gestos do iPhone. */
+  --altura-nav: calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Tema escuro — dirigido só pelo atributo data-theme no <html>, nunca
@@ -122,6 +174,15 @@
   --cor-consumo: #4fd2e3;
   --cor-pix: #3ecfb0;
 
+  --cor-cartao-conexao: #25343f;
+  --cor-cartao-conexao-fim: #25343f;
+  --cor-primaria-container: #4a2414;
+  --cor-sobre-primaria-container: #ffc4a3;
+  --cor-terciaria: #ff8a8a;
+  --cor-terciaria-container: #6e1018;
+  --cor-superficie-alta: #26303a;
+  --cor-superficie-media: #1e262c;
+
   /* Alguns acentos de marca são escuros demais pra servir de TEXTO sobre
      fundo já escuro (ex: botões com fundo translúcido da própria cor) —
      clareados só aqui; como ícone/badge com texto branco por cima eles
@@ -152,7 +213,8 @@ body {
 /* Reserva espaço pro conteúdo não ficar escondido atrás da barra de
    navegação fixa no rodapé, quando ela está presente na página. */
 body:has(.bottom-nav) {
-  padding-bottom: 64px;
+  /* + 24px: o botão "Pagar" sobe acima da barra. */
+  padding-bottom: calc(var(--altura-nav) + 24px);
 }
 
 /* Transição leve de entrada nas telas — aplicada no container raiz de

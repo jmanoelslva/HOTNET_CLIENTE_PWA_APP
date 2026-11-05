@@ -4,6 +4,7 @@
   right: 0;
   bottom: 24px;
   z-index: 1000;
+  /* Sem esconder atrás da barra de baixo (ver body:has(.bottom-nav) abaixo). */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -46,4 +47,8 @@
 
 .toast-erro {
   background: var(--cor-primaria-escura);
+}
+
+body:has(.bottom-nav) .toast-pilha {
+  bottom: calc(var(--altura-nav) + 32px);
 }

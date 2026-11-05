@@ -19,6 +19,7 @@ const DetalheChamado = lazy(() => import('./pages/DetalheChamado'))
 const Faq = lazy(() => import('./pages/Faq'))
 const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Login'))
+const Perfil = lazy(() => import('./pages/Perfil'))
 const Sobre = lazy(() => import('./pages/Sobre'))
 const Suporte = lazy(() => import('./pages/Suporte'))
 
@@ -92,6 +93,14 @@ function App() {
             element={
               <RotaProtegida>
                 <DetalheChamado />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/perfil"
+            element={
+              <RotaProtegida>
+                <Perfil />
               </RotaProtegida>
             }
           />

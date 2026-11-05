@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { definirTema, temaAtual, type Tema } from '../utils/tema'
+import { definirModoTema, definirTema, modoTemaAtual, temaAtual, type ModoTema, type Tema } from '../utils/tema'
 
 const ouvintesMudanca = new Set<() => void>()
 
@@ -30,4 +30,16 @@ export function useTema(): { tema: Tema; alternarTema: () => void } {
   }
 
   return { tema, alternarTema }
+}
+
+/** Modo escolhido (sistema/claro/escuro) para a Aparência do Perfil. */
+export function useModoTema(): { modo: ModoTema; definirModo: (modo: ModoTema) => void } {
+  const modo = useSyncExternalStore(inscrever, modoTemaAtual)
+
+  function definirModo(novo: ModoTema) {
+    definirModoTema(novo)
+    notificarMudanca()
+  }
+
+  return { modo, definirModo }
 }

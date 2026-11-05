@@ -253,8 +253,8 @@
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  /* Laranja da marca com texto branco (4,9:1). */
-  background: var(--cor-primaria);
+  /* Laranja vivo do logotipo com texto escuro (7:1), como no app Android. */
+  background: var(--cor-laranja-vivo);
   color: var(--cor-texto-sobre-laranja);
 }
 
