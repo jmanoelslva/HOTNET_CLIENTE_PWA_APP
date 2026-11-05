@@ -45,7 +45,7 @@ export default function Login() {
   async function aoEnviar(evento: FormEvent) {
     evento.preventDefault()
     const sucesso = await entrar(usuario, senha)
-    if (sucesso) navigate('/', { viewTransition: true })
+    if (sucesso) navigate('/', { replace: true, viewTransition: true })
   }
 
   return (

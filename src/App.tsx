@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigationType } from 'react-router-dom'
 import AvisoGate from './components/AvisoGate'
 import RotaProtegida from './components/RotaProtegida'
 import BottomNav from './components/BottomNav'
@@ -11,6 +11,7 @@ import Spinner from './components/Spinner'
 import { useSessao } from './auth/useSessao'
 import { aplicarVersaoNovaSePreciso } from './utils/atualizacaoApp'
 import { atualizarCorDasBarras } from './utils/tema'
+import { registrarTela } from './utils/pilhaNavegacao'
 
 // Uma página por chunk — carregada só quando o cliente navega até ela, em
 // vez de tudo num bundle inicial só (a lista de rotas só cresce).
@@ -59,6 +60,12 @@ function App() {
     aplicarVersaoNovaSePreciso()
     atualizarCorDasBarras()
   }, [location.pathname])
+
+  // Nível de cada tela no histórico, para o voltar da barra (utils/pilhaNavegacao.ts).
+  const tipoNavegacao = useNavigationType()
+  useEffect(() => {
+    registrarTela(location.key, location.pathname, tipoNavegacao)
+  }, [location.key, location.pathname, tipoNavegacao])
 
   return (
     <AvisoGate>

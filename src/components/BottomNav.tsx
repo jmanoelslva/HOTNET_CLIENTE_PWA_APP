@@ -1,8 +1,10 @@
+import { useEffect, useRef, type MouseEvent } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { MdHome, MdOutlineHome, MdOutlinePayments, MdOutlineSupportAgent, MdPayments, MdSupportAgent } from 'react-icons/md'
 import { IcPix } from './IconesApp'
 import { useSessao } from '../auth/useSessao'
 import { contasSalvas, fotoDaConta } from '../utils/contaLocal'
+import { nivelDaTela, planoTrocaDeAba } from '../utils/pilhaNavegacao'
 import type { IconType } from 'react-icons'
 import './BottomNav.css'
 
@@ -42,10 +44,36 @@ function AvatarAba({ ativo }: { ativo: boolean }) {
 export default function BottomNav() {
   const navigate = useNavigate()
   const location = useLocation()
+  // Troca de aba que espera o "voltar" do histórico terminar.
+  const pendente = useRef<{ to: string; state?: unknown } | null>(null)
+
+  useEffect(() => {
+    const p = pendente.current
+    if (!p) return
+    pendente.current = null
+    if (location.pathname !== p.to || p.state) navigate(p.to, { replace: true, state: p.state })
+  }, [location.key, navigate, location.pathname])
+
+  /**
+   * Abas como no app Android: ficam sempre logo acima do Início, então o
+   * voltar de qualquer aba leva ao Início e, dele, sai do app — sem passar
+   * por todas as telas abertas antes.
+   */
+  function irParaAba(evento: MouseEvent | null, to: string, state?: unknown) {
+    evento?.preventDefault()
+    if (to === location.pathname && !state) return
+    const { voltar, substituir } = planoTrocaDeAba(nivelDaTela(location.key, location.pathname), to)
+    if (voltar > 0) {
+      if (to !== '/') pendente.current = { to, state }
+      navigate(-voltar)
+      return
+    }
+    navigate(to, { replace: substituir, state, viewTransition: true })
+  }
 
   // "Pagar" abre os boletos em aberto (no app Android: a aba do mais urgente).
   function pagar() {
-    navigate('/boletos', { state: { filtro: 'aberto' }, viewTransition: true })
+    irParaAba(null, '/boletos', { filtro: 'aberto' })
   }
 
   function renderItem(item: Item) {
@@ -55,7 +83,7 @@ export default function BottomNav() {
         key={item.to}
         to={item.to}
         end={item.fim}
-        viewTransition
+        onClick={(e) => irParaAba(e, item.to)}
         className={`bottom-nav-item ${ativo ? 'ativo' : ''}`}
       >
         <span className="bottom-nav-pilula">
@@ -80,7 +108,7 @@ export default function BottomNav() {
       {DIREITA.map(renderItem)}
       <NavLink
         to="/perfil"
-        viewTransition
+        onClick={(e) => irParaAba(e, '/perfil')}
         className={`bottom-nav-item ${location.pathname.startsWith('/perfil') ? 'ativo' : ''}`}
       >
         <span className="bottom-nav-pilula">

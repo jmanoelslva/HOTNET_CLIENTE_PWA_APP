@@ -78,8 +78,24 @@ export function salvarFoto(documento: string, dataUrl: string | null): void {
   window.dispatchEvent(new Event('hotnet-foto'))
 }
 
-/** Reduz a imagem escolhida para 256×256 (corte central) em JPEG. */
-export async function prepararFoto(arquivo: File): Promise<string> {
+/** Foto em HEIC/HEIF (câmera do iPhone e de vários Samsung): o navegador do Android não abre. */
+export class FormatoFotoNaoSuportado extends Error {}
+
+function pareceHeic(arquivo: File): boolean {
+  return /hei[cf]/i.test(arquivo.type) || /\.hei[cf]$/i.test(arquivo.name)
+}
+
+async function decodificar(arquivo: File): Promise<{ origem: CanvasImageSource; largura: number; altura: number; liberar: () => void }> {
+  // createImageBitmap: decodifica fora da tela, gasta menos memória com foto
+  // grande da câmera e já respeita a rotação (EXIF).
+  if (typeof createImageBitmap === 'function') {
+    try {
+      const bitmap = await createImageBitmap(arquivo)
+      return { origem: bitmap, largura: bitmap.width, altura: bitmap.height, liberar: () => bitmap.close() }
+    } catch {
+      // Cai para o <img> abaixo.
+    }
+  }
   const url = URL.createObjectURL(arquivo)
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -88,15 +104,34 @@ export async function prepararFoto(arquivo: File): Promise<string> {
       i.onerror = () => reject(new Error('Imagem inválida'))
       i.src = url
     })
-    const lado = Math.min(img.naturalWidth, img.naturalHeight)
+    return { origem: img, largura: img.naturalWidth, altura: img.naturalHeight, liberar: () => URL.revokeObjectURL(url) }
+  } catch (erro) {
+    URL.revokeObjectURL(url)
+    throw erro
+  }
+}
+
+/** Reduz a imagem escolhida para 256×256 (corte central) em JPEG. */
+export async function prepararFoto(arquivo: File): Promise<string> {
+  let imagem
+  try {
+    imagem = await decodificar(arquivo)
+  } catch (erro) {
+    if (pareceHeic(arquivo)) throw new FormatoFotoNaoSuportado('HEIC')
+    throw erro
+  }
+  try {
+    const { origem, largura, altura } = imagem
+    if (!largura || !altura) throw new Error('Imagem vazia')
+    const lado = Math.min(largura, altura)
     const canvas = document.createElement('canvas')
     canvas.width = 256
     canvas.height = 256
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('Sem canvas')
-    ctx.drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, 256, 256)
+    ctx.drawImage(origem, (largura - lado) / 2, (altura - lado) / 2, lado, lado, 0, 0, 256, 256)
     return canvas.toDataURL('image/jpeg', 0.85)
   } finally {
-    URL.revokeObjectURL(url)
+    imagem.liberar()
   }
 }

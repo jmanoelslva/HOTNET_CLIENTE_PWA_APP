@@ -9,7 +9,7 @@ import { usePwaInstall } from '../hooks/usePwaInstall'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import { mascararDocumento } from '../utils/recibo'
 import { nomeParaExibir } from '../utils/formatacao'
-import { fotoDaConta, prepararFoto, salvarFoto } from '../utils/contaLocal'
+import { FormatoFotoNaoSuportado, fotoDaConta, prepararFoto, salvarFoto } from '../utils/contaLocal'
 import { pinAtivo } from '../utils/pinApp'
 import { useToast } from '../components/Toast/useToast'
 import CabecalhoTela from '../components/CabecalhoTela'
@@ -42,8 +42,13 @@ export default function Perfil() {
       const dataUrl = await prepararFoto(arquivo)
       salvarFoto(cpf, dataUrl)
       setFoto(dataUrl)
-    } catch {
-      toast('Não foi possível usar essa imagem. Tente outra.')
+    } catch (erro) {
+      console.error('[foto de perfil]', arquivo.type || '(sem tipo)', arquivo.size, erro)
+      toast(
+        erro instanceof FormatoFotoNaoSuportado
+          ? 'Essa foto está em HEIC, formato que o navegador não abre. Escolha uma foto em JPG ou PNG (por exemplo, um print da foto).'
+          : 'Não foi possível usar essa imagem. Tente outra foto.',
+      )
     }
   }
 
@@ -90,7 +95,7 @@ export default function Perfil() {
         <input
           ref={entradaFoto}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/*"
           hidden
           onChange={(e) => {
             escolherFoto(e.target.files?.[0])
