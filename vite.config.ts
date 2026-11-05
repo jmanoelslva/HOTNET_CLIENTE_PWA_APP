@@ -42,6 +42,8 @@ export default defineConfig({
         clientsClaim: true,
         // Padrão (js/css/html) + as fontes locais, para abrir já com elas.
         globPatterns: ['**/*.{js,css,html,woff2}'],
+        // O gerador de PDF (jsPDF e dependências) só baixa quando alguém gera um recibo ou declaração.
+        globIgnores: ['**/jspdf*.js', '**/index.es-*.js', '**/html2canvas*.js', '**/purify*.js'],
       },
       manifest: {
         name: 'HOTNET — Portal do Cliente',

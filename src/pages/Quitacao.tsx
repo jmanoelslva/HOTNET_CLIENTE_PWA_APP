@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { IcCheckCircle, IcSchedule, IcTask, IcWarning } from '../components/IconesApp'
-import { createPortal } from 'react-dom'
+import { MdShare } from 'react-icons/md'
+import { IcCheckCircle, IcSchedule, IcWarning } from '../components/IconesApp'
 import { useSessao } from '../auth/useSessao'
 import { listarBoletos, type FaturaDto } from '../api/client'
 import { buscarDadosCliente } from '../api/cadastro'
@@ -9,95 +9,10 @@ import BotaoFechar from '../components/BotaoFechar'
 import Skeleton from '../components/Skeleton'
 import { AbasPilula, RotuloGrupo } from '../components/PadraoTelas'
 import { anosQuitacao, montarDadosQuitacao, type AnoQuitacao, type DadosQuitacao } from '../utils/quitacao'
-import { EMPRESA_RECIBO, formatarReais, rotuloDocumento, valorPorExtenso } from '../utils/recibo'
-import logoHotnet from '../assets/logo-hotnet.png'
-import '../components/ReciboModal.css'
+import { formatarReais } from '../utils/recibo'
+import { compartilharPdf, pdfQuitacao } from '../utils/pdfDocumentos'
+import { useToast } from '../components/Toast/useToast'
 import './Quitacao.css'
-
-/** Declaração em folha (impressão / "Salvar como PDF"), mesmo esquema do recibo. */
-function QuitacaoImpressao({ d }: { d: DadosQuitacao }) {
-  return (
-    <div className="recibo-impressao" aria-hidden="true">
-      <div className="ri-faixa" />
-      <header className="ri-topo">
-        <div className="ri-marca">
-          <img src={logoHotnet} alt="" width={56} height={56} />
-          <div>
-            <h1>{EMPRESA_RECIBO.nome}</h1>
-            <small>
-              {EMPRESA_RECIBO.responsavel} · CNPJ {EMPRESA_RECIBO.cnpj}
-            </small>
-            <small>
-              {EMPRESA_RECIBO.endereco} · {EMPRESA_RECIBO.cidade}
-            </small>
-          </div>
-        </div>
-        <div className="ri-titulo">
-          <b>Declaração de quitação</b>
-          Ano de referência {d.ano}
-          <small>Lei nº 12.007/2009</small>
-        </div>
-      </header>
-      <p className="ri-corpo">
-        Declaramos, para os fins da Lei nº 12.007/2009, que <b>{d.clienteNome?.toUpperCase() ?? 'TITULAR DO CONTRATO'}</b>
-        {d.documentoMascarado ? `, ${rotuloDocumento(d.documentoMascarado)} ${d.documentoMascarado}` : ''}, efetuou o
-        pagamento de todas as cobranças{d.contratoNumero != null ? ` do contrato nº ${d.contratoNumero}` : ''} com vencimento
-        no ano de <b>{d.ano}</b>, no total de{' '}
-        <b>
-          {formatarReais(d.totalCentavos)} ({valorPorExtenso(d.totalCentavos)})
-        </b>
-        , nada devendo a esta empresa referente a esse período.
-      </p>
-      <div className="ri-info">
-        <div>
-          <span>Ano</span>
-          {d.ano}
-        </div>
-        <div>
-          <span>Cobranças</span>
-          {d.linhas.length}
-        </div>
-        <div>
-          <span>Contrato</span>
-          {d.contratoNumero != null ? `Nº ${d.contratoNumero}` : '—'}
-        </div>
-        <div>
-          <span>Total pago</span>
-          {formatarReais(d.totalCentavos)}
-        </div>
-      </div>
-      <table className="ri-tabela">
-        <thead>
-          <tr>
-            <th>Cobrança</th>
-            <th>Vencimento</th>
-            <th>Pagamento</th>
-            <th className="ri-valor">Valor pago</th>
-          </tr>
-        </thead>
-        <tbody>
-          {d.linhas.map((l) => (
-            <tr key={l.numero}>
-              <td>Nº {l.numero}</td>
-              <td>{l.vencimento}</td>
-              <td>{l.pagamento}</td>
-              <td className="ri-valor">{formatarReais(l.pagoCentavos)}</td>
-            </tr>
-          ))}
-          <tr className="ri-total">
-            <td colSpan={3}>Total pago no ano</td>
-            <td className="ri-valor">{formatarReais(d.totalCentavos)}</td>
-          </tr>
-        </tbody>
-      </table>
-      <small className="ri-rodape">
-        Esta declaração substitui, para a comprovação do cumprimento das obrigações do consumidor, as quitações dos
-        faturamentos mensais dos débitos do ano a que se refere e dos anos anteriores (art. 4º da Lei nº 12.007/2009).
-        Emitida pelo portal HOTNET em {new Date().toLocaleDateString('pt-BR')}.
-      </small>
-    </div>
-  )
-}
 
 function situacao(ano: AnoQuitacao): { texto: string; tom: 'ok' | 'andamento' | 'pendente' } {
   if (ano.disponivel) return { texto: `${ano.faturas.length} cobranças · ${formatarReais(ano.totalPagoCentavos)}`, tom: 'ok' }
@@ -117,7 +32,8 @@ export default function Quitacao() {
   const [erro, setErro] = useState<string | null>(null)
   const [contratoPk, setContratoPk] = useState<number | null>(null)
   const [cliente, setCliente] = useState<{ nome: string | null; doc: string | null }>({ nome: null, doc: cpf })
-  const [imprimindo, setImprimindo] = useState<DadosQuitacao | null>(null)
+  const [gerandoAno, setGerandoAno] = useState<number | null>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     listarBoletos()
@@ -141,19 +57,22 @@ export default function Quitacao() {
 
   const anos = faturas && contratoPk != null ? anosQuitacao(faturas, contratoPk, new Date().getFullYear()) : []
 
-  useEffect(() => {
-    if (!imprimindo) return
-    const limpar = () => {
-      document.body.classList.remove('imprimindo-recibo')
-      window.removeEventListener('afterprint', limpar)
-      setImprimindo(null)
+  /** Declaração em PDF de verdade, compartilhada como arquivo (como no app). */
+  async function compartilhar(ano: AnoQuitacao) {
+    const dados: DadosQuitacao | null = montarDadosQuitacao(ano, cliente.nome, cliente.doc)
+    if (!dados) return
+    setGerandoAno(ano.ano)
+    try {
+      const blob = await pdfQuitacao(dados)
+      const resultado = await compartilharPdf(blob, `declaracao-quitacao-hotnet-${dados.ano}.pdf`, `Declaração de quitação ${dados.ano}`)
+      if (resultado === 'baixado') toast('Declaração salva em PDF.', 'sucesso')
+    } catch (erro) {
+      console.error('[quitação pdf]', erro)
+      toast('Não foi possível gerar o PDF da declaração. Tente novamente.')
+    } finally {
+      setGerandoAno(null)
     }
-    document.body.classList.add('imprimindo-recibo')
-    window.addEventListener('afterprint', limpar)
-    // Espera a folha entrar no documento antes de abrir a impressão.
-    const t = setTimeout(() => window.print(), 50)
-    return () => clearTimeout(t)
-  }, [imprimindo])
+  }
 
   return (
     <div className="quitacao-tela tela-entrada">
@@ -199,9 +118,10 @@ export default function Quitacao() {
                     <button
                       type="button"
                       className="botao-contorno quitacao-gerar"
-                      onClick={() => setImprimindo(montarDadosQuitacao(ano, cliente.nome, cliente.doc))}
+                      disabled={gerandoAno != null}
+                      onClick={() => compartilhar(ano)}
                     >
-                      <IcTask size={16} /> PDF
+                      <MdShare size={16} /> {gerandoAno === ano.ano ? 'Gerando…' : 'Compartilhar'}
                     </button>
                   ) : (
                     <span className="quitacao-indisponivel">Indisponível</span>
@@ -217,7 +137,6 @@ export default function Quitacao() {
         <p className="quitacao-nenhum">Ainda não há ano encerrado com todas as cobranças pagas neste contrato.</p>
       )}
 
-      {imprimindo && createPortal(<QuitacaoImpressao d={imprimindo} />, document.body)}
     </div>
   )
 }
