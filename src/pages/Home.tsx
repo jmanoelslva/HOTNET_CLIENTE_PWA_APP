@@ -22,10 +22,9 @@ import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import PullToRefresh from '../components/PullToRefresh'
 import './Home.css'
 
+// "Olá, Nome", como main_saudacao_formato do app.
 function saudacaoPorHorario(primeiroNome: string): string {
-  const hora = new Date().getHours()
-  const periodo = hora >= 5 && hora < 12 ? 'Bom dia' : hora >= 12 && hora < 18 ? 'Boa tarde' : 'Boa noite'
-  return `${periodo}, ${primeiroNome}!`
+  return `Olá, ${primeiroNome}`
 }
 
 function formatarData(data: string | undefined): string {

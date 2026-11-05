@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { MdRadioButtonUnchecked } from 'react-icons/md'
 import { IcCheckCircle, IcLock } from '../components/IconesApp'
+import BotaoFechar from '../components/BotaoFechar'
 import { useNavigate } from 'react-router-dom'
 import { useSessao } from '../auth/useSessao'
 import { alterarSenha, login, SessaoExpiradaError } from '../api/client'
@@ -103,7 +104,7 @@ export default function AlterarSenha() {
 
   return (
     <div className="senha-tela tela-entrada">
-      <CabecalhoTela titulo="Alterar senha" subtitulo="A senha que você usa para entrar no portal e no app." />
+      <CabecalhoTela titulo="Alterar senha" acoes={<BotaoFechar />} />
 
       {etapa === 'confirmar' && (
         <form className="senha-card" onSubmit={confirmarSenhaAtual}>

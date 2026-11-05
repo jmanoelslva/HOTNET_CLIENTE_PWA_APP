@@ -17,7 +17,7 @@ const PASSOS = [
   {
     seletor: '.bottom-nav-pagar-botao',
     titulo: 'Pagar em um toque',
-    texto: 'O botão do meio abre direto os boletos em aberto, com Pix e QR Code.',
+    texto: 'O botão do meio abre direto o boleto mais urgente, com Pix e QR Code.',
   },
   {
     seletor: '.home-atalhos',

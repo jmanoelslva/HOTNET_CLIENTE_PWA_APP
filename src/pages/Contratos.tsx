@@ -9,6 +9,9 @@ import Skeleton from '../components/Skeleton'
 import { AbasPilula, BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import { abrirEImprimir } from '../utils/impressao'
 import { useToast } from '../components/Toast/useToast'
+import EstadoVazio from '../components/EstadoVazio'
+import { useSessao } from '../auth/useSessao'
+import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import './Contratos.css'
 
 // contract_status: ponto colorido + texto, como no app Android.
@@ -41,6 +44,7 @@ function mesAnoPorExtenso(data: string | null): string | null {
  */
 export default function Contratos() {
   const { toast } = useToast()
+  const { cpf } = useSessao()
   const [contratos, setContratos] = useState<Contrato[]>([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
@@ -60,7 +64,6 @@ export default function Contratos() {
     try {
       // contract_client_show=false: o contrato sai da lista (o status dele ainda vale na Início).
       const resultado = (await buscarContratos()).filter((contrato) => contrato.podeVerDados)
-      if (resultado.length === 0) setErro('Nenhum contrato disponível para exibição no momento.')
       setContratos(resultado)
       setSelecionado((atual) => (resultado.some((c) => c.id === atual) ? atual : (resultado[0]?.id ?? null)))
     } catch {
@@ -94,6 +97,15 @@ export default function Contratos() {
               Tentar novamente
             </button>
           </div>
+        )}
+
+        {!carregando && !erro && contratos.length === 0 && (
+          <EstadoVazio
+            icone={IcDescription}
+            titulo="Nenhum contrato por aqui"
+            subtitulo="Se você tem internet da HOTNET e não vê o contrato, fale com a gente."
+            acao={{ rotulo: 'Falar no WhatsApp', onClick: () => abrirWhatsappSuporte(null, cpf) }}
+          />
         )}
 
         {!carregando && contrato && (

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { MdAdd, MdKeyboardArrowRight } from 'react-icons/md'
-import { IcCampaign, IcClose, IcConstruction, IcPayments, IcSell, IcSupportAgent, IcSwapHoriz, IcWarning, IcWhatsapp } from '../components/IconesApp'
+import { IcCampaign, IcCheckCircle, IcClose, IcConstruction, IcPayments, IcSell, IcSupportAgent, IcSwapHoriz, IcWarning, IcWhatsapp } from '../components/IconesApp'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { IconType } from 'react-icons'
 import { useSessao } from '../auth/useSessao'
@@ -244,18 +244,18 @@ export default function Suporte() {
       )}
 
       {!carregando && !erro && filtrados.length === 0 && !haMaisParaCarregar && (
-        <EstadoVazio
-          icone={IcSupportAgent}
-          titulo={aba === 'resolvidos' ? 'Nenhum chamado resolvido ainda' : 'Nenhum chamado em aberto'}
-          subtitulo={aba === 'resolvidos' ? undefined : 'Tudo certo por aqui. Precisando, toque em "Novo chamado".'}
-        />
+        aba === 'resolvidos' ? (
+          <EstadoVazio icone={IcSupportAgent} titulo="Nenhum chamado resolvido ainda" />
+        ) : (
+          <EstadoVazio icone={IcCheckCircle} tom="sucesso" titulo="Você não tem chamados em aberto" />
+        )
       )}
 
       {!carregando && !erro && filtrados.length === 0 && haMaisParaCarregar && (
         <div className="suporte-status">
           <p>
             Nenhum chamado {aba === 'resolvidos' ? 'resolvido' : 'em aberto'} entre os já carregados — toque em
-            "Carregar mais" abaixo pra continuar procurando.
+            "Carregar mais" abaixo para continuar procurando.
           </p>
         </div>
       )}
@@ -279,7 +279,7 @@ export default function Suporte() {
                           <IconeCategoria size={18} />
                         </span>
                         <span className="ticket-textos">
-                          <strong className="ticket-assunto">{chamado.ticket_title ?? 'Chamado sem título'}</strong>
+                          <strong className="ticket-assunto">{chamado.ticket_title ?? 'Sem título'}</strong>
                           <span className="ticket-meta">
                             {chamado.category_name ?? 'Categoria não informada'} · Protocolo{' '}
                             {chamado.ticket_protocol ?? chamado.ticket_pk}
@@ -294,7 +294,7 @@ export default function Suporte() {
                   <span className="ticket-rodape">
                     <span>
                       {resolvido
-                        ? `Aberto em ${formatarData(chamado.ticket_date_create) ?? '—'} · fechado em ${formatarData(chamado.ticket_date_close) ?? '—'}`
+                        ? `Aberto em ${formatarData(chamado.ticket_date_create) ?? '—'} · Resolvido em ${formatarData(chamado.ticket_date_close) ?? '—'}`
                         : `Aberto em ${formatarData(chamado.ticket_date_create) ?? '—'}`}
                     </span>
                     <span className="ticket-ver">

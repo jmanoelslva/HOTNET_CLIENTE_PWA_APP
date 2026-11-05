@@ -76,7 +76,7 @@ export default function Faq() {
 
   return (
     <div className="faq-tela tela-entrada">
-      <CabecalhoTela titulo="Dúvidas" subtitulo="Perguntas frequentes e nossos canais de contato." />
+      <CabecalhoTela titulo="Dúvidas frequentes" subtitulo="Respostas rápidas sobre conexão, boletos e sua conta." />
 
       <input
         className="faq-busca"
@@ -130,7 +130,7 @@ export default function Faq() {
       </section>
 
       {grupos.length === 0 && (
-        <EstadoVazio icone={MdSearchOff} titulo="Nenhuma pergunta encontrada" subtitulo="Tente buscar com outras palavras." />
+        <EstadoVazio icone={MdSearchOff} titulo={`Nada encontrado para "${busca.trim()}"`} />
       )}
 
       {grupos.map(({ categoria, itens }) => (
@@ -181,7 +181,7 @@ export default function Faq() {
           <IcWhatsapp size={22} />
         </span>
         <span className="faq-falar-textos">
-          <strong>Não achou sua dúvida?</strong>
+          <strong>Não encontrou sua dúvida?</strong>
           <span>Fale com a gente no WhatsApp</span>
         </span>
         <span className="faq-falar-chamar">Chamar</span>

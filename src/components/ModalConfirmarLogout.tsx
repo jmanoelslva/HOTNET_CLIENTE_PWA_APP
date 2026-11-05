@@ -14,7 +14,7 @@ export default function ModalConfirmarLogout({ aberto, onCancelar, onConfirmar }
       aberto={aberto}
       onFechar={onCancelar}
       titulo="Sair da conta?"
-      texto="Sua conta continua salva neste aparelho para entrar de novo."
+      texto="Sua conta continua salva neste celular para entrar de novo."
       icone={MdExitToApp}
       tom="perigo"
       acoes={

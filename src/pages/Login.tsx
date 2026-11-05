@@ -66,7 +66,7 @@ export default function Login() {
       <div className="login-card">
         {contas.length > 0 && (
           <div className="login-contas">
-            <span className="login-contas-titulo">Contas neste aparelho</span>
+            <span className="login-contas-titulo">Contas salvas neste celular</span>
             {contas.map((conta) => {
               const foto = fotoDaConta(conta.documento)
               const ativa = usuario.replace(/\D/g, '') === conta.documento

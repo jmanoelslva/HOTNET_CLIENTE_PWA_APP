@@ -86,7 +86,7 @@ describe('Suporte — estado vazio x paginação por aba', () => {
     renderizar()
 
     await waitFor(() => expect(screen.getByRole('button', { name: /Carregar mais/ })).toBeInTheDocument())
-    expect(screen.queryByText('Nenhum chamado em aberto')).not.toBeInTheDocument()
+    expect(screen.queryByText('Você não tem chamados em aberto')).not.toBeInTheDocument()
     expect(screen.getByText(/entre os já carregados/)).toBeInTheDocument()
   })
 
@@ -97,7 +97,7 @@ describe('Suporte — estado vazio x paginação por aba', () => {
 
     renderizar()
 
-    await waitFor(() => expect(screen.getByText('Nenhum chamado em aberto')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Você não tem chamados em aberto')).toBeInTheDocument())
     expect(screen.queryByRole('button', { name: /Carregar mais/ })).not.toBeInTheDocument()
   })
 })

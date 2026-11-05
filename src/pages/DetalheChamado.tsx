@@ -248,7 +248,7 @@ export default function DetalheChamado() {
         )}
 
         {!carregando && !erro && listaExibida.length === 0 && (
-          <EstadoVazio icone={MdChatBubbleOutline} titulo="Nenhuma mensagem ainda" subtitulo="Escreva algo pra começar a conversa." />
+          <EstadoVazio icone={MdChatBubbleOutline} titulo="Nenhuma mensagem ainda." />
         )}
 
         {!carregando &&

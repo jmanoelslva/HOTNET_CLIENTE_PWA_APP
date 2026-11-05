@@ -1,6 +1,7 @@
 import CabecalhoTela from '../components/CabecalhoTela'
 import { MdLanguage } from 'react-icons/md'
 import { IcPrivacyTip, IcShare, IcWhatsapp } from '../components/IconesApp'
+import BotaoFechar from '../components/BotaoFechar'
 import { BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import { useToast } from '../components/Toast/useToast'
 import logoApp from '../assets/logo-app.png'
@@ -40,7 +41,7 @@ export default function Sobre() {
 
   return (
     <div className="sobre-tela tela-entrada">
-      <CabecalhoTela titulo="Sobre" subtitulo="Portal do cliente HOTNET." />
+      <CabecalhoTela titulo="Sobre" acoes={<BotaoFechar />} />
 
       <section className="cartao-destaque sobre-cartao">
         <span className="sobre-logo-circulo">
