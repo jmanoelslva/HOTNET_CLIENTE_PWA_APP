@@ -214,7 +214,13 @@ export default function Cadastro() {
               className="cadastro-dado-errado"
               onClick={() => abrirWhatsappSuporte(cliente.client_complete_name ?? null, documento || cpf)}
             >
-              <FaWhatsapp size={18} aria-hidden="true" /> Algum dado errado? Fale com a gente
+              <span className="cadastro-dado-errado-icone" aria-hidden="true">
+                <FaWhatsapp size={20} />
+              </span>
+              <span className="cadastro-dado-errado-textos">
+                <strong>Algum dado errado?</strong>
+                <span>Peça a atualização pelo WhatsApp</span>
+              </span>
             </button>
           </>
         )}

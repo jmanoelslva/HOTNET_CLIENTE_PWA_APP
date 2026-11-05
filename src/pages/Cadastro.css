@@ -68,23 +68,49 @@
   color: var(--cor-texto-secundario);
 }
 
+/* "Algum dado errado?" (AlgumDadoErrado do app Android): cartão branco
+   com o símbolo do WhatsApp num círculo verde. */
 .cadastro-dado-errado {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
-  min-height: 48px;
   margin-top: 6px;
-  border: none;
-  background: transparent;
-  color: var(--cor-primaria);
+  padding: 12px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
   font: inherit;
-  font-size: 14px;
-  font-weight: 800;
+  text-align: left;
   cursor: pointer;
 }
 
-:root[data-theme='dark'] .cadastro-dado-errado {
-  color: var(--cor-primaria-clara);
+.cadastro-dado-errado-icone {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-whatsapp);
+  color: #ffffff;
+}
+
+.cadastro-dado-errado-textos {
+  display: flex;
+  flex-direction: column;
+}
+
+.cadastro-dado-errado-textos strong {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 800;
+}
+
+.cadastro-dado-errado-textos span {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--cor-texto-secundario);
 }
