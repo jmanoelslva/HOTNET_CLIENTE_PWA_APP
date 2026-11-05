@@ -3,6 +3,8 @@ import {
   dataIsoParaBr,
   formatarCentavosComSinal,
   linhasDemonstrativo,
+  acrescimosCentavos,
+  tituloSemAcrescimosCentavos,
   mascararDocumento,
   montarDadosRecibo,
   numeroRecibo,
@@ -83,6 +85,20 @@ describe('recibo — montagem e demonstrativo', () => {
       { nome: 'Plano 100Mbps', valorCentavos: 5000, descontoCentavos: 450, outrosCentavos: 0 },
       { nome: 'ROTEADOR', valorCentavos: 0, descontoCentavos: 0, outrosCentavos: 0 },
     ])!
-    expect(linhasDemonstrativo(d).map((l) => l.tipo)).toEqual(['item', 'desconto', 'item'])
+    // Item zerado (comodato) sai; item único vira mensalidade, como no app.
+    expect(linhasDemonstrativo(d).map((l) => l.tipo)).toEqual(['mensalidade', 'desconto'])
+  })
+
+  it('juros já embutidos no título: acréscimos vêm dos itens de encargo', () => {
+    const d = montarDadosRecibo({ ...fatura, invoice_amount_document: '52.35', invoice_amount_paid: '52.35' }, 'Ana', null, null, [
+      { nome: 'Plano 100Mbps', valorCentavos: 5000, descontoCentavos: 0, outrosCentavos: 0 },
+      { nome: 'Multa/Juros por atraso de pagamento', valorCentavos: 235, descontoCentavos: 0, outrosCentavos: 0 },
+    ])!
+    expect(acrescimosCentavos(d)).toBe(235)
+    expect(tituloSemAcrescimosCentavos(d)).toBe(5000)
+    expect(linhasDemonstrativo(d)).toEqual([
+      { tipo: 'mensalidade', nome: 'Plano 100Mbps', centavos: 5000 },
+      { tipo: 'encargos', nome: null, centavos: 235 },
+    ])
   })
 })

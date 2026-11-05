@@ -14,6 +14,7 @@ import {
   textoPrazo,
   valorAtual,
 } from '../utils/faturas'
+import './PadraoTelas.css'
 import './CartaoBoleto.css'
 
 // Chave Pix (CNPJ) quando o boleto não traz código próprio, como no app.

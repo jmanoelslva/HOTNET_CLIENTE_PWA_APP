@@ -134,14 +134,49 @@ export function numeroRecibo(d: DadosRecibo): string {
   return String(d.invoicePk).padStart(8, '0')
 }
 
+/** Itens de encargo do list_details, ex.: "Multa/Juros por atraso de pagamento" (como no app). */
+export function ehEncargo(nome: string): boolean {
+  return /multa|juros/i.test(nome)
+}
+
+/**
+ * Multa/juros do fechamento (DadosRecibo.acrescimosCentavos do app). Com itens,
+ * soma os itens de encargo: o Controllr às vezes grava o título já com os
+ * juros (título = pago), e a diferença pago − título daria zero.
+ */
+export function acrescimosCentavos(d: DadosRecibo): number {
+  if (d.itens.length > 0) {
+    const soma = d.itens
+      .filter((i) => ehEncargo(i.nome))
+      .reduce((t, i) => t + i.valorCentavos - i.descontoCentavos + i.outrosCentavos, 0)
+    return Math.max(soma, 0)
+  }
+  return Math.max(d.pagoCentavos - d.tituloCentavos, 0)
+}
+
+/** "Valor do título" do fechamento: sem os acréscimos, para fechar título + acréscimos = pago. */
+export function tituloSemAcrescimosCentavos(d: DadosRecibo): number {
+  const acrescimos = acrescimosCentavos(d)
+  return acrescimos > 0 ? d.pagoCentavos - acrescimos : d.tituloCentavos
+}
+
+/** Serviços primeiro (item único = mensalidade do plano), encargos numa linha só no fim. */
 export function linhasDemonstrativo(d: DadosRecibo): LinhaRecibo[] {
   if (d.itens.length > 0) {
-    return d.itens.flatMap((item) => {
-      const linhas: LinhaRecibo[] = [{ tipo: 'item', nome: item.nome, centavos: item.valorCentavos }]
-      if (item.descontoCentavos > 0) linhas.push({ tipo: 'desconto', nome: item.nome, centavos: -item.descontoCentavos })
-      if (item.outrosCentavos > 0) linhas.push({ tipo: 'outros', nome: item.nome, centavos: item.outrosCentavos })
-      return linhas
+    // Sem itens zerados (equipamento em comodato, ex.: "ROTEADOR HUAWEI AX2" a R$ 0,00).
+    const servicos = d.itens
+      .filter((i) => !ehEncargo(i.nome))
+      .filter((i) => i.valorCentavos !== 0 || i.descontoCentavos !== 0 || i.outrosCentavos !== 0)
+    const tipo: TipoLinhaRecibo = servicos.length === 1 ? 'mensalidade' : 'item'
+    const linhas: LinhaRecibo[] = servicos.flatMap((item) => {
+      const l: LinhaRecibo[] = [{ tipo, nome: item.nome, centavos: item.valorCentavos }]
+      if (item.descontoCentavos > 0) l.push({ tipo: 'desconto', nome: item.nome, centavos: -item.descontoCentavos })
+      if (item.outrosCentavos > 0) l.push({ tipo: 'outros', nome: item.nome, centavos: item.outrosCentavos })
+      return l
     })
+    const acrescimos = acrescimosCentavos(d)
+    if (acrescimos > 0) linhas.push({ tipo: 'encargos', nome: null, centavos: acrescimos })
+    return linhas
   }
   const encargos = Math.max(d.pagoCentavos - d.tituloCentavos, 0)
   const desconto = Math.max(d.tituloCentavos - d.pagoCentavos, 0)
@@ -151,18 +186,19 @@ export function linhasDemonstrativo(d: DadosRecibo): LinhaRecibo[] {
   return linhas
 }
 
+/** Mesmos textos do app (recibo_mensalidade_plano, recibo_encargos…). */
 export function descricaoLinha(linha: LinhaRecibo): string {
   switch (linha.tipo) {
     case 'item':
-      return linha.nome ?? 'Item'
+      return linha.nome ?? ''
     case 'mensalidade':
-      return linha.nome ? `Mensalidade · ${linha.nome}` : 'Mensalidade'
+      return linha.nome ? `${linha.nome} — mensalidade` : 'Mensalidade'
     case 'encargos':
-      return 'Multa e juros por atraso de pagamento'
+      return 'Multa e juros por pagamento após o vencimento'
     case 'desconto':
       return linha.nome ? `Desconto · ${linha.nome}` : 'Desconto'
     case 'outros':
-      return `Outros · ${linha.nome ?? ''}`.trim()
+      return `Outros · ${linha.nome ?? ''}`
   }
 }
 
