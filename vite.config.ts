@@ -44,7 +44,8 @@ export default defineConfig({
         lang: 'pt-BR',
         start_url: '/',
         display: 'standalone',
-        background_color: '#f5f5f5',
+        // Tela de abertura (splash) na cor da marca, como o app do técnico.
+        background_color: '#f28f3b',
         theme_color: '#f28f3b',
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },

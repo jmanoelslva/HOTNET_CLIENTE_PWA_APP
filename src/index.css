@@ -113,6 +113,13 @@
   box-sizing: border-box;
 }
 
+/* Sensação de app: sem a página esticar no topo/fim (o "puxar para
+   atualizar" é do próprio app, PullToRefresh). */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
   background: var(--cor-fundo);
@@ -142,21 +149,55 @@ body:has(.bottom-nav) {
   animation: fade-in 0.22s ease;
 }
 
-/* Feedback tátil: qualquer botão, link ou item de lista clicável "afunda"
-   levemente ao toque, no lugar do brilho cinza padrão do navegador — mais
-   parecido com um app nativo. */
-button:not(:disabled),
-a,
-.ticket-card {
+/* --- Toque como app nativo ------------------------------------------------ */
+html {
+  /* Sem o realce do navegador ao tocar e sem zoom (pinça ou toque duplo)
+     na tela — o iPhone ignora user-scalable=no do viewport, por isso o
+     touch-action também. */
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.1s ease, opacity 0.1s ease;
+  touch-action: pan-x pan-y;
 }
 
-button:not(:disabled):active,
-a:active,
-.ticket-card:active {
-  transform: scale(0.96);
-  opacity: 0.85;
+/* Botões, abas, rótulos e títulos não selecionam texto ao segurar o dedo
+   (campos, linha digitável, código PIX e demais dados continuam
+   selecionáveis). */
+button,
+[role='tab'],
+nav,
+label,
+h1,
+h2,
+h3 {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Botão, link ou item de lista "afunda" de leve ao tocar. `scale` (não
+   transform) para não brigar com elementos que já usam transform para se
+   posicionar. */
+@media (pointer: coarse) {
+  button,
+  a,
+  [role='tab'],
+  .ticket-card {
+    transition: scale 0.12s ease;
+  }
+
+  button:active:not(:disabled),
+  a:active,
+  [role='tab']:active,
+  .ticket-card:active {
+    scale: 0.97;
+  }
+
+  /* Sem barra de rolagem visível no celular. */
+  html {
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Respeita quem desativou animação no sistema — para tudo (fade-in,
@@ -175,33 +216,54 @@ a:active,
 /* Transição entre telas — View Transitions API nativa do navegador (sem
    lib nenhuma), ligada via a prop "viewTransition" do react-router-dom
    em cada <Link>/<NavLink>/navigate() (ver App.tsx e as páginas). Troca
-   o corte seco de rota por um fade + leve deslize horizontal, parecido
-   com a navegação "empurrada" de um app nativo. Sem suporte no navegador
-   (Firefox, Safari antigo), a prop é ignorada e a navegação continua
-   funcionando normal, só sem a transição — progressive enhancement, não
-   quebra nada. */
+   o corte seco de rota pela navegação "empurrada" de app nativo: a tela
+   nova entra inteira pela direita por cima da anterior, que recua um
+   pouco e escurece. Sem suporte no navegador (Firefox, Safari antigo), a
+   prop é ignorada e a navegação continua funcionando normal, só sem a
+   transição. */
 @media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.25s;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation-fill-mode: both;
+  }
+
   ::view-transition-old(root) {
-    animation: tela-sai 0.22s ease both;
+    animation-name: tela-sai;
   }
 
   ::view-transition-new(root) {
-    animation: tela-entra 0.22s ease both;
+    animation-name: tela-entra;
   }
 }
 
 @keyframes tela-sai {
   to {
-    opacity: 0;
-    transform: translateX(-16px);
+    transform: translateX(-25%);
+    filter: brightness(0.85);
   }
 }
 
 @keyframes tela-entra {
   from {
-    opacity: 0;
-    transform: translateX(16px);
+    transform: translateX(100%);
   }
+}
+
+/* Barra do rodapé e aviso de sem conexão ficam parados durante a troca de
+   tela (senão deslizariam junto com a página). */
+.bottom-nav {
+  view-transition-name: barra-inferior;
+}
+
+.status-banner-offline {
+  view-transition-name: aviso-offline;
+}
+
+::view-transition-group(barra-inferior),
+::view-transition-group(aviso-offline) {
+  animation: none;
 }
 
 /* Texto só para leitores de tela (ex.: "atendida/pendente" nas regras da senha). */
