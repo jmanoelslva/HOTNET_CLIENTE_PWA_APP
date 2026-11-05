@@ -1,39 +1,38 @@
 .boletos-tela {
   max-width: var(--largura-conteudo);
   margin: 0 auto;
-  padding: 24px 20px 48px;
+  padding: 16px 16px 24px;
 }
 
+/* Abas em pílula, como AbasPilula do app Android: trilho cinza, aba ativa
+   branca; contagem em laranja-claro (atrasados em vermelho-claro). */
 .boletos-abas {
   display: flex;
-  gap: 8px;
+  padding: 3px;
   margin-bottom: 12px;
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie-alta);
 }
 
-/* Prefixado com .boletos-tela pra não colidir com o .aba-chip de mesmo
-   nome em Suporte.css — sem isso, o CSS de qualquer um dos dois arquivos
-   que "vencer" a ordem de import define a cor dos dois ao mesmo tempo. */
 .boletos-tela .aba-chip {
   flex: 1;
-  /* 44px = alvo de toque mínimo recomendado (WCAG 2.5.5 / Material Design). */
-  height: 44px;
+  min-width: 0;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 0 6px;
-  border-radius: 22px;
-  border: 1.5px solid var(--cor-ajuda);
+  gap: 5px;
+  padding: 8px 4px;
+  border: none;
+  border-radius: var(--raio-sm);
   background: transparent;
-  color: var(--cor-ajuda);
+  color: var(--cor-texto-secundario);
+  font: inherit;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 
-/* Rede de segurança: com 3 abas dividindo o espaço, um rótulo longo
-   (ex: "Em aberto" + contagem de 2 dígitos) corta em vez de sobrepor a
-   aba vizinha ou quebrar linha dentro dos 44px de altura fixa. */
 .boletos-tela .aba-chip-texto {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -42,55 +41,26 @@
 
 .boletos-tela .aba-chip-contagem {
   flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 800;
-  background: var(--cor-ajuda);
-  color: var(--cor-branco-fixo);
-}
-
-.boletos-tela .aba-chip.aba-atrasados {
-  border-color: var(--cor-erro);
-  color: var(--cor-erro);
-}
-
-.boletos-tela .aba-chip.aba-pagos {
-  border-color: var(--cor-sucesso);
-  color: var(--cor-sucesso);
+  line-height: 18px;
+  background: var(--cor-primaria-container);
+  color: var(--cor-sobre-primaria-container);
 }
 
 .boletos-tela .aba-chip.aba-atrasados .aba-chip-contagem {
-  background: var(--cor-erro);
-}
-
-.boletos-tela .aba-chip.aba-pagos .aba-chip-contagem {
-  background: var(--cor-sucesso);
+  background: var(--cor-terciaria-container);
+  color: var(--cor-terciaria);
 }
 
 .boletos-tela .aba-chip.ativa {
-  background: var(--cor-ajuda);
-  color: var(--cor-branco-fixo);
-}
-
-.boletos-tela .aba-chip.aba-atrasados.ativa {
-  background: var(--cor-erro);
-  color: var(--cor-branco-fixo);
-}
-
-.boletos-tela .aba-chip.aba-pagos.ativa {
-  background: var(--cor-sucesso);
-  color: var(--cor-branco-fixo);
-}
-
-.boletos-tela .aba-chip.ativa .aba-chip-contagem {
-  background: var(--cor-branco-fixo);
-  color: var(--cor-ajuda);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-weight: 800;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 .boletos-tela .aba-chip.aba-atrasados.ativa .aba-chip-contagem {

@@ -1,45 +1,38 @@
 .suporte-tela {
   max-width: var(--largura-conteudo);
   margin: 0 auto;
-  padding: 24px 20px 96px;
+  padding: 16px 16px 96px;
   position: relative;
   min-height: 100vh;
 }
 
+/* Abas em pílula, como AbasPilula do app Android. */
 .suporte-abas {
   display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
+  padding: 3px;
+  margin-bottom: 16px;
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie-alta);
 }
 
-/* Prefixado com .suporte-tela pra não colidir com o .aba-chip de mesmo
-   nome em Boletos.css — sem isso, o CSS de qualquer um dos dois arquivos
-   que "vencer" a ordem de import define a cor dos dois ao mesmo tempo. */
 .suporte-tela .aba-chip {
   flex: 1;
-  height: 40px;
-  border-radius: 20px;
-  border: 1.5px solid var(--cor-primaria);
+  min-height: 40px;
+  border: none;
+  border-radius: var(--raio-sm);
   background: transparent;
-  color: var(--cor-primaria);
+  color: var(--cor-texto-secundario);
+  font: inherit;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.suporte-tela .aba-chip.aba-resolvidos {
-  border-color: var(--cor-sucesso);
-  color: var(--cor-sucesso);
-}
-
 .suporte-tela .aba-chip.ativa {
-  background: var(--cor-primaria);
-  color: var(--cor-branco-fixo);
-}
-
-.suporte-tela .aba-chip.aba-resolvidos.ativa {
-  background: var(--cor-sucesso);
-  color: var(--cor-branco-fixo);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-weight: 800;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 .suporte-status {
