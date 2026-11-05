@@ -10,6 +10,9 @@
 /* Cabeçalho (MainHeader): inicial no círculo laranja-claro com anel laranja,
    saudação em titleLarge ExtraBold e a pergunta em cinza. */
 .home-cabecalho {
+  /* A Início não tem respiro no topo (o próprio cabeçalho já tem): sem o ajuste do .topo-fixo. */
+  margin-top: 0;
+  border-top: 0;
   display: flex;
   align-items: center;
   gap: 12px;

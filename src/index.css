@@ -258,6 +258,11 @@ body:has(.bottom-nav) {
   z-index: 6;
   background: var(--cor-fundo);
   box-shadow: 0 -16px 0 16px var(--cor-fundo);
+  /* As telas têm 16px de respiro no topo: sem isto o bloco rolava esses 16px
+     antes de parar. A margem negativa o leva ao topo e a borda devolve o
+     mesmo espaço, então nada muda de lugar e ele fica parado desde o início. */
+  margin-top: -16px;
+  border-top: 16px solid var(--cor-fundo);
 }
 
 /* --- Toque como app nativo ------------------------------------------------ */
