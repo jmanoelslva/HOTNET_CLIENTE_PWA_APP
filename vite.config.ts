@@ -2,14 +2,28 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Identificador do build (data/hora UTC, ex.: 20261105.1931): vai embutido no app e em
+// /version.json, que o app consulta para saber se está rodando o build publicado
+// (ver src/utils/atualizacaoApp.ts).
+const BUILD_ID = new Date().toISOString().slice(0, 16).replace(/[-:]/g, '').replace('T', '.')
+
 // https://vite.dev/config/
 export default defineConfig({
   // Versão do package.json, mostrada em Perfil → Sobre.
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? ''),
+    __BUILD_ID__: JSON.stringify(BUILD_ID),
   },
   plugins: [
     react(),
+    {
+      // /version.json fora do precache (globPatterns não inclui json): sempre vem do servidor.
+      name: 'versao-publicada',
+      apply: 'build',
+      generateBundle() {
+        this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ build: BUILD_ID }) })
+      },
+    },
     VitePWA({
       registerType: 'autoUpdate',
       // Registro manual via useRegisterSW (StatusBanners.tsx), não o

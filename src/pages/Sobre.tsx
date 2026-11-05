@@ -48,7 +48,12 @@ export default function Sobre() {
         </span>
         <div>
           <strong className="sobre-nome">HOTNET</strong>
-          {__APP_VERSION__ && <span className="sobre-versao">Versão {__APP_VERSION__}</span>}
+          {__APP_VERSION__ && (
+            <span className="sobre-versao">
+              Versão {__APP_VERSION__}
+              {__BUILD_ID__ ? ` · build ${__BUILD_ID__}` : ''}
+            </span>
+          )}
         </div>
       </section>
 
