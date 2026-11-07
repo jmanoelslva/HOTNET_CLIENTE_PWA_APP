@@ -216,8 +216,9 @@ export default function DetalheChamado() {
         {chamado && (
           <div className="detalhe-resumo">
             <div className="detalhe-resumo-topo">
-              <span className="detalhe-assunto">{chamado.ticket_title ?? `Chamado #${pk}`}</span>
+              <h1 className="detalhe-assunto">{chamado.ticket_title ?? `Chamado #${pk}`}</h1>
               <span className={`ticket-status-badge ${resolvido ? 'badge-fechado' : 'badge-aberto'}`}>
+                <span className="sr-only">Situação: </span>
                 {resolvido ? 'Fechado' : 'Aberto'}
               </span>
             </div>
@@ -243,7 +244,9 @@ export default function DetalheChamado() {
         {!carregando && erro && (
           <div className="detalhe-status">
             <p>{erro}</p>
-            <button onClick={() => carregar(true)}>Tentar novamente</button>
+            <button type="button" onClick={() => carregar(true)}>
+              Tentar novamente
+            </button>
           </div>
         )}
 
@@ -256,15 +259,27 @@ export default function DetalheChamado() {
           listaExibida.map((op) => (
             <div key={op.opPk} className={`balao-linha ${op.doCliente ? 'linha-cliente' : 'linha-equipe'}`}>
               <div className={`balao ${op.doCliente ? 'balao-cliente' : 'balao-equipe'}`}>
-                {!op.doCliente && <span className="balao-autor">Equipe Hotnet</span>}
+                {/* Leitor de tela: quem falou, o quê e quando, numa frase só. */}
+                <span className="sr-only">
+                  {`${op.doCliente ? 'Você' : 'Equipe Hotnet'}${op.texto ? `: ${op.texto}` : op.urlAnexo ? ' enviou um anexo' : ''}. ${formatarDataHora(op.dataCriacao)}`}
+                </span>
+                {!op.doCliente && (
+                  <span className="balao-autor" aria-hidden="true">
+                    Equipe Hotnet
+                  </span>
+                )}
 
-                {op.texto && <p className="balao-texto">{op.texto}</p>}
+                {op.texto && (
+                  <p className="balao-texto" aria-hidden="true">
+                    {op.texto}
+                  </p>
+                )}
 
                 {op.urlAnexo && ehArquivoDeImagem(op.arquivo) && (
-                  <img src={op.urlAnexo} alt="Anexo" className="balao-anexo-imagem" />
+                  <img src={op.urlAnexo} alt="Imagem anexada" className="balao-anexo-imagem" />
                 )}
                 {op.urlAnexo && ehArquivoDeVideo(op.arquivo) && (
-                  <video src={op.urlAnexo} controls className="balao-anexo-imagem" />
+                  <video src={op.urlAnexo} controls aria-label="Vídeo anexado" className="balao-anexo-imagem" />
                 )}
                 {op.urlAnexo && !ehArquivoDeImagem(op.arquivo) && !ehArquivoDeVideo(op.arquivo) && (
                   <a
@@ -272,15 +287,18 @@ export default function DetalheChamado() {
                     target="_blank"
                     rel="noreferrer"
                     className={`balao-anexo-documento ${ehArquivoPdf(op.arquivo) ? 'balao-anexo-pdf' : ''}`}
+                    aria-label={`Abrir ${ehArquivoPdf(op.arquivo) ? 'PDF' : 'arquivo'} anexado: ${op.arquivo ?? 'sem nome'}`}
                   >
-                    <span className="balao-anexo-documento-icone">
+                    <span className="balao-anexo-documento-icone" aria-hidden="true">
                       {ehArquivoPdf(op.arquivo) ? <MdPictureAsPdf size={20} /> : <IcAttachFile size={20} />}
                     </span>
                     <span className="balao-anexo-documento-nome">{op.arquivo}</span>
                   </a>
                 )}
 
-                <span className="balao-data">{formatarDataHora(op.dataCriacao)}</span>
+                <span className="balao-data" aria-hidden="true">
+                  {formatarDataHora(op.dataCriacao)}
+                </span>
               </div>
             </div>
           ))}
@@ -308,24 +326,26 @@ export default function DetalheChamado() {
 
           <div className="detalhe-anexo-wrapper">
             <button
+              type="button"
               className="detalhe-btn-anexar"
               disabled={enviando}
               onClick={() => setMenuAnexoAberto((v) => !v)}
-              aria-label="Anexar"
+              aria-label="Anexar arquivo"
+              aria-expanded={menuAnexoAberto}
             >
               <IcAttachFile size={20} />
             </button>
             {menuAnexoAberto && (
               <>
-                <div className="detalhe-menu-fundo" onClick={() => setMenuAnexoAberto(false)} />
+                <div className="detalhe-menu-fundo" aria-hidden="true" onClick={() => setMenuAnexoAberto(false)} />
                 <div className="detalhe-menu-anexo">
-                  <button onClick={() => inputFotoRef.current?.click()}>
+                  <button type="button" onClick={() => inputFotoRef.current?.click()} aria-label="Tirar foto. Abre a câmera">
                     <IcPhotoCamera /> Tirar foto
                   </button>
-                  <button onClick={() => inputGaleriaRef.current?.click()}>
+                  <button type="button" onClick={() => inputGaleriaRef.current?.click()} aria-label="Galeria. Foto ou vídeo do celular">
                     <IcPhotoLibrary /> Galeria
                   </button>
-                  <button onClick={() => inputArquivoRef.current?.click()}>
+                  <button type="button" onClick={() => inputArquivoRef.current?.click()} aria-label="Arquivo. PDF ou outro documento">
                     <IcDescription /> Arquivo
                   </button>
                 </div>
@@ -334,6 +354,7 @@ export default function DetalheChamado() {
           </div>
 
           <button
+            type="button"
             className="detalhe-btn-anexar"
             disabled={enviando}
             onClick={() => setConfirmandoLocalizacao(true)}
@@ -349,8 +370,9 @@ export default function DetalheChamado() {
             onChange={(evento) => setMensagem(evento.target.value)}
             onKeyDown={(evento) => evento.key === 'Enter' && aoEnviarMensagem()}
             placeholder="Digite uma mensagem…"
+            aria-label="Mensagem"
           />
-          <button className="detalhe-btn-enviar" disabled={enviando || !mensagem.trim()} onClick={aoEnviarMensagem}>
+          <button type="button" className="detalhe-btn-enviar" disabled={enviando || !mensagem.trim()} onClick={aoEnviarMensagem}>
             Enviar
           </button>
         </div>

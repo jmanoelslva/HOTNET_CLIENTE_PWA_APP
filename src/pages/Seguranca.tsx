@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MdKey } from 'react-icons/md'
 import { IcLock, IcPrivacyTip } from '../components/IconesApp'
 import { useNavigate } from 'react-router-dom'
@@ -28,6 +28,12 @@ export default function Seguranca() {
   const [etapa, setEtapa] = useState<Etapa>({ tipo: 'inicio' })
   const [pin, setPin] = useState('')
   const [erro, setErro] = useState<string | null>(null)
+  // Cada etapa do PIN (criar, confirmar, conferir) é anunciada pelo leitor de tela.
+  const refTituloEtapa = useRef<HTMLHeadingElement>(null)
+  const chaveEtapa = etapa.tipo === 'criar' ? `criar-${etapa.primeiro == null}` : etapa.tipo
+  useEffect(() => {
+    refTituloEtapa.current?.focus({ preventScroll: true })
+  }, [chaveEtapa])
 
   function ir(nova: Etapa) {
     setEtapa(nova)
@@ -77,7 +83,9 @@ export default function Seguranca() {
       etapa.tipo === 'conferir' ? 'Digite seu PIN atual' : etapa.primeiro == null ? 'Crie um PIN de 4 dígitos' : 'Confirme o PIN'
     return (
       <div className="seguranca-tela seguranca-pin tela-entrada">
-        <h1>{titulo}</h1>
+        <h1 ref={refTituloEtapa} tabIndex={-1}>
+          {titulo}
+        </h1>
         <p>{etapa.tipo === 'criar' ? 'Ele vai ser pedido ao abrir o portal neste aparelho.' : 'Para mudar a proteção do app.'}</p>
         <TecladoPin
           valor={pin}
@@ -100,8 +108,11 @@ export default function Seguranca() {
       <CabecalhoTela titulo="Segurança" subtitulo="Proteja o acesso ao app neste celular." />
 
       <section className={`cartao-destaque seguranca-estado ${ativo ? 'ligada' : ''}`}>
-        <span className="cartao-destaque-rotulo">Proteção do app</span>
-        <strong>{ativo ? 'Ligada' : 'Desligada'}</strong>
+        <h2 className="sr-only">{`Proteção do app: ${ativo ? 'ligada' : 'desligada'}`}</h2>
+        <span className="cartao-destaque-rotulo" aria-hidden="true">
+          Proteção do app
+        </span>
+        <strong aria-hidden="true">{ativo ? 'Ligada' : 'Desligada'}</strong>
         <p>Com ela ligada, o portal pede um PIN só deste aparelho ao abrir e depois de 5 minutos fora dele.</p>
         <button
           type="button"

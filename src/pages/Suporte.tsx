@@ -198,14 +198,14 @@ export default function Suporte() {
 
       {/* Atalhos no topo (AtalhoSuporte do app Android), no lugar do botão flutuante. */}
       <div className="suporte-atalhos">
-        <button type="button" className="suporte-atalho" onClick={abrirChecklist} aria-label="Novo chamado">
+        <button type="button" className="suporte-atalho" onClick={abrirChecklist} aria-label="Novo chamado. Acompanhe pelo app">
           <span className="suporte-atalho-icone novo" aria-hidden="true">
             <MdAdd size={18} />
           </span>
           <strong>Novo chamado</strong>
           <span>Acompanhe pelo app</span>
         </button>
-        <button type="button" className="suporte-atalho" onClick={falarNoWhatsapp}>
+        <button type="button" className="suporte-atalho" onClick={falarNoWhatsapp} aria-label="WhatsApp. Resposta rápida">
           <span className="suporte-atalho-icone whatsapp" aria-hidden="true">
             <IcWhatsapp size={18} />
           </span>
@@ -242,7 +242,9 @@ export default function Suporte() {
       {!carregando && erro && (
         <div className="suporte-status">
           <p>{erro}</p>
-          <button onClick={carregar}>Tentar novamente</button>
+          <button type="button" onClick={carregar}>
+            Tentar novamente
+          </button>
         </div>
       )}
 
@@ -272,6 +274,17 @@ export default function Suporte() {
                 <button
                   type="button"
                   className="ticket-card"
+                  aria-label={[
+                    chamado.ticket_title ?? 'Sem título',
+                    resolvido ? 'Resolvido' : 'Em aberto',
+                    chamado.category_name ?? 'Categoria não informada',
+                    `Protocolo ${chamado.ticket_protocol ?? chamado.ticket_pk}`,
+                    `Aberto em ${formatarData(chamado.ticket_date_create) ?? 'data não informada'}`,
+                    resolvido ? `Resolvido em ${formatarData(chamado.ticket_date_close) ?? 'data não informada'}` : null,
+                    'Ver conversa',
+                  ]
+                    .filter(Boolean)
+                    .join('. ')}
                   onClick={() => navigate(`/suporte/${chamado.ticket_pk}`, { state: { chamado }, viewTransition: true })}
                 >
                   {(() => {
@@ -312,7 +325,7 @@ export default function Suporte() {
       )}
 
       {!carregando && !erro && haMaisParaCarregar && (
-        <button className="suporte-carregar-mais" onClick={carregarMais} disabled={carregandoMais}>
+        <button type="button" className="suporte-carregar-mais" onClick={carregarMais} disabled={carregandoMais}>
           {carregandoMais ? 'Carregando…' : 'Carregar mais'}
         </button>
       )}

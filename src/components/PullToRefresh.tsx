@@ -141,6 +141,9 @@ export default function PullToRefresh({ aoAtualizar, children }: Props) {
           style={atualizando ? undefined : { transform: `rotate(${progresso * 180}deg)` }}
         />
       </div>
+      <span className="sr-only" aria-live="polite">
+        {atualizando ? 'Atualizando' : ''}
+      </span>
       {children}
     </div>
   )

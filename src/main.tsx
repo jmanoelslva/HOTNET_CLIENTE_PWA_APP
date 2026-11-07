@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { IconContext } from 'react-icons'
 import { SessionProvider } from './auth/SessionContext.tsx'
 import { ToastProvider } from './components/Toast/ToastContext.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
@@ -17,14 +18,17 @@ iniciarAtualizacaoApp()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <ErrorBoundary>
-        <ToastProvider>
-          <SessionProvider>
-            <App />
-          </SessionProvider>
-        </ToastProvider>
-      </ErrorBoundary>
-    </BrowserRouter>
+    {/* Ícones são enfeite: o leitor de tela lê o texto ou o aria-label do botão, como no app (contentDescription = null). */}
+    <IconContext.Provider value={{ attr: { 'aria-hidden': true, focusable: 'false' } }}>
+      <BrowserRouter>
+        <ErrorBoundary>
+          <ToastProvider>
+            <SessionProvider>
+              <App />
+            </SessionProvider>
+          </ToastProvider>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </IconContext.Provider>
   </StrictMode>,
 )

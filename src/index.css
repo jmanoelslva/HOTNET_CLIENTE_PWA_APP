@@ -485,3 +485,8 @@ img {
 :focus:not(:focus-visible) {
   outline: none;
 }
+
+/* Título da tela e janelas recebem foco só para o leitor de tela anunciar. */
+[tabindex='-1']:focus {
+  outline: none;
+}

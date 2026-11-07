@@ -9,5 +9,5 @@ interface Props {
 /** Placeholder de carregamento com efeito de brilho — usado no lugar de
  * texto "Carregando…" nas listas, dentro dos mesmos cards da tela final. */
 export default function Skeleton({ width = '100%', height = 14, className = '' }: Props) {
-  return <span className={`skeleton ${className}`} style={{ width, height }} />
+  return <span className={`skeleton ${className}`} style={{ width, height }} aria-hidden="true" />
 }

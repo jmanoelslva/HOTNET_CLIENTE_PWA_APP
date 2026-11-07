@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigationType } from 'react-router-dom'
 import AvisoGate from './components/AvisoGate'
 import RotaProtegida from './components/RotaProtegida'
@@ -12,6 +12,7 @@ import { useSessao } from './auth/useSessao'
 import { aplicarVersaoNovaSePreciso } from './utils/atualizacaoApp'
 import { atualizarCorDasBarras } from './utils/tema'
 import { registrarTela } from './utils/pilhaNavegacao'
+import { focarTituloDaTela, tituloDaTela } from './utils/acessibilidade'
 
 // Uma página por chunk — carregada só quando o cliente navega até ela, em
 // vez de tudo num bundle inicial só (a lista de rotas só cresce).
@@ -66,6 +67,18 @@ function App() {
   useEffect(() => {
     registrarTela(location.key, location.pathname, tipoNavegacao)
   }, [location.key, location.pathname, tipoNavegacao])
+
+  // Leitor de tela: título da janela com o nome da tela e, a cada troca,
+  // foco no título da tela nova para o TalkBack/VoiceOver anunciá-la.
+  const primeiraTela = useRef(true)
+  useEffect(() => {
+    document.title = `${tituloDaTela(location.pathname)} · HOTNET`
+    if (primeiraTela.current) {
+      primeiraTela.current = false
+      return
+    }
+    return focarTituloDaTela()
+  }, [location.pathname])
 
   return (
     <AvisoGate>

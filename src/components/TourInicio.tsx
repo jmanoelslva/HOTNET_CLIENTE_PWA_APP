@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useFocoNoDialogo } from '../hooks/useFocoNoDialogo'
 import { marcarTourVisto } from '../utils/tour'
 import './TourInicio.css'
 
@@ -36,6 +37,13 @@ interface Retangulo {
 export default function TourInicio({ onFim }: { onFim: () => void }) {
   const [passo, setPasso] = useState(0)
   const [alvo, setAlvo] = useState<Retangulo | null>(null)
+  const refTour = useRef<HTMLDivElement>(null)
+  const refCartao = useRef<HTMLDivElement>(null)
+  useFocoNoDialogo(refTour)
+  // A cada passo o leitor de tela vai para o cartão e lê o passo novo.
+  useEffect(() => {
+    refCartao.current?.focus({ preventScroll: true })
+  }, [passo])
   const atual = PASSOS[passo]
 
   useLayoutEffect(() => {
@@ -72,13 +80,18 @@ export default function TourInicio({ onFim }: { onFim: () => void }) {
   const embaixo = !alvo || alvo.top + alvo.height / 2 < window.innerHeight / 2
 
   return (
-    <div className="tour" role="dialog" aria-modal="true" aria-labelledby="tour-titulo">
+    <div ref={refTour} className="tour" role="dialog" aria-modal="true" aria-labelledby="tour-titulo">
       {alvo ? (
         <div className="tour-recorte" style={{ top: alvo.top, left: alvo.left, width: alvo.width, height: alvo.height }} />
       ) : (
         <div className="tour-fundo" />
       )}
       <div
+        ref={refCartao}
+        tabIndex={-1}
+        role="group"
+        aria-labelledby="tour-passo tour-titulo"
+        aria-describedby="tour-texto"
         className="tour-cartao"
         style={
           alvo
@@ -88,11 +101,11 @@ export default function TourInicio({ onFim }: { onFim: () => void }) {
             : { top: '35%' }
         }
       >
-        <span className="tour-passo">
+        <span className="tour-passo" id="tour-passo">
           {passo + 1} de {PASSOS.length}
         </span>
         <h2 id="tour-titulo">{atual.titulo}</h2>
-        <p>{atual.texto}</p>
+        <p id="tour-texto">{atual.texto}</p>
         <div className="tour-acoes">
           {!ultimo && (
             <button type="button" className="tour-pular" onClick={concluir}>

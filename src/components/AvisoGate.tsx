@@ -63,11 +63,11 @@ function AvisoGateInterno({ children }: { children: ReactNode }) {
   return (
     <div className="aviso-gate-tela">
       <div className="aviso-gate-card">
-        <span className="aviso-gate-icone">⚠️</span>
+        <span className="aviso-gate-icone" aria-hidden="true">⚠️</span>
         <h1>{titulo}</h1>
         <p>{descricao}</p>
         {detalhes && <p className="aviso-gate-detalhes">{detalhes}</p>}
-        <button disabled={confirmando} onClick={confirmar}>
+        <button type="button" disabled={confirmando} onClick={confirmar}>
           {confirmando ? 'Confirmando…' : 'Estou ciente'}
         </button>
       </div>

@@ -79,7 +79,9 @@ export default function Faq() {
       <CabecalhoTela titulo="Dúvidas frequentes" subtitulo="Respostas rápidas sobre conexão, boletos e sua conta." />
 
       <input
+        type="search"
         className="faq-busca"
+        aria-label="Buscar dúvidas"
         placeholder="Busque: pix, recibo, Wi-Fi…"
         value={busca}
         onChange={(evento) => {
@@ -117,7 +119,7 @@ export default function Faq() {
               onClick={() => selecionarCategoria(categoria.id)}
               aria-pressed={categoriaFiltro === categoria.id}
             >
-              <span className="faq-categoria-icone" style={{ background: comAlpha(categoria.cor, 15), color: categoria.cor }}>
+              <span className="faq-categoria-icone" aria-hidden="true" style={{ background: comAlpha(categoria.cor, 15), color: categoria.cor }}>
                 <categoria.Icone size={20} />
               </span>
               <span className="faq-categoria-nome">{categoria.nome}</span>
@@ -128,6 +130,15 @@ export default function Faq() {
           ))}
         </div>
       </section>
+
+      <p className="sr-only" aria-live="polite">
+        {busca.trim()
+          ? (() => {
+              const total = grupos.reduce((soma, g) => soma + g.itens.length, 0)
+              return total === 0 ? 'Nenhuma pergunta encontrada' : `${total} ${total === 1 ? 'pergunta encontrada' : 'perguntas encontradas'}`
+            })()
+          : ''}
+      </p>
 
       {grupos.length === 0 && (
         <EstadoVazio icone={MdSearchOff} titulo={`Nada encontrado para "${busca.trim()}"`} />

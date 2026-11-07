@@ -29,7 +29,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="toast-pilha">
+      <div className="toast-pilha" role="status" aria-live="polite">
         {itens.map((item) => (
           <div key={item.id} className={`toast toast-${item.tipo}`}>
             {item.mensagem}

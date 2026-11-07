@@ -15,10 +15,10 @@ interface Props {
 export default function EstadoVazio({ icone: Icone, titulo, subtitulo, tom = 'neutro', acao }: Props) {
   return (
     <div className="estado-vazio">
-      <span className={`estado-vazio-icone ${tom === 'sucesso' ? 'sucesso' : ''}`}>
+      <span className={`estado-vazio-icone ${tom === 'sucesso' ? 'sucesso' : ''}`} aria-hidden="true">
         <Icone size={34} />
       </span>
-      <p className="estado-vazio-titulo">{titulo}</p>
+      <p className="estado-vazio-titulo" role="heading" aria-level={2}>{titulo}</p>
       {subtitulo && <p className="estado-vazio-subtitulo">{subtitulo}</p>}
       {acao && (
         <button type="button" className="botao-contorno estado-vazio-acao" onClick={acao.onClick}>

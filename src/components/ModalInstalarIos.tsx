@@ -1,5 +1,7 @@
 import './ModalInstalarIos.css'
+import { useRef } from 'react'
 import { useFecharComVoltar } from '../hooks/useFecharComVoltar'
+import { useFocoNoDialogo } from '../hooks/useFocoNoDialogo'
 import { MdAddBox, MdIosShare } from 'react-icons/md'
 
 interface Props {
@@ -18,12 +20,21 @@ interface Props {
  */
 export default function ModalInstalarIos({ aberto, onFechar }: Props) {
   useFecharComVoltar(aberto, onFechar)
+  const refDialogo = useRef<HTMLDivElement>(null)
+  useFocoNoDialogo(refDialogo, aberto)
   if (!aberto) return null
 
   return (
     <div className="modal-instalar-ios-fundo" onClick={onFechar}>
-      <div className="modal-instalar-ios" onClick={(evento) => evento.stopPropagation()}>
-        <h2>Instalar o app</h2>
+      <div
+        ref={refDialogo}
+        className="modal-instalar-ios"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="instalar-ios-titulo"
+        onClick={(evento) => evento.stopPropagation()}
+      >
+        <h2 id="instalar-ios-titulo">Instalar o app</h2>
         <ol className="modal-instalar-ios-passos">
           <li>
             Toque no ícone de compartilhar <MdIosShare size={16} /> na barra do Safari
@@ -36,7 +47,7 @@ export default function ModalInstalarIos({ aberto, onFechar }: Props) {
           Só funciona pelo Safari — não abre pelo app do WhatsApp, Instagram ou outro navegador
           (Chrome, Firefox etc).
         </p>
-        <button onClick={onFechar}>Entendi</button>
+        <button type="button" onClick={onFechar}>Entendi</button>
       </div>
     </div>
   )

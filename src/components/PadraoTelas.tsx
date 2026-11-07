@@ -44,20 +44,39 @@ interface LinhaItemProps {
   /** "primaria": ícone laranja no círculo laranja-claro; "neutra": grafite no cinza; "perigo": vermelho. */
   tom?: 'primaria' | 'neutra' | 'perigo'
   fim?: ReactNode
+  /** Frase falada pelo leitor de tela no lugar dos textos (linha só de leitura). */
+  falado?: string
 }
 
-export function LinhaItem({ icone: Icone, titulo, rotulo, detalhe, onClick, comSeta, tom = 'neutra', fim }: LinhaItemProps) {
+/** Frase única para o leitor de tela numa linha só de leitura: "Rótulo: título, detalhe". */
+function fraseDaLinha(titulo: string, rotulo?: string, detalhe?: ReactNode): string | null {
+  const textoDetalhe = typeof detalhe === 'string' || typeof detalhe === 'number' ? String(detalhe) : null
+  if (detalhe != null && textoDetalhe == null) return null
+  if (!rotulo && !textoDetalhe) return null
+  // "·" separa visualmente; falado vira vírgula (o leitor diria "ponto").
+  return `${rotulo ? `${rotulo}: ` : ''}${titulo}${textoDetalhe ? `, ${textoDetalhe}` : ''}`.replace(/ · /g, ', ')
+}
+
+export function LinhaItem({ icone: Icone, titulo, rotulo, detalhe, onClick, comSeta, tom = 'neutra', fim, falado }: LinhaItemProps) {
+  // Linha que não é botão: o TalkBack leria rótulo, título e detalhe aos
+  // pedaços; como no app (mergeDescendants), fala tudo de uma vez.
+  const frase = onClick ? null : (falado ?? fraseDaLinha(titulo, rotulo, detalhe))
   const conteudo = (
     <>
       <span className={`linha-item-icone linha-item-icone-${tom}`} aria-hidden="true">
         <Icone size={18} />
       </span>
-      <span className="linha-item-textos">
+      {frase && <span className="sr-only">{frase}</span>}
+      <span className="linha-item-textos" aria-hidden={frase ? true : undefined}>
         {rotulo && <span className="linha-item-rotulo">{rotulo}</span>}
         <span className={`linha-item-titulo ${tom === 'perigo' ? 'linha-item-titulo-perigo' : ''}`}>{titulo}</span>
       </span>
-      {detalhe != null && <span className="linha-item-detalhe">{detalhe}</span>}
-      {fim}
+      {detalhe != null && (
+        <span className="linha-item-detalhe" aria-hidden={frase ? true : undefined}>
+          {detalhe}
+        </span>
+      )}
+      {falado && fim ? <span aria-hidden="true">{fim}</span> : fim}
       {(comSeta ?? onClick != null) && <MdKeyboardArrowRight size={20} className="linha-item-seta" aria-hidden="true" />}
     </>
   )
