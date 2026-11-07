@@ -4,7 +4,6 @@ import { IcClose, IcWhatsapp } from '../components/IconesApp'
 import { useNavigate } from 'react-router-dom'
 import { contasSalvas, esquecerConta, fotoDaConta, type ContaSalva } from '../utils/contaLocal'
 import { mascararDocumento } from '../utils/recibo'
-import { descricaoDocumento } from '../utils/acessibilidade'
 import { useSessao } from '../auth/useSessao'
 import ModalInstalarIos from '../components/ModalInstalarIos'
 import AjudaLogin from '../components/AjudaLogin'
@@ -58,12 +57,8 @@ export default function Login() {
         <span className="login-logo-circulo">
           <img src={logoApp} alt="" className="login-logo" />
         </span>
-        <span className="login-marca" aria-hidden="true">
-          HOTNET
-        </span>
-        <h1>
-          <span className="sr-only">HOTNET. </span>Entre na sua conta
-        </h1>
+        <span className="login-marca">HOTNET</span>
+        <h1>Entre na sua conta</h1>
         <p>Conexão, boletos e suporte num só lugar.</p>
       </header>
 
@@ -71,7 +66,7 @@ export default function Login() {
       <div className="login-card">
         {contas.length > 0 && (
           <div className="login-contas">
-            <span className="login-contas-titulo" role="heading" aria-level={2}>Contas salvas neste celular</span>
+            <span className="login-contas-titulo">Contas salvas neste celular</span>
             {contas.map((conta) => {
               const foto = fotoDaConta(conta.documento)
               const ativa = usuario.replace(/\D/g, '') === conta.documento
@@ -83,10 +78,7 @@ export default function Login() {
                     </span>
                     <span className="login-conta-textos">
                       <strong>{conta.nome ?? 'Cliente HOTNET'}</strong>
-                      <span>
-                        <span aria-hidden="true">{mascararDocumento(conta.documento) ?? conta.documento}</span>
-                        <span className="sr-only">{descricaoDocumento(conta.documento)}</span>
-                      </span>
+                      <span>{mascararDocumento(conta.documento) ?? conta.documento}</span>
                     </span>
                   </button>
                   <button
@@ -113,7 +105,6 @@ export default function Login() {
             id="usuario"
             type="text"
             inputMode="numeric"
-            autoComplete="username"
             value={usuario}
             onChange={(evento) => setUsuario(evento.target.value)}
             placeholder="Somente números"
@@ -126,7 +117,6 @@ export default function Login() {
               ref={campoSenha}
               id="senha"
               type={mostrarSenha ? 'text' : 'password'}
-              autoComplete="current-password"
               value={senha}
               onChange={(evento) => setSenha(evento.target.value)}
               placeholder="Digite sua senha"
@@ -142,11 +132,7 @@ export default function Login() {
             </button>
           </div>
 
-          {erro && (
-            <p className="login-erro" role="alert">
-              {erro}
-            </p>
-          )}
+          {erro && <p className="login-erro">{erro}</p>}
 
           <button type="submit" className="login-btn-entrar" disabled={carregando}>
             {carregando ? 'Entrando…' : 'Entrar'}

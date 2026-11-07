@@ -255,7 +255,7 @@ export default function Home() {
             {foto ? <img src={foto} alt="" /> : nomeExibido.charAt(0).toUpperCase()}
           </button>
           <div className="home-cabecalho-textos">
-            <h1 className="home-saudacao">{saudacaoPorHorario(nomeExibido)}</h1>
+            <span className="home-saudacao">{saudacaoPorHorario(nomeExibido)}</span>
             <span className="home-subtitulo">O que você precisa hoje?</span>
           </div>
         </header>
@@ -346,8 +346,7 @@ export default function Home() {
               </button>
               {detalhesAbertos && (
                 <div className="home-faixa-detalhes">
-                  <p className="sr-only">{`Plano: ${plano ?? 'não informado'}. Uso em ${nomeMes}: ${usoDoMes > 0 ? formatarBytes(usoDoMes) : 'sem dados'}.`}</p>
-                  <div className="home-blocos" aria-hidden="true">
+                  <div className="home-blocos">
                     <div className="home-bloco">
                       <span>Plano</span>
                       <strong>{plano ?? '—'}</strong>

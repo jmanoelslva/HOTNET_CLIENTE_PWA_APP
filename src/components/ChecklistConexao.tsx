@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { useFocoNoDialogo } from '../hooks/useFocoNoDialogo'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useFecharComVoltar } from '../hooks/useFecharComVoltar'
 import { MdBlock, MdCheck, MdInfo, MdTimer } from 'react-icons/md'
 import { IcClose, IcLock, IcPayments, IcWhatsapp, IcWifi } from './IconesApp'
@@ -52,16 +51,10 @@ function Passo({ numero, titulo, descricao, feito, atual, onAlternar, children }
       </span>
       <div className="checklist-passo-texto">
         <label htmlFor={id}>{titulo}</label>
-        <p id={`${id}-descricao`}>{descricao}</p>
+        <p>{descricao}</p>
         {children}
       </div>
-      <input
-        id={id}
-        type="checkbox"
-        checked={feito}
-        onChange={(e) => onAlternar(e.target.checked)}
-        aria-describedby={`${id}-descricao`}
-      />
+      <input id={id} type="checkbox" checked={feito} onChange={(e) => onAlternar(e.target.checked)} />
     </li>
   )
 }
@@ -75,8 +68,6 @@ function Passo({ numero, titulo, descricao, feito, atual, onAlternar, children }
 export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onVerBoletos, onFechar, onContinuar, onWhatsapp }: Props) {
   // Voltar do celular fecha a janela, como no app.
   useFecharComVoltar(true, onFechar)
-  const refDialogo = useRef<HTMLDivElement>(null)
-  useFocoNoDialogo(refDialogo)
   const [reiniciou, setReiniciou] = useState(false)
   const [luzes, setLuzes] = useState(false)
   const [cabos, setCabos] = useState(false)
@@ -122,12 +113,12 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
 
   return (
     <div className="checklist-fundo" onClick={onFechar}>
-      <div ref={refDialogo} className="checklist-modal" role="dialog" aria-modal="true" aria-labelledby="checklist-titulo" onClick={(e) => e.stopPropagation()}>
+      <div className="checklist-modal" role="dialog" aria-modal="true" aria-labelledby="checklist-titulo" onClick={(e) => e.stopPropagation()}>
         <div className="checklist-barra">
           <span className="checklist-icone" aria-hidden="true">
             <IcWifi size={22} />
           </span>
-          <button type="button" className="checklist-fechar" onClick={onFechar} aria-label="Fechar">
+          <button className="checklist-fechar" onClick={onFechar} aria-label="Fechar">
             <IcClose size={22} />
           </button>
         </div>
@@ -165,7 +156,7 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
               <p>
                 Há {atrasados} {plural(atrasados, 'boleto', 'boletos')} em atraso. O pagamento evita o bloqueio da conexão.
               </p>
-              <button type="button" className="checklist-link" onClick={onVerBoletos}>
+              <button className="checklist-link" onClick={onVerBoletos}>
                 Ver boletos
               </button>
             </div>
@@ -174,24 +165,20 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
 
         {(boletosAtrasados != null || contratoStatus != null) && (
           <>
-            <span className="checklist-secao" role="heading" aria-level={3}>
-              O portal já conferiu
-            </span>
+            <span className="checklist-secao">O portal já conferiu</span>
             <ul className="checklist-conferido">
               {boletosAtrasados != null && (
                 <li>
-                  <span className="sr-only">{`Boletos: ${atrasados > 0 ? `${atrasados} em atraso` : 'em dia'}`}</span>
-                  <span aria-hidden="true">Boletos</span>
-                  <strong className={atrasados > 0 ? 'ruim' : 'bom'} aria-hidden="true">
+                  <span>Boletos</span>
+                  <strong className={atrasados > 0 ? 'ruim' : 'bom'}>
                     {atrasados > 0 ? `${atrasados} em atraso` : 'Em dia'}
                   </strong>
                 </li>
               )}
               {contratoStatus != null && STATUS_CONTRATO[contratoStatus] && (
                 <li>
-                  <span className="sr-only">{`Contrato: ${STATUS_CONTRATO[contratoStatus]}`}</span>
-                  <span aria-hidden="true">Contrato</span>
-                  <strong className={contratoStatus === 1 ? 'bom' : 'ruim'} aria-hidden="true">
+                  <span>Contrato</span>
+                  <strong className={contratoStatus === 1 ? 'bom' : 'ruim'}>
                     {cancelado ? <MdBlock aria-hidden="true" /> : null} {STATUS_CONTRATO[contratoStatus]}
                   </strong>
                 </li>
@@ -202,9 +189,7 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
 
         {!bloqueado && !cancelado && (
           <>
-            <span className="checklist-secao" role="heading" aria-level={3}>
-              Faça agora
-            </span>
+            <span className="checklist-secao">Faça agora</span>
             <ol className="checklist-passos">
               <Passo
                 numero={1}
@@ -219,13 +204,11 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
               >
                 {!reiniciou &&
                   (contando ? (
-                    <div className="checklist-contagem" role="timer">
+                    <div className="checklist-contagem" role="timer" aria-label={`Faltam ${anunciado} segundos`}>
                       <span aria-hidden="true">{restantes}</span>
-                      <span className="sr-only" aria-live="polite">{`Faltam ${anunciado} segundos`}</span>
                     </div>
                   ) : (
                     <button
-                      type="button"
                       className="checklist-contar"
                       onClick={() => {
                         setRestantes(SEGUNDOS_FORA_DA_TOMADA)
@@ -253,45 +236,43 @@ export default function ChecklistConexao({ boletosAtrasados, contratoStatus, onV
                 onAlternar={setCabos}
               />
             </ol>
-            <p className={todosFeitos ? 'checklist-pergunta' : 'sr-only'} role="status">
-              {todosFeitos ? 'A internet voltou?' : ''}
-            </p>
+            {todosFeitos && <p className="checklist-pergunta">A internet voltou?</p>}
           </>
         )}
 
         <div className="checklist-acoes">
           {bloqueado && (
             <>
-              <button type="button" className="checklist-btn-primario" onClick={onVerBoletos}>
+              <button className="checklist-btn-primario" onClick={onVerBoletos}>
                 <IcPayments size={18} aria-hidden="true" /> Ver boletos
               </button>
-              <button type="button" className="checklist-btn-secundario" onClick={() => onContinuar(passos)}>
+              <button className="checklist-btn-secundario" onClick={() => onContinuar(passos)}>
                 Já paguei, abrir chamado
               </button>
             </>
           )}
           {cancelado && (
             <>
-              <button type="button" className="checklist-btn-whatsapp" onClick={onWhatsapp}>
+              <button className="checklist-btn-whatsapp" onClick={onWhatsapp}>
                 <IcWhatsapp size={18} aria-hidden="true" /> Falar no WhatsApp
               </button>
-              <button type="button" className="checklist-btn-secundario" onClick={onFechar}>
+              <button className="checklist-btn-secundario" onClick={onFechar}>
                 Fechar
               </button>
             </>
           )}
           {!bloqueado && !cancelado && todosFeitos && (
             <>
-              <button type="button" className="checklist-btn-primario" onClick={onFechar}>
+              <button className="checklist-btn-primario" onClick={onFechar}>
                 Sim, voltou
               </button>
-              <button type="button" className="checklist-btn-secundario" onClick={() => onContinuar(passos)}>
+              <button className="checklist-btn-secundario" onClick={() => onContinuar(passos)}>
                 Não, abrir chamado
               </button>
             </>
           )}
           {!bloqueado && !cancelado && !todosFeitos && (
-            <button type="button" className="checklist-btn-secundario" onClick={() => onContinuar(passos)}>
+            <button className="checklist-btn-secundario" onClick={() => onContinuar(passos)}>
               Pular e abrir chamado
             </button>
           )}

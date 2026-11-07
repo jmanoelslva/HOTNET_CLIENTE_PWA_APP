@@ -4,9 +4,8 @@ import './Spinner.css'
 export default function Spinner({ tela = false }: { tela?: boolean }) {
   if (tela) {
     return (
-      <div className="spinner-tela" role="status">
-        <span className="spinner" aria-hidden="true" />
-        <span className="sr-only">Carregando</span>
+      <div className="spinner-tela">
+        <span className="spinner" />
       </div>
     )
   }

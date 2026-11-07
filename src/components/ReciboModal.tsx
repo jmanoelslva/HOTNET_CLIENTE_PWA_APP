@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
-import { useFocoNoDialogo } from '../hooks/useFocoNoDialogo'
+import { useEffect, useState } from 'react'
 import { useFecharComVoltar } from '../hooks/useFecharComVoltar'
 import { compartilharPdf, pdfRecibo } from '../utils/pdfDocumentos'
 import { IcClose, IcDownload, IcShare } from './IconesApp'
@@ -68,8 +67,6 @@ interface Props {
  */
 export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
   useFecharComVoltar(true, onFechar)
-  const refDialogo = useRef<HTMLDivElement>(null)
-  useFocoNoDialogo(refDialogo)
   const { toast } = useToast()
   const [dados, setDados] = useState<DadosRecibo | null | undefined>(undefined)
 
@@ -118,10 +115,10 @@ export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
 
   return (
     <div className="recibo-fundo" onClick={onFechar}>
-      <div ref={refDialogo} className="recibo-modal" role="dialog" aria-modal="true" aria-labelledby="recibo-titulo" onClick={(e) => e.stopPropagation()}>
+      <div className="recibo-modal" role="dialog" aria-modal="true" aria-labelledby="recibo-titulo" onClick={(e) => e.stopPropagation()}>
         <div className="recibo-barra">
           <h2 id="recibo-titulo">Recibo</h2>
-          <button type="button" className="recibo-fechar" onClick={onFechar} aria-label="Fechar recibo">
+          <button className="recibo-fechar" onClick={onFechar} aria-label="Fechar recibo">
             <IcClose size={22} />
           </button>
         </div>
@@ -140,54 +137,44 @@ export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
         {dados && (
           <>
             <div className="recibo-card">
-              <p className="sr-only">
-                {`Cobrança número ${numeroRecibo(dados)}. Pago. ${formatarReais(dados.pagoCentavos)}, ${valorPorExtenso(dados.pagoCentavos)}, pago em ${dados.dataCredito}.`}
-              </p>
-              <div className="recibo-topo" aria-hidden="true">
+              <div className="recibo-topo">
                 <span className="recibo-rotulo">Cobrança nº {numeroRecibo(dados)}</span>
                 <span className="recibo-selo">Pago</span>
               </div>
-              <div className="recibo-valor" aria-hidden="true">{formatarReais(dados.pagoCentavos)}</div>
-              <p className="recibo-extenso" aria-hidden="true">
+              <div className="recibo-valor">{formatarReais(dados.pagoCentavos)}</div>
+              <p className="recibo-extenso">
                 {valorPorExtenso(dados.pagoCentavos)} · pago em {dados.dataCredito}
               </p>
               {linhasDemonstrativo(dados).map((linha, i) => (
                 <div className="recibo-linha" key={i}>
-                  <span className="sr-only">{`${descricaoLinha(linha)}: ${formatarCentavosComSinal(linha.centavos)}`}</span>
-                  <span aria-hidden="true">{descricaoLinha(linha)}</span>
-                  <span aria-hidden="true">{formatarCentavosComSinal(linha.centavos)}</span>
+                  <span>{descricaoLinha(linha)}</span>
+                  <span>{formatarCentavosComSinal(linha.centavos)}</span>
                 </div>
               ))}
-              <hr aria-hidden="true" />
+              <hr />
               <div className="recibo-linha recibo-linha-total">
-                <span className="sr-only">{`Valor pago: ${formatarReais(dados.pagoCentavos)}`}</span>
-                <span aria-hidden="true">Valor pago</span>
-                <span aria-hidden="true">{formatarReais(dados.pagoCentavos)}</span>
+                <span>Valor pago</span>
+                <span>{formatarReais(dados.pagoCentavos)}</span>
               </div>
-              <hr aria-hidden="true" />
+              <hr />
               <div className="recibo-linha">
-                <span className="sr-only">{`Vencimento: ${dados.vencimento}`}</span>
-                <span aria-hidden="true">Vencimento</span>
-                <span aria-hidden="true">{dados.vencimento}</span>
+                <span>Vencimento</span>
+                <span>{dados.vencimento}</span>
               </div>
               {dados.contratoNumero != null && (
                 <div className="recibo-linha">
-                  <span className="sr-only">{`Contrato número ${dados.contratoNumero}`}</span>
-                  <span aria-hidden="true">Contrato</span>
-                  <span aria-hidden="true">Nº {dados.contratoNumero}</span>
+                  <span>Contrato</span>
+                  <span>Nº {dados.contratoNumero}</span>
                 </div>
               )}
               <div className="recibo-linha">
-                <span className="sr-only">
-                  {`Cliente: ${dados.clienteNome ?? 'Titular do contrato'}${dados.documentoMascarado ? `. ${rotuloDocumento(dados.documentoMascarado)} parcialmente oculto` : ''}`}
-                </span>
-                <span aria-hidden="true">Cliente</span>
-                <span aria-hidden="true">
+                <span>Cliente</span>
+                <span>
                   {dados.clienteNome ?? 'Titular do contrato'}
                   {dados.documentoMascarado && (
                     <>
                       <br />
-                      <span>
+                      <span aria-label={`${rotuloDocumento(dados.documentoMascarado)} parcialmente oculto`}>
                         {rotuloDocumento(dados.documentoMascarado)} {dados.documentoMascarado}
                       </span>
                     </>
@@ -197,15 +184,14 @@ export default function ReciboModal({ fatura, cpf, onFechar }: Props) {
             </div>
 
             <div className="recibo-acoes">
-              <button type="button" className="recibo-btn-primario" disabled={gerando} onClick={() => enviarPdf(dados, 'compartilhar')}>
+              <button className="recibo-btn-primario" disabled={gerando} onClick={() => enviarPdf(dados, 'compartilhar')}>
                 <IcShare size={18} /> {gerando ? 'Gerando PDF…' : 'Compartilhar'}
               </button>
-              <button type="button" className="recibo-btn-borda" disabled={gerando} onClick={() => enviarPdf(dados, 'salvar')}>
+              <button className="recibo-btn-borda" disabled={gerando} onClick={() => enviarPdf(dados, 'salvar')}>
                 <IcDownload size={18} /> Salvar PDF
               </button>
             </div>
             <button
-              type="button"
               className="recibo-sistema"
               onClick={() =>
                 abrirEImprimir(urlImpressaoBoleto(dados.invoicePk, true), () =>

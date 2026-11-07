@@ -122,13 +122,10 @@ export default function Contratos() {
             )}
 
             <section className="cartao-destaque" aria-label="Plano">
-              <p className="sr-only">{`Plano: ${contrato.plano ?? 'não informado'}. Contrato ${contrato.numero ?? contrato.id}. ${status.texto}.`}</p>
-              <span className="cartao-destaque-rotulo" aria-hidden="true">
-                Plano
-              </span>
-              <strong className="contrato-plano" aria-hidden="true">{contrato.plano ?? 'Plano não informado'}</strong>
-              <span className="contrato-numero" aria-hidden="true">Contrato {contrato.numero ?? contrato.id}</span>
-              <span className="etiqueta-destaque contrato-estado" aria-hidden="true">
+              <span className="cartao-destaque-rotulo">Plano</span>
+              <strong className="contrato-plano">{contrato.plano ?? 'Plano não informado'}</strong>
+              <span className="contrato-numero">Contrato {contrato.numero ?? contrato.id}</span>
+              <span className="etiqueta-destaque contrato-estado">
                 <span className="contrato-ponto" style={{ background: status.ponto }} aria-hidden="true" />
                 {status.texto}
               </span>
@@ -155,7 +152,6 @@ export default function Contratos() {
                       rotulo={item.ehEquipamento ? 'Equipamento' : 'Plano'}
                       titulo={item.nome}
                       fim={<strong className="contrato-item-valor">{formatarMoeda(item.valor)}</strong>}
-                      falado={`${item.ehEquipamento ? 'Equipamento' : 'Plano'}: ${item.nome}, ${formatarMoeda(item.valor)}`}
                     />
                   ))}
                 </BlocoBranco>

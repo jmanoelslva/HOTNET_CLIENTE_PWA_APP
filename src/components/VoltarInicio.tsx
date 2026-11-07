@@ -25,7 +25,7 @@ export default function VoltarInicio({ to = '/', label = 'Início', anterior = f
     )
   }
   return (
-    <Link to={to} className="voltar-inicio" viewTransition aria-label={`Voltar para ${label}`}>
+    <Link to={to} className="voltar-inicio" viewTransition>
       <MdArrowBack size={18} />
       {label}
     </Link>

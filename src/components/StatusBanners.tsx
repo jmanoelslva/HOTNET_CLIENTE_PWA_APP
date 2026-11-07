@@ -39,17 +39,15 @@ export default function StatusBanners() {
 
   if (!online) {
     return (
-      <div className="status-banner status-banner-offline" role="alert">Sem conexão com a internet</div>
+      <div className="status-banner status-banner-offline">Sem conexão com a internet</div>
     )
   }
 
   if (precisaAtualizar) {
     return (
-      <div className="status-banner status-banner-atualizar" role="status">
+      <div className="status-banner status-banner-atualizar">
         <span>Nova versão disponível</span>
-        <button type="button" onClick={() => updateServiceWorker(true)}>
-          Atualizar
-        </button>
+        <button onClick={() => updateServiceWorker(true)}>Atualizar</button>
       </div>
     )
   }

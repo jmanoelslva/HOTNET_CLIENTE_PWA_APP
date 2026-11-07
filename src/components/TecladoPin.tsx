@@ -26,10 +26,7 @@ export default function TecladoPin({ valor, onMudar, onCompleto, erro }: Props) 
 
   return (
     <div className="teclado-pin">
-      <p className="sr-only" aria-live="polite">
-        {valor.length > 0 ? `${valor.length} de 4 dígitos` : ''}
-      </p>
-      <div className={`teclado-pin-bolinhas ${erro ? 'erro' : ''}`} aria-hidden="true">
+      <div className={`teclado-pin-bolinhas ${erro ? 'erro' : ''}`} aria-label={`${valor.length} de 4 dígitos`}>
         {[0, 1, 2, 3].map((i) => (
           <span key={i} className={i < valor.length ? 'cheia' : ''} />
         ))}

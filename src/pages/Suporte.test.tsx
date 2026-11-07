@@ -63,7 +63,7 @@ describe('Suporte — retry de categorias', () => {
     await waitFor(() => expect(apiSuporte.buscarCategorias).toHaveBeenCalledTimes(1))
 
     const usuario = userEvent.setup()
-    await usuario.click(screen.getByRole('button', { name: /^Novo chamado/ }))
+    await usuario.click(screen.getByRole('button', { name: 'Novo chamado' }))
     await usuario.click(screen.getByRole('button', { name: 'Pular e abrir chamado' }))
 
     await waitFor(() => expect(apiSuporte.buscarCategorias).toHaveBeenCalledTimes(2))

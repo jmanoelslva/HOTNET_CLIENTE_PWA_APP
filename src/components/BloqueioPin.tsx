@@ -1,5 +1,4 @@
-import { useRef, useState } from 'react'
-import { useFocoNoDialogo } from '../hooks/useFocoNoDialogo'
+import { useState } from 'react'
 import TecladoPin from './TecladoPin'
 import { conferirPin, removerPin } from '../utils/pinApp'
 import logoApp from '../assets/logo-app.png'
@@ -14,8 +13,6 @@ interface Props {
 /** Tela de bloqueio ao abrir o app (ou depois de 5 min fora) quando há PIN. */
 export default function BloqueioPin({ documento, onDesbloquear, onSair }: Props) {
   const [pin, setPin] = useState('')
-  const refDialogo = useRef<HTMLDivElement>(null)
-  useFocoNoDialogo(refDialogo)
   const [erro, setErro] = useState<string | null>(null)
 
   async function conferir(valor: string) {
@@ -35,7 +32,7 @@ export default function BloqueioPin({ documento, onDesbloquear, onSair }: Props)
   }
 
   return (
-    <div ref={refDialogo} className="bloqueio-pin" role="dialog" aria-modal="true" aria-labelledby="bloqueio-pin-titulo">
+    <div className="bloqueio-pin" role="dialog" aria-modal="true" aria-labelledby="bloqueio-pin-titulo">
       <span className="bloqueio-pin-logo">
         <img src={logoApp} alt="" />
       </span>

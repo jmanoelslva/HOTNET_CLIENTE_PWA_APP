@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { MdRadioButtonUnchecked } from 'react-icons/md'
 import { IcCheckCircle, IcLock } from '../components/IconesApp'
 import BotaoFechar from '../components/BotaoFechar'
@@ -44,15 +44,6 @@ export default function AlterarSenha() {
   const [bloqueadoAte, setBloqueadoAte] = useState(0)
 
   const avaliacao = avaliarSenha(nova, confirmacao, cpf)
-
-  // Troca de etapa (confirmar → nova → concluído): o leitor de tela anuncia o título novo.
-  const etapaInicial = useRef(etapa)
-  useEffect(() => {
-    if (etapa === etapaInicial.current) return
-    const titulo = document.querySelector<HTMLElement>('.senha-tela .senha-card h2')
-    titulo?.setAttribute('tabindex', '-1')
-    titulo?.focus({ preventScroll: true })
-  }, [etapa])
 
   async function confirmarSenhaAtual(evento: FormEvent) {
     evento.preventDefault()
@@ -196,7 +187,7 @@ export default function AlterarSenha() {
             Use a nova senha na próxima vez que entrar. Se você usa o app HOTNET no celular, ele vai pedir a nova
             senha no próximo acesso.
           </p>
-          <button type="button" className="senha-btn-primario" onClick={() => navigate('/', { viewTransition: true })}>
+          <button className="senha-btn-primario" onClick={() => navigate('/', { viewTransition: true })}>
             Voltar ao início
           </button>
         </div>

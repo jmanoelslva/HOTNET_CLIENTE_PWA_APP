@@ -11,7 +11,6 @@ import { BlocoBranco, LinhaItem, RotuloGrupo } from '../components/PadraoTelas'
 import { useToast } from '../components/Toast/useToast'
 import { mostrarAvisoCopiado } from '../utils/avisoCopiado'
 import { mascararDocumento } from '../utils/recibo'
-import { descricaoDocumento } from '../utils/acessibilidade'
 import { nomeParaExibir } from '../utils/formatacao'
 import { fotoDaConta } from '../utils/contaLocal'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
@@ -117,9 +116,8 @@ export default function Cadastro() {
                   {fotoDaConta(cpf) ? <img src={fotoDaConta(cpf)!} alt="" /> : nome.charAt(0).toUpperCase()}
                 </span>
                 <div className="cadastro-titular-textos">
-                  <span className="sr-only">{`${nome}${desde ? `. Cliente desde ${desde}` : ''}`}</span>
-                  <strong aria-hidden="true">{nome}</strong>
-                  {desde && <span aria-hidden="true">Cliente desde {desde}</span>}
+                  <strong>{nome}</strong>
+                  {desde && <span>Cliente desde {desde}</span>}
                 </div>
               </div>
               {documento && (
@@ -127,11 +125,7 @@ export default function Cadastro() {
                   type="button"
                   className="etiqueta-destaque cadastro-documento"
                   onClick={() => setMostrarDocumento((v) => !v)}
-                  aria-label={
-                    mostrarDocumento
-                      ? `${rotuloDocumento(documento)} ${formatarDocumento(documento)}. Toque para ocultar`
-                      : `${descricaoDocumento(documento)}. Toque para mostrar`
-                  }
+                  aria-label={mostrarDocumento ? 'Ocultar documento' : 'Mostrar documento'}
                 >
                   {rotuloDocumento(documento)}{' '}
                   {mostrarDocumento ? formatarDocumento(documento) : (mascararDocumento(documento) ?? documento)}
@@ -198,10 +192,7 @@ export default function Cadastro() {
                       <span className="linha-item-icone linha-item-icone-primaria" aria-hidden="true">
                         <IcLocationOn size={18} />
                       </span>
-                      <span className="sr-only">
-                        {`${rotulo}: ${logradouro || 'sem logradouro'}${detalhes ? `. ${detalhes.split(' · ').join(', ')}` : ''}`}
-                      </span>
-                      <span className="linha-item-textos" aria-hidden="true">
+                      <span className="linha-item-textos">
                         <span className="linha-item-rotulo">{rotulo}</span>
                         <span className="linha-item-titulo">{logradouro || 'Sem logradouro'}</span>
                         {detalhes && <span className="cadastro-endereco-detalhes">{detalhes}</span>}

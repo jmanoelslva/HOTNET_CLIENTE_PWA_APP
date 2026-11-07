@@ -172,12 +172,8 @@ export default function Boletos() {
       <div className="topo-fixo">
       <CabecalhoTela titulo="Boletos" subtitulo="Pague, consulte e baixe seus recibos." />
 
-      <div className="boletos-abas" role="tablist" aria-label="Situação dos boletos">
+      <div className="boletos-abas">
         <button
-          type="button"
-          role="tab"
-          aria-selected={filtroStatus === 'aberto'}
-          aria-label={`Em aberto${contagens.aberto > 0 ? `, ${contagens.aberto} ${contagens.aberto === 1 ? 'boleto' : 'boletos'}` : ''}`}
           className={`aba-chip aba-aberto ${filtroStatus === 'aberto' ? 'ativa' : ''}`}
           onClick={() => trocarStatus('aberto')}
         >
@@ -185,10 +181,6 @@ export default function Boletos() {
           {contagens.aberto > 0 && <span className="aba-chip-contagem">{formatarContagem(contagens.aberto)}</span>}
         </button>
         <button
-          type="button"
-          role="tab"
-          aria-selected={filtroStatus === 'atrasados'}
-          aria-label={`Atrasado${contagens.atrasados > 0 ? `, ${contagens.atrasados} ${contagens.atrasados === 1 ? 'boleto' : 'boletos'}` : ''}`}
           className={`aba-chip aba-atrasados ${filtroStatus === 'atrasados' ? 'ativa' : ''}`}
           onClick={() => trocarStatus('atrasados')}
         >
@@ -198,10 +190,6 @@ export default function Boletos() {
           )}
         </button>
         <button
-          type="button"
-          role="tab"
-          aria-selected={filtroStatus === 'pagos'}
-          aria-label={`Pago${contagens.pagos > 0 ? `, ${contagens.pagos} ${contagens.pagos === 1 ? 'boleto' : 'boletos'}` : ''}`}
           className={`aba-chip aba-pagos ${filtroStatus === 'pagos' ? 'ativa' : ''}`}
           onClick={() => trocarStatus('pagos')}
         >
@@ -241,9 +229,7 @@ export default function Boletos() {
       {!carregando && erro && (
         <div className="boletos-status">
           <p>{erro}</p>
-          <button type="button" onClick={carregar}>
-            Tentar novamente
-          </button>
+          <button onClick={carregar}>Tentar novamente</button>
         </div>
       )}
 
@@ -298,13 +284,7 @@ export default function Boletos() {
               abertaPk === fatura.invoice_pk ? (
                 cartao(fatura)
               ) : (
-                <button
-                  key={fatura.invoice_pk}
-                  type="button"
-                  className="fatura-compacta"
-                  onClick={() => setAbertaPk(fatura.invoice_pk)}
-                  aria-label={`${formatarMoeda(valorAtual(fatura))}. ${textoVencimento(fatura)}${fatura.contract_number != null ? `. Contrato ${fatura.contract_number}` : ''}. Toque para ver opções de pagamento`}
-                >
+                <button key={fatura.invoice_pk} type="button" className="fatura-compacta" onClick={() => setAbertaPk(fatura.invoice_pk)}>
                   <span className="fatura-compacta-textos">
                     <strong>{formatarMoeda(valorAtual(fatura))}</strong>
                     <span className={estaVencida(fatura) ? 'atrasada' : ''}>
@@ -330,8 +310,7 @@ export default function Boletos() {
           <div className="bloco-branco">
             {faturasExibidas.map((fatura, i) => (
               <div key={fatura.invoice_pk} className={`fatura-paga ${i > 0 ? 'com-divisoria' : ''}`}>
-                <span className="sr-only">{`${formatarMoeda(Number.parseFloat((fatura.invoice_amount_paid || fatura.invoice_amount_document || '0').replace(',', '.')) || 0)}, pago em ${formatarDataBr(fatura.invoice_date_credit)}`}</span>
-                <span className="fatura-paga-textos" aria-hidden="true">
+                <span className="fatura-paga-textos">
                   <span className="fatura-paga-topo">
                     <strong>{formatarMoeda(Number.parseFloat((fatura.invoice_amount_paid || fatura.invoice_amount_document || '0').replace(',', '.')) || 0)}</strong>
                     <span className="fatura-paga-selo">Pago</span>
@@ -353,7 +332,7 @@ export default function Boletos() {
       )}
 
       {filtroStatus === 'pagos' && !mostrarTodosPagos && faturasExibidas.length < faturasFiltradas.length && (
-        <button type="button" className="boletos-ver-mais" onClick={() => setMostrarTodosPagos(true)}>
+        <button className="boletos-ver-mais" onClick={() => setMostrarTodosPagos(true)}>
           Ver mais boletos pagos ({faturasFiltradas.length - faturasExibidas.length})
         </button>
       )}

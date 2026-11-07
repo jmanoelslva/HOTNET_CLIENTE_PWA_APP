@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { useFocoNoDialogo } from '../hooks/useFocoNoDialogo'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { MdArrowBack } from 'react-icons/md'
 import { IcCheckCircle, IcClose, IcContentCopy, IcWhatsapp } from './IconesApp'
 import { useFecharComVoltar } from '../hooks/useFecharComVoltar'
@@ -100,8 +99,6 @@ export default function NovoChamado({
   const [copiado, setCopiado] = useState(false)
   // Voltar do celular fecha a janela, como no app.
   useFecharComVoltar(true, onFechar)
-  const refDialogo = useRef<HTMLDivElement>(null)
-  useFocoNoDialogo(refDialogo)
 
   const ordenadas = useMemo(
     () =>
@@ -146,19 +143,6 @@ export default function NovoChamado({
     }
   }
 
-  // Cada etapa (assunto, detalhes, chamado aberto) é anunciada pelo leitor de tela.
-  const etapaAtual = contratoStatus === 5 ? 'cancelado' : criado ? 'criado' : categoria ? 'detalhes' : 'assunto'
-  const primeiraEtapa = useRef(true)
-  useEffect(() => {
-    if (primeiraEtapa.current) {
-      primeiraEtapa.current = false
-      return
-    }
-    const titulo = document.getElementById('chamado-titulo')
-    titulo?.setAttribute('tabindex', '-1')
-    titulo?.focus({ preventScroll: true })
-  }, [etapaAtual])
-
   const fecharSePuder = () => {
     if (!enviando) onFechar()
   }
@@ -169,10 +153,10 @@ export default function NovoChamado({
       <div className="chamado-etapa">
         <h2 id="chamado-titulo">Contrato cancelado</h2>
         <p className="chamado-texto">O atendimento de contratos cancelados é feito pelo WhatsApp. Fale com a gente por lá.</p>
-        <button type="button" className="chamado-btn-whatsapp" onClick={onWhatsapp}>
+        <button className="chamado-btn-whatsapp" onClick={onWhatsapp}>
           <IcWhatsapp size={18} aria-hidden="true" /> Falar no WhatsApp
         </button>
-        <button type="button" className="chamado-btn-secundario" onClick={onFechar}>
+        <button className="chamado-btn-secundario" onClick={onFechar}>
           Fechar
         </button>
       </div>
@@ -187,11 +171,7 @@ export default function NovoChamado({
             <p className="chamado-texto">Guarde o número para acompanhar o atendimento.</p>
             <div className="chamado-protocolo" aria-live="polite">
               <span>{criado.protocolo}</span>
-              <button
-                type="button"
-                onClick={() => copiar(criado.protocolo!)}
-                aria-label={copiado ? 'Número do chamado copiado' : `Copiar número do chamado, ${criado.protocolo}`}
-              >
+              <button onClick={() => copiar(criado.protocolo!)} aria-label="Copiar número do chamado">
                 <IcContentCopy size={16} aria-hidden="true" /> {copiado ? 'Copiado' : 'Copiar'}
               </button>
             </div>
@@ -200,11 +180,11 @@ export default function NovoChamado({
           <p className="chamado-texto">O número do chamado aparece na lista em instantes.</p>
         )}
         {criado.ticketPk != null && (
-          <button type="button" className="chamado-btn-primario" onClick={() => onVerConversa(criado, assunto.trim(), categoria?.category_name ?? null)}>
+          <button className="chamado-btn-primario" onClick={() => onVerConversa(criado, assunto.trim(), categoria?.category_name ?? null)}>
             Ver conversa
           </button>
         )}
-        <button type="button" className="chamado-btn-secundario" onClick={onFechar}>
+        <button className="chamado-btn-secundario" onClick={onFechar}>
           Fechar
         </button>
       </div>
@@ -212,8 +192,7 @@ export default function NovoChamado({
   } else if (!categoria) {
     conteudo = (
       <div className="chamado-etapa">
-        <p className="sr-only">Etapa 1 de 2</p>
-        <div className="chamado-etapas" aria-hidden="true">
+        <div className="chamado-etapas" aria-label="Etapa 1 de 2">
           <span className="on" />
           <span />
         </div>
@@ -225,8 +204,8 @@ export default function NovoChamado({
             const cor = corDaCategoria(c.category_name ?? '')
             return (
               <li key={c.category_pk}>
-                <button type="button" onClick={() => setCategoriaPk(c.category_pk)}>
-                  <span className="chamado-categoria-icone" aria-hidden="true" style={{ color: cor, background: `color-mix(in srgb, ${cor} 12%, transparent)` }}>
+                <button onClick={() => setCategoriaPk(c.category_pk)}>
+                  <span className="chamado-categoria-icone" style={{ color: cor, background: `color-mix(in srgb, ${cor} 12%, transparent)` }}>
                     <Icone size={20} aria-hidden="true" />
                   </span>
                   <span className="chamado-categoria-texto">
@@ -238,7 +217,7 @@ export default function NovoChamado({
             )
           })}
         </ul>
-        <button type="button" className="chamado-btn-secundario" onClick={onFechar}>
+        <button className="chamado-btn-secundario" onClick={onFechar}>
           Cancelar
         </button>
       </div>
@@ -246,18 +225,11 @@ export default function NovoChamado({
   } else {
     conteudo = (
       <form className="chamado-etapa" onSubmit={enviar}>
-        <p className="sr-only">Etapa 2 de 2</p>
-        <div className="chamado-etapas" aria-hidden="true">
+        <div className="chamado-etapas" aria-label="Etapa 2 de 2">
           <span className="on" />
           <span className="on" />
         </div>
-        <button
-          type="button"
-          className="chamado-voltar"
-          onClick={() => setCategoriaPk(null)}
-          disabled={enviando}
-          aria-label={`Assunto escolhido: ${categoria.category_name ?? 'categoria'}. Toque para trocar`}
-        >
+        <button type="button" className="chamado-voltar" onClick={() => setCategoriaPk(null)} disabled={enviando}>
           <MdArrowBack size={16} aria-hidden="true" /> {categoria.category_name}
         </button>
         <h2 id="chamado-titulo">O que está acontecendo?</h2>
@@ -273,14 +245,7 @@ export default function NovoChamado({
         {ajuda && ajuda.sugestoes.length > 0 && (
           <div className="chamado-sugestoes">
             {ajuda.sugestoes.map((s) => (
-              <button
-                type="button"
-                key={s}
-                className={assunto === s ? 'ativa' : ''}
-                onClick={() => setAssunto(s)}
-                disabled={enviando}
-                aria-pressed={assunto === s}
-              >
+              <button type="button" key={s} className={assunto === s ? 'ativa' : ''} onClick={() => setAssunto(s)} disabled={enviando}>
                 {s}
               </button>
             ))}
@@ -314,7 +279,7 @@ export default function NovoChamado({
             </ul>
           </div>
         )}
-        <button type="submit" className="chamado-btn-primario" disabled={enviando || !assunto.trim() || !descricao.trim()}>
+        <button className="chamado-btn-primario" type="submit" disabled={enviando || !assunto.trim() || !descricao.trim()}>
           {enviando ? 'Enviando…' : 'Enviar chamado'}
         </button>
         <button type="button" className="chamado-btn-secundario" onClick={onFechar} disabled={enviando}>
@@ -326,8 +291,8 @@ export default function NovoChamado({
 
   return (
     <div className="chamado-fundo" onClick={fecharSePuder}>
-      <div ref={refDialogo} className="chamado-modal" role="dialog" aria-modal="true" aria-labelledby="chamado-titulo" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="chamado-fechar" onClick={fecharSePuder} aria-label="Fechar" disabled={enviando}>
+      <div className="chamado-modal" role="dialog" aria-modal="true" aria-labelledby="chamado-titulo" onClick={(e) => e.stopPropagation()}>
+        <button className="chamado-fechar" onClick={fecharSePuder} aria-label="Fechar" disabled={enviando}>
           <IcClose size={22} />
         </button>
         {conteudo}

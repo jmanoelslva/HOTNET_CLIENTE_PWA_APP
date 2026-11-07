@@ -8,7 +8,6 @@ import { useModoTema } from '../hooks/useTema'
 import { usePwaInstall } from '../hooks/usePwaInstall'
 import { abrirWhatsappSuporte } from '../utils/whatsapp'
 import { mascararDocumento } from '../utils/recibo'
-import { descricaoDocumento } from '../utils/acessibilidade'
 import { nomeParaExibir } from '../utils/formatacao'
 import { FormatoFotoNaoSuportado, fotoDaConta, prepararFoto, salvarFoto } from '../utils/contaLocal'
 import { pinAtivo } from '../utils/pinApp'
@@ -105,12 +104,7 @@ export default function Perfil() {
         />
         <div className="perfil-identidade">
           <strong>{nome ?? 'Cliente HOTNET'}</strong>
-          {documentoMascarado && (
-            <span>
-              <span aria-hidden="true">{documentoMascarado}</span>
-              <span className="sr-only">{descricaoDocumento(documento)}</span>
-            </span>
-          )}
+          {documentoMascarado && <span>{documentoMascarado}</span>}
           {foto && (
             <button
               type="button"

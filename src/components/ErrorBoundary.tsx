@@ -35,7 +35,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             <span className="error-boundary-icone">⚠️</span>
             <h1>Ops, algo deu errado</h1>
             <p>Não foi possível carregar essa parte do app. Tente recarregar a página.</p>
-            <button type="button" onClick={() => window.location.reload()}>Recarregar</button>
+            <button onClick={() => window.location.reload()}>Recarregar</button>
           </div>
         </div>
       )

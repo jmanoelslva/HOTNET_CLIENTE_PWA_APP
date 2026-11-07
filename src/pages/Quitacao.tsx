@@ -110,8 +110,7 @@ export default function Quitacao() {
                   <span className={`linha-item-icone quitacao-icone ${s.tom}`} aria-hidden="true">
                     <Icone size={18} />
                   </span>
-                  <span className="sr-only">{`${ano.ano}: ${s.texto}`}</span>
-                  <span className="linha-item-textos" aria-hidden="true">
+                  <span className="linha-item-textos">
                     <span className="linha-item-titulo">{ano.ano}</span>
                     <span className="linha-item-rotulo">{s.texto}</span>
                   </span>
@@ -121,14 +120,11 @@ export default function Quitacao() {
                       className="botao-contorno quitacao-gerar"
                       disabled={gerandoAno != null}
                       onClick={() => compartilhar(ano)}
-                      aria-label={gerandoAno === ano.ano ? `Gerando a declaração de ${ano.ano}` : `Compartilhar a declaração de ${ano.ano}`}
                     >
                       <MdShare size={16} /> {gerandoAno === ano.ano ? 'Gerando…' : 'Compartilhar'}
                     </button>
                   ) : (
-                    <span className="quitacao-indisponivel" aria-hidden="true">
-                      Indisponível
-                    </span>
+                    <span className="quitacao-indisponivel">Indisponível</span>
                   )}
                 </div>
               )

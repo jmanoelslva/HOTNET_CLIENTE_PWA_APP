@@ -140,7 +140,7 @@ export default function Consumo() {
         <button type="button" onClick={irParaMesAnterior} aria-label="Mês anterior">
           <MdKeyboardArrowLeft size={22} />
         </button>
-        <button type="button" className="consumo-seletor-mes-nome" onClick={() => setEscolhendoMes(true)} aria-label={`${nomesMeses[mes - 1]} de ${ano}. Escolher outro mês`}>
+        <button type="button" className="consumo-seletor-mes-nome" onClick={() => setEscolhendoMes(true)} aria-label="Selecionar mês">
           {nomesMeses[mes - 1]} de {ano}
           <MdArrowDropDown size={24} aria-hidden="true" />
         </button>
@@ -202,17 +202,9 @@ export default function Consumo() {
       {!carregando && !erro && consumoSelecionado && (
         <>
           <section className="cartao-destaque" aria-label="Total no mês">
-            <p className="sr-only">
-              {`Total no mês: ${formatarBytes(totalBytes(consumoSelecionado))}. Download ${formatarBytes(totalTxBytes(consumoSelecionado))}. Upload ${formatarBytes(totalRxBytes(consumoSelecionado))}.` +
-                (consumoSelecionado.dias.length > 0
-                  ? ` Média de ${formatarBytes(totalBytes(consumoSelecionado) / consumoSelecionado.dias.length)} por dia.`
-                  : '')}
-            </p>
-            <span className="cartao-destaque-rotulo" aria-hidden="true">
-              Total no mês
-            </span>
-            <strong className="consumo-total" aria-hidden="true">{formatarBytes(totalBytes(consumoSelecionado))}</strong>
-            <div className="consumo-legendas" aria-hidden="true">
+            <span className="cartao-destaque-rotulo">Total no mês</span>
+            <strong className="consumo-total">{formatarBytes(totalBytes(consumoSelecionado))}</strong>
+            <div className="consumo-legendas">
               <span>
                 <i className="consumo-legenda-ponto download" aria-hidden="true" /> Download{' '}
                 {formatarBytes(totalTxBytes(consumoSelecionado))}
@@ -223,7 +215,7 @@ export default function Consumo() {
               </span>
             </div>
             {consumoSelecionado.dias.length > 0 && (
-              <span className="consumo-media" aria-hidden="true">
+              <span className="consumo-media">
                 Média de {formatarBytes(totalBytes(consumoSelecionado) / consumoSelecionado.dias.length)} por dia
               </span>
             )}
@@ -263,15 +255,14 @@ export default function Consumo() {
                   const proporcao = Math.max(4, (total / maiorDia) * 100)
                   return (
                     <div className="consumo-dia" key={dia.data}>
-                      <span className="sr-only">{`${diaMes}, ${diaSemana}${dia.data === hojeIso ? ', hoje' : ''}: ${formatarBytes(total)}`}</span>
-                      <div className="consumo-dia-cabecalho" aria-hidden="true">
+                      <div className="consumo-dia-cabecalho">
                         <span>
                           {diaMes} <span className="consumo-dia-semana">{diaSemana}</span>
                           {dia.data === hojeIso && <span className="consumo-chip-hoje">Hoje</span>}
                         </span>
                         <strong>{formatarBytes(total)}</strong>
                       </div>
-                      <div className="consumo-barra-fundo" aria-hidden="true">
+                      <div className="consumo-barra-fundo">
                         <div className="consumo-barra" style={{ width: `${proporcao}%` }} />
                       </div>
                     </div>

@@ -1,7 +1,6 @@
-import { useEffect, useId, useRef, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type { IconType } from 'react-icons'
 import { useFecharComVoltar } from '../hooks/useFecharComVoltar'
-import { useFocoNoDialogo } from '../hooks/useFocoNoDialogo'
 import './DialogoHotnet.css'
 
 interface Props {
@@ -24,35 +23,17 @@ interface Props {
  */
 export default function DialogoHotnet({ aberto, onFechar, titulo, texto, icone: Icone, tom = 'primaria', children, acoes }: Props) {
   useFecharComVoltar(aberto, onFechar)
-  const ref = useRef<HTMLDivElement>(null)
-  useFocoNoDialogo(ref, aberto)
-  const idTexto = useId()
-  // Mesmo diálogo trocando de conteúdo (ex.: ajuda do login): o leitor lê o título novo.
-  useEffect(() => {
-    if (aberto) ref.current?.focus({ preventScroll: true })
-  }, [titulo, aberto])
   if (!aberto) return null
   return (
     <div className="dialogo-fundo" onClick={onFechar}>
-      <div
-        ref={ref}
-        className="dialogo"
-        role="dialog"
-        aria-modal="true"
-        aria-label={titulo}
-        aria-describedby={texto ? idTexto : undefined}
-        onClick={(e) => e.stopPropagation()}>
+      <div className="dialogo" role="dialog" aria-modal="true" aria-label={titulo} onClick={(e) => e.stopPropagation()}>
         {Icone && (
           <span className={`dialogo-icone ${tom}`} aria-hidden="true">
             <Icone size={26} />
           </span>
         )}
         <h2 className="dialogo-titulo">{titulo}</h2>
-        {texto && (
-          <p className="dialogo-texto" id={idTexto}>
-            {texto}
-          </p>
-        )}
+        {texto && <p className="dialogo-texto">{texto}</p>}
         {children}
         {acoes && <div className="dialogo-acoes">{acoes}</div>}
       </div>

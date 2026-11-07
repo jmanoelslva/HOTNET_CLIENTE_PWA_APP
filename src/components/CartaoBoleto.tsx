@@ -114,74 +114,55 @@ export default function CartaoBoleto({
     }
   }
 
-  // Leitor de tela: o topo do cartão vira uma frase só, como o app (semantics mergeDescendants).
-  const resumoFalado = [
-    `${vencida ? 'Boleto atrasado' : 'Próximo boleto'}${fatura.contract_number != null && (mostrarContrato || variante === 'boletos') ? `, contrato ${fatura.contract_number}` : ''}`,
-    formatarMoeda(valorAtual(fatura)),
-    textoPrazo(fatura),
-    vencida ? 'Atrasado' : 'Em aberto',
-  ].join('. ')
-
   const corPrazo = prazo?.tipo === 'atrasado' ? 'atrasado' : prazo?.tipo === 'hoje' ? 'hoje' : 'em-dia'
 
   return (
     <section className="cartao-destaque cartao-boleto" aria-label={vencida ? 'Boleto atrasado' : 'Próximo boleto'}>
-      <p className="sr-only">{resumoFalado}</p>
       <div className="cartao-boleto-topo">
         <span className="cartao-boleto-rotulos">
-          <span className="cartao-destaque-rotulo" aria-hidden="true">{vencida ? 'Boleto atrasado' : 'Próximo boleto'}</span>
+          <span className="cartao-destaque-rotulo">{vencida ? 'Boleto atrasado' : 'Próximo boleto'}</span>
           {fatura.contract_number != null &&
             (variante === 'boletos' && onVerContrato ? (
               <>
                 <span className="cartao-boleto-ponto" aria-hidden="true">
                   ·
                 </span>
-                <button
-                  type="button"
-                  className="cartao-boleto-contrato"
-                  onClick={onVerContrato}
-                  aria-label={`Ver contrato ${fatura.contract_number}`}
-                >
+                <button type="button" className="cartao-boleto-contrato" onClick={onVerContrato}>
                   Contrato {fatura.contract_number} ›
                 </button>
               </>
             ) : (
-              mostrarContrato && <span className="cartao-destaque-rotulo" aria-hidden="true"> · Contrato {fatura.contract_number}</span>
+              mostrarContrato && <span className="cartao-destaque-rotulo"> · Contrato {fatura.contract_number}</span>
             ))}
         </span>
-        <span className={`cartao-boleto-estado ${vencida ? 'atrasado' : 'aberto'}`} aria-hidden="true">{vencida ? 'Atrasado' : 'Em aberto'}</span>
+        <span className={`cartao-boleto-estado ${vencida ? 'atrasado' : 'aberto'}`}>{vencida ? 'Atrasado' : 'Em aberto'}</span>
       </div>
 
-      <strong className="cartao-boleto-valor" aria-hidden="true">{formatarMoeda(valorAtual(fatura))}</strong>
+      <strong className="cartao-boleto-valor">{formatarMoeda(valorAtual(fatura))}</strong>
 
-      <span className={`cartao-boleto-prazo ${corPrazo}`} aria-hidden="true">
+      <span className={`cartao-boleto-prazo ${corPrazo}`}>
         <MdCalendarMonth size={15} aria-hidden="true" />
         {textoPrazo(fatura)}
       </span>
 
       {encargos && (
         <div className="cartao-boleto-conta">
-          <p className="sr-only">
-            {`Valor do boleto ${formatarMoeda(encargos.original)}. Multa de ${fatura.invoice_rate_fine?.replace('.', ',')}%: ${formatarMoeda(encargos.multa)}. ` +
-              `Juros de ${fatura.invoice_rate_interest?.replace('.', ',')}% ao dia por ${diasDeAtraso(fatura)} ${diasDeAtraso(fatura) === 1 ? 'dia' : 'dias'}: ${formatarMoeda(encargos.juros)}. ` +
-              `Total hoje ${formatarMoeda(encargos.total)}.`}
-          </p>
-          <div aria-hidden="true">
+          <div>
             <span>Valor do boleto</span>
             <span>{formatarMoeda(encargos.original)}</span>
           </div>
-          <div aria-hidden="true">
+          <div>
             <span>Multa ({fatura.invoice_rate_fine?.replace('.', ',')}%)</span>
             <span>{formatarMoeda(encargos.multa)}</span>
           </div>
-          <div aria-hidden="true">
+          <div>
             <span>
               Juros ({fatura.invoice_rate_interest?.replace('.', ',')}% ao dia × {diasDeAtraso(fatura)})
             </span>
             <span>{formatarMoeda(encargos.juros)}</span>
           </div>
-          <hr aria-hidden="true" />
-          <div className="total" aria-hidden="true">
+          <hr />
+          <div className="total">
             <span>Total hoje</span>
             <span>{formatarMoeda(encargos.total)}</span>
           </div>

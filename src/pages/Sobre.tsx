@@ -48,12 +48,9 @@ export default function Sobre() {
           <img src={logoApp} alt="" className="sobre-logo" />
         </span>
         <div>
-          <span className="sr-only">{`HOTNET${__APP_VERSION__ ? `. Versão ${__APP_VERSION__}` : ''}`}</span>
-          <strong className="sobre-nome" aria-hidden="true">
-            HOTNET
-          </strong>
+          <strong className="sobre-nome">HOTNET</strong>
           {__APP_VERSION__ && (
-            <span className="sobre-versao" aria-hidden="true">
+            <span className="sobre-versao">
               Versão {__APP_VERSION__}
               {__BUILD_ID__ ? ` · build ${__BUILD_ID__}` : ''}
             </span>
