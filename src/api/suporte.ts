@@ -33,6 +33,21 @@ export async function buscarChamados(start: number, limit = 20): Promise<PaginaC
   return { chamados, total: resposta.total ?? chamados.length }
 }
 
+/**
+ * Um chamado pelo ticket_pk, para o chat aberto sem os dados da lista (página
+ * recarregada). O Controllr não tem consulta por chamado para o cliente: percorre
+ * a mesma lista paginada, até `maxPaginas` páginas.
+ */
+export async function buscarChamadoPorPk(ticketPk: number, porPagina = 50, maxPaginas = 4): Promise<TicketDto | null> {
+  for (let pagina = 0; pagina < maxPaginas; pagina++) {
+    const { chamados, total } = await buscarChamados(pagina * porPagina, porPagina)
+    const achado = chamados.find((c) => c.ticket_pk === ticketPk)
+    if (achado) return achado
+    if (chamados.length === 0 || (pagina + 1) * porPagina >= total) break
+  }
+  return null
+}
+
 export async function buscarCategorias(): Promise<CategoriaDto[]> {
   const resposta = await listarCategoriasSuporte()
   if (resposta.success === false) return []

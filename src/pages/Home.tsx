@@ -314,7 +314,7 @@ export default function Home() {
                 </div>
               </div>
               {estado === 'bloqueado' && (
-                <button type="button" className="botao-primario" onClick={() => ir('/boletos', { filtro: 'atrasados' })}>
+                <button type="button" className="botao-primario" onClick={() => ir('/boletos', { pagar: true })}>
                   <IcPayments size={18} aria-hidden="true" /> Pagar agora
                 </button>
               )}

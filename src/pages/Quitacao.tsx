@@ -55,7 +55,9 @@ export default function Quitacao() {
     return [...mapa.entries()]
   }, [faturas])
 
-  const anos = faturas && contratoPk != null ? anosQuitacao(faturas, contratoPk, new Date().getFullYear()) : []
+  // Ano lido uma vez ao abrir a tela (render puro).
+  const [anoAtual] = useState(() => new Date().getFullYear())
+  const anos = faturas && contratoPk != null ? anosQuitacao(faturas, contratoPk, anoAtual) : []
 
   /** Declaração em PDF de verdade, compartilhada como arquivo (como no app). */
   async function compartilhar(ano: AnoQuitacao) {

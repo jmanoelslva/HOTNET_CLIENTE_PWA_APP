@@ -21,7 +21,8 @@ interface Props {
  * com setas (até 10 anos atrás), grade de 12 meses com os futuros riscados.
  */
 export default function SeletorMes({ aberto, mes, ano, onFechar, onEscolher }: Props) {
-  const hoje = new Date()
+  // Data lida uma vez ao montar (render puro).
+  const [hoje] = useState(() => new Date())
   const anoHoje = hoje.getFullYear()
   const mesHoje = hoje.getMonth() + 1
   const [mesEscolhido, setMesEscolhido] = useState(mes)

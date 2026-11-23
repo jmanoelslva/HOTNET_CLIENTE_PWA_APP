@@ -140,8 +140,9 @@ export default function Boletos() {
     [porContrato],
   )
 
+  // Só a aba Pago é limitada ("Ver mais"): em Atrasado, cortar escondia os vencidos mais antigos.
   const faturasExibidas =
-    filtroStatus === 'aberto' || mostrarTodosPagos ? faturasFiltradas : faturasFiltradas.slice(0, LIMITE_PAGOS_PADRAO)
+    filtroStatus !== 'pagos' || mostrarTodosPagos ? faturasFiltradas : faturasFiltradas.slice(0, LIMITE_PAGOS_PADRAO)
 
   function trocarStatus(status: FiltroStatus) {
     setFiltroStatus(status)

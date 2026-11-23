@@ -105,6 +105,7 @@ export default function Login() {
             id="usuario"
             type="text"
             inputMode="numeric"
+            autoComplete="username"
             value={usuario}
             onChange={(evento) => setUsuario(evento.target.value)}
             placeholder="Somente números"
@@ -117,6 +118,7 @@ export default function Login() {
               ref={campoSenha}
               id="senha"
               type={mostrarSenha ? 'text' : 'password'}
+              autoComplete="current-password"
               value={senha}
               onChange={(evento) => setSenha(evento.target.value)}
               placeholder="Digite sua senha"

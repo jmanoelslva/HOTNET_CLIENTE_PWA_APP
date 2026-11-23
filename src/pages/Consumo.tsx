@@ -126,7 +126,9 @@ export default function Consumo() {
   const maiorDia = consumoSelecionado
     ? Math.max(1, ...consumoSelecionado.dias.map((d) => d.rxBytes + d.txBytes))
     : 1
-  const hojeIso = new Date().toISOString().slice(0, 10)
+  // Data local: toISOString é UTC e, depois das 21h, já marcava o dia seguinte.
+  const agora = new Date()
+  const hojeIso = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`
 
   return (
     <PullToRefresh aoAtualizar={carregar}>

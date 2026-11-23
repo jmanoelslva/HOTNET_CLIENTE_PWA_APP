@@ -71,7 +71,7 @@ function App() {
     <AvisoGate>
       <StatusBanners />
       <AvisoCopiadoHost />
-      {logado && cpf && bloqueado && pinAtivo(cpf) && (
+      {logado && cpf && bloqueado && pinAtivo(cpf) && precisaDesbloquear() && (
         <BloqueioPin
           documento={cpf}
           onDesbloquear={() => setBloqueado(false)}

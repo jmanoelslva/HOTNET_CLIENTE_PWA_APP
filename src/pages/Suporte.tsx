@@ -12,7 +12,7 @@ import {
   type ChamadoCriado,
 } from '../api/suporte'
 import { buscarContratos } from '../api/contratos'
-import { buscarDadosCliente } from '../api/cadastro'
+import { useNomeCliente } from '../hooks/useNomeCliente'
 import { contarBoletosAtrasados, situacaoDosContratos } from '../api/situacao'
 import ChecklistConexao from '../components/ChecklistConexao'
 import NovoChamado from '../components/NovoChamado'
@@ -80,6 +80,7 @@ function formatarData(data: string | null | undefined): string | null {
 
 export default function Suporte() {
   const { cpf } = useSessao()
+  const nomeCliente = useNomeCliente(cpf)
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -180,13 +181,8 @@ export default function Suporte() {
     }
   }
 
-  async function falarNoWhatsapp() {
-    try {
-      const cliente = await buscarDadosCliente(cpf)
-      abrirWhatsappSuporte(cliente.client_complete_name ?? null, cpf)
-    } catch {
-      abrirWhatsappSuporte(null, cpf)
-    }
+  function falarNoWhatsapp() {
+    abrirWhatsappSuporte(nomeCliente, cpf)
   }
 
   return (

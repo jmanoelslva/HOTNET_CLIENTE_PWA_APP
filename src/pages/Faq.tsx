@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { IconType } from 'react-icons'
 import { MdArrowForward, MdKeyboardArrowDown, MdKeyboardArrowRight, MdOutlineLightbulb, MdSearchOff } from 'react-icons/md'
 import { useSessao } from '../auth/useSessao'
-import { buscarDadosCliente } from '../api/cadastro'
+import { useNomeCliente } from '../hooks/useNomeCliente'
 import { abrirWhatsappAjuda } from '../utils/whatsapp'
 import CabecalhoTela from '../components/CabecalhoTela'
 import EstadoVazio from '../components/EstadoVazio'
@@ -39,6 +39,7 @@ const DESTINOS: Record<FaqDestino, { rotulo: string; rota: string; state?: unkno
 export default function Faq() {
   const navigate = useNavigate()
   const { cpf } = useSessao()
+  const nomeCliente = useNomeCliente(cpf)
   const [busca, setBusca] = useState('')
   const [categoriaFiltro, setCategoriaFiltro] = useState<string | null>(null)
   const [abertaId, setAbertaId] = useState<number | null>(null)
@@ -59,13 +60,8 @@ export default function Faq() {
     setCategoriaFiltro((atual) => (atual === id ? null : id))
   }
 
-  async function aoClicarWhatsapp() {
-    try {
-      const cliente = await buscarDadosCliente(cpf)
-      abrirWhatsappAjuda(cliente.client_complete_name ?? null, cpf)
-    } catch {
-      abrirWhatsappAjuda(null, cpf)
-    }
+  function aoClicarWhatsapp() {
+    abrirWhatsappAjuda(nomeCliente, cpf)
   }
 
   // Perguntas agrupadas por assunto, como no app Android (FaqScreen.kt).

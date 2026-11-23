@@ -54,6 +54,11 @@ export default function TourInicio({ onFim }: { onFim: () => void }) {
     return () => window.removeEventListener('resize', medir)
   }, [atual.seletor])
 
+  function concluir() {
+    marcarTourVisto()
+    onFim()
+  }
+
   useEffect(() => {
     const aoTeclar = (e: KeyboardEvent) => {
       if (e.key === 'Escape') concluir()
@@ -61,11 +66,6 @@ export default function TourInicio({ onFim }: { onFim: () => void }) {
     window.addEventListener('keydown', aoTeclar)
     return () => window.removeEventListener('keydown', aoTeclar)
   })
-
-  function concluir() {
-    marcarTourVisto()
-    onFim()
-  }
 
   const ultimo = passo === PASSOS.length - 1
   // Cartão abaixo do destaque, ou acima quando o destaque está na metade de baixo.

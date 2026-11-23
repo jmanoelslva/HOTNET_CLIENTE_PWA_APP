@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { ehSenhaPadrao, lembrarConta, marcarSenhaPadrao } from '../utils/contaLocal'
+import { marcarDesbloqueado } from '../utils/pinApp'
 import { aoExpirarSessao, buscarCadastroInfo, login as apiLogin, logout as apiLogout } from '../api/client'
 import { useToast } from '../components/Toast/useToast'
 import { SessionContext } from './session-context'
@@ -55,6 +56,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setCpf(somenteDigitos)
         lembrarConta(somenteDigitos)
         marcarSenhaPadrao(somenteDigitos, ehSenhaPadrao(somenteDigitos, senha))
+        // Acabou de entrar com CPF e senha: não pede o PIN em seguida.
+        marcarDesbloqueado()
         return true
       }
       // A mensagem do servidor (ex: "Authentication failed for user [X]") é

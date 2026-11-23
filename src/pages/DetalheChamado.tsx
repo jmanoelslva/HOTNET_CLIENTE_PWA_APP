@@ -6,6 +6,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import VoltarInicio from '../components/VoltarInicio'
 import EstadoVazio from '../components/EstadoVazio'
 import {
+  buscarChamadoPorPk,
   buscarOperacoes,
   chamadoResolvido,
   descartarPendentesConfirmadas,
@@ -48,8 +49,28 @@ export default function DetalheChamado() {
   const pk = Number(ticketPk)
   const location = useLocation()
   const { toast } = useToast()
-  const chamado = (location.state as { chamado?: TicketDto } | null)?.chamado ?? null
+  const chamadoDaLista = (location.state as { chamado?: TicketDto } | null)?.chamado ?? null
+  // Página recarregada (F5 ou versão nova) chega sem o chamado: busca no servidor.
+  // undefined = ainda procurando (campo de envio fica oculto); null = não achou.
+  const [chamadoBuscado, setChamadoBuscado] = useState<TicketDto | null | undefined>(undefined)
+  const chamado = chamadoDaLista ?? chamadoBuscado ?? null
   const resolvido = chamado ? chamadoResolvido(chamado) : false
+  const procurandoChamado = !chamadoDaLista && chamadoBuscado === undefined
+
+  useEffect(() => {
+    if (chamadoDaLista || !Number.isFinite(pk)) return
+    let cancelado = false
+    buscarChamadoPorPk(pk)
+      .then((achado) => {
+        if (!cancelado) setChamadoBuscado(achado)
+      })
+      .catch(() => {
+        if (!cancelado) setChamadoBuscado(null)
+      })
+    return () => {
+      cancelado = true
+    }
+  }, [pk, chamadoDaLista])
 
   const [operacoes, setOperacoes] = useState<OperacaoChamado[]>([])
   // Mensagens de texto enviadas mas ainda não confirmadas pelo servidor —
@@ -200,6 +221,8 @@ export default function DetalheChamado() {
         setEnviando(false)
         toast('Não foi possível obter a localização agora. Verifique a permissão do navegador.')
       },
+      // Sem limite, alguns celulares nunca respondem e o envio fica travado.
+      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 60_000 },
     )
   }
 
@@ -256,7 +279,7 @@ export default function DetalheChamado() {
           listaExibida.map((op) => (
             <div key={op.opPk} className={`balao-linha ${op.doCliente ? 'linha-cliente' : 'linha-equipe'}`}>
               <div className={`balao ${op.doCliente ? 'balao-cliente' : 'balao-equipe'}`}>
-                {!op.doCliente && <span className="balao-autor">Equipe Hotnet</span>}
+                {!op.doCliente && <span className="balao-autor">Equipe HOTNET</span>}
 
                 {op.texto && <p className="balao-texto">{op.texto}</p>}
 
@@ -287,7 +310,7 @@ export default function DetalheChamado() {
         <div ref={fimDaListaRef} />
       </div>
 
-      {!resolvido && (
+      {!resolvido && !procurandoChamado && (
         <div className="detalhe-envio">
           <input
             ref={inputFotoRef}
